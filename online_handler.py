@@ -1,27 +1,21 @@
 import numpy as np
-
-from clustpy.metrics import purity, unsupervised_clustering_accuracy
-from sklearn.metrics import adjusted_rand_score, adjusted_mutual_info_score, normalized_mutual_info_score
-
-from cmm import get_cmm
 from online.batch_learn import BatchLearn
 from online.clustream import CluStream
 from utils import dps_to_np, get_noise_labels
+from evaluation_handler import evaluate_clustering
 from sklearn.neighbors import BallTree, KDTree
 
-incremental = ["clustream", "clustream_online"]
 
-
-def get_method(method, config_dict):
+def get_online_method(method, config_dict, seed):
     if method == "clustream_online" or method == "clustream":
         param_dict = {"n_macro_clusters": 10, "mmc": 100, "time_gap": 100000000, "mu": 0.5,
-                      "sigma": 0.5} | config_dict
+                      "sigma": 0.5, "mc_r_factor": 2.0} | config_dict
         method = CluStream(n_macro_clusters=param_dict["n_macro_clusters"], max_micro_clusters=param_dict["mmc"],
                            micro_cluster_r_factor=param_dict["mc_r_factor"],
                            time_gap=param_dict["time_gap"], time_window=param_dict["time_window"],
                            sigma=param_dict["sigma"],
                            mu=param_dict["mu"],
-                           seed=param_dict["seed"])
+                           seed=seed)
     elif method == "batch":
         method = BatchLearn()
     else:
@@ -29,47 +23,52 @@ def get_method(method, config_dict):
     return method
 
 
-def get_assignments(method, summary, batch):
+def get_online_assignments(method, summary, batch):
     if method == "clustream_online" or method == "clustream":
-        centers = summary[:, 1]
+        centers = np.array(summary)[:, 1]
     else:
         centers = summary
+    if method in dict_methods:
+        centers = dps_to_np(centers)
     if len(batch[0]) > 3:
         nnTree = BallTree(centers)
     else:
         nnTree = KDTree(centers)
     cur_preds = nnTree.query(batch, 1)[1]
-    return cur_preds
+    return cur_preds # make sure that id num = order in summary
 
 
+incremental = ["clustream", "clustream_online"]
 dict_methods = ["clustream", "clustream_online"]
 
 
-def get_clustering(data_points, method, config_dict, batch_size, seed, return_summary):
-    method = get_method(method, config_dict)
-    if method in dict_methods:
-        data_points = dps_to_np(data_points)
+def get_online_clustering(data_points, method_name, config_dict, batch_size, return_summary, seed):
+    online_method = get_online_method(method_name, config_dict, seed)
     i = 0
     cur_batch = []
     summaries = []
     preds = []
-    for dp in data_points:
-        if method in incremental:
-            method.learn_one(dp)
-        cur_batch.append(dp)
+    for x in data_points:
+        if method_name in dict_methods:
+            dp = dict(enumerate(x))
+        else:
+            dp = x
+        if method_name in incremental:
+            online_method.learn_one(dp)
+        cur_batch.append(x)
         if len(cur_batch) == batch_size:
-            if method not in incremental:
-                method.learn(cur_batch)
-            summary = method.get_summary()
+            if method_name not in incremental:
+                online_method.learn(cur_batch)
+            summary = online_method.get_summary()
             summaries.append(summary)
-            cur_preds = get_assignments(method, summary, cur_batch)
+            cur_preds = get_online_assignments(method_name, summary, cur_batch)
             preds.append(cur_preds)
             cur_batch = []
         i += 1
     if len(cur_batch) > 0:
-        summary = method.get_summary()
+        summary = online_method.get_summary()
         summaries.append(summary)
-        cur_preds = get_assignments(method, summary, cur_batch)
+        cur_preds = get_online_assignments(method_name, summary, cur_batch)
         preds.append(cur_preds)
 
     if return_summary:
@@ -78,51 +77,19 @@ def get_clustering(data_points, method, config_dict, batch_size, seed, return_su
         return preds
 
 
-def evaluate_online_clustering(data_points, labels, method, config_dict, batch_size, seed, return_summary=False,
-                               eval_mode="all"):
-    clusterings = get_clustering(data_points, method, config_dict, batch_size, seed, return_summary)
+def evaluate_online_clustering(data_points, labels, method, config_dict, batch_size, return_summary=False,
+                               eval_mode="all", seed=0):
+    clusterings = get_online_clustering(data_points, method, config_dict, batch_size, return_summary, seed)
     if return_summary:
         clusterings, summaries = clusterings
     labels = get_noise_labels(labels)
     batch_idxs = range(batch_size, len(labels), batch_size)
     label_batches = np.split(labels, batch_idxs)
     data_batches = np.split(data_points, batch_idxs)
-    i = 0
 
-    metrics = {"purity":0.0, "accuracy":0.0, "ari":0.0, "nmi":0.0, "ami": 0.0, "cmm": 0.0, "cmm_alt": 0.0}
-
-    for i in range(len(clusterings)):
-        cur_labels = label_batches[i]
-        print(cur_labels)
-        cur_preds = clusterings[i].reshape(len(cur_labels))
-        cur_preds = get_noise_labels(cur_preds)
-        if eval_mode == "purity":
-            cur_purity = purity(cur_labels, cur_preds)
-            metrics["purity"] += cur_purity*len(cur_labels)
-        elif eval_mode == "ariami":
-            cur_ami = adjusted_mutual_info_score(cur_labels, cur_preds)
-            metrics["ami"] += cur_ami * len(cur_labels)
-            cur_ari = adjusted_rand_score(cur_labels, cur_preds)
-            metrics["ari"] += cur_ari*len(cur_labels)
-        else:
-            cur_purity = purity(cur_labels, cur_preds)
-            metrics["purity"] += cur_purity*len(cur_labels)
-            cur_acc = unsupervised_clustering_accuracy(cur_labels, cur_preds)
-            metrics["accuracy"] += cur_acc*len(cur_labels)
-            cur_ami = adjusted_mutual_info_score(cur_labels, cur_preds)
-            metrics["ami"] += cur_ami * len(cur_labels)
-            cur_nmi = normalized_mutual_info_score(cur_labels, cur_preds)
-            metrics["nmi"] += cur_nmi * len(cur_labels)
-            cur_ari = adjusted_rand_score(cur_labels, cur_preds)
-            metrics["ari"] += cur_ari * len(cur_labels)
-            cur_data = data_batches[i]
-            cur_cmm, cur_cmm_alt = get_cmm(cur_data, cur_labels, cur_preds, np.ones(len(cur_labels)), k=5, alternate=True)
-            metrics["cmm"]  += cur_cmm * len(cur_labels)
-            metrics["cmm_alt"] += cur_cmm_alt * len(cur_labels)
-    for metric in metrics.keys():
-        metrics[metric] = metrics[metric] / len(labels)
+    metrics = evaluate_clustering(data_batches=data_batches, label_batches=label_batches, clusterings=clusterings, data_points=data_points, labels=labels, eval_mode=eval_mode)
 
     if return_summary:
-        return metrics, summaries
+        return metrics, clusterings, summaries
     else:
-        return metrics
+        return metrics, clusterings

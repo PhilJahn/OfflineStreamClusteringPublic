@@ -133,7 +133,7 @@ def get_penalty(x, gt, index, true_clu, fault_clu, k):
     #print("pen", first, second, penalty)
     return penalty
 
-# alternate includes Marwan Hassani version of CMM
+# alternate includes Hardy Kremer dissertaion / Marwan Hassani version of CMM
 def get_cmm(x, gt, clu, w, k, alternate=True):
     gt = np.array(gt)
     clu = np.array(clu)

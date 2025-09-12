@@ -5,6 +5,7 @@ import itertools
 import ast
 import copy
 
+
 def dict_to_np(dp):
     value_list = [value for key, value in sorted(dp.items())]
     return np.array(value_list)
@@ -40,12 +41,16 @@ def flatten_dict(d):
 
 def get_noise_labels(labels):
     labels = copy.deepcopy(labels)
-    max_label = np.max(labels)
+    min_label = -1
     for i in np.where(labels == -1)[0]:
-        max_label += 1
-        labels[i] = max_label
+        min_label -= 1
+        labels[i] = min_label
 
     return labels
 
-
-
+def get_data_properties(data_points, labels):
+    d = len(data_points[0])
+    all_lb = np.unique(labels)
+    gt_cls = np.where(all_lb >= 0)[0]
+    gt_cls_num = max(1,len(gt_cls))
+    return d, gt_cls_num
