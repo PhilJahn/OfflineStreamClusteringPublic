@@ -139,3 +139,9 @@ class STREAMKMeans(base.Clusterer):
             return utils.math.minkowski_distance(self.centers[c], x, 2)
 
         return min(self.centers, key=get_distance)
+
+    def get_summary(self):
+        summary = []
+        for id, center in self.centers.items():
+            summary.append([id, center])
+        return summary
