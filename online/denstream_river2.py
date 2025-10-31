@@ -232,7 +232,7 @@ class DenStream(base.Clusterer):
         if len(self.p_micro_clusters) != 0:
             # try to merge p into its nearest p-micro-cluster c_p
             closest_pmc_key = self._get_closest_cluster_key(point, self.p_micro_clusters)
-            updated_pmc = copy.copy(self.p_micro_clusters[closest_pmc_key])
+            updated_pmc = copy.deepcopy(self.p_micro_clusters[closest_pmc_key])
             updated_pmc.insert(point, self.timestamp)
             if updated_pmc.calc_radius(self.timestamp) <= self.epsilon:
                 # keep updated p-micro-cluster
@@ -241,7 +241,7 @@ class DenStream(base.Clusterer):
 
         if not merged_status and len(self.o_micro_clusters) != 0:
             closest_omc_key = self._get_closest_cluster_key(point, self.o_micro_clusters)
-            updated_omc = copy.copy(self.o_micro_clusters[closest_omc_key])
+            updated_omc = copy.deepcopy(self.o_micro_clusters[closest_omc_key])
             updated_omc.insert(point, self.timestamp)
             if updated_omc.calc_radius(self.timestamp) <= self.epsilon:
                 # keep updated o-micro-cluster
@@ -289,27 +289,6 @@ class DenStream(base.Clusterer):
             if cluster != pmc and self._is_directly_density_reachable(cluster, pmc):
                 neighbors.append(pmc)
         return neighbors
-
-    @staticmethod
-    def _generate_clusters_for_labels(cluster_labels):
-        # initiate the dictionary for final clusters
-        clusters = {}
-
-        # group clusters per label
-        mcs_per_label = defaultdict(deque)
-        for mc, label in cluster_labels.items():
-            mcs_per_label[label].append(mc)
-
-        # generate set of clusters with the same label
-        for label, micro_clusters in mcs_per_label.items():
-            # merge clusters with the same label into a big cluster
-            cluster = copy.copy(micro_clusters[0])
-            for mc in range(1, len(micro_clusters)):
-                cluster.merge(micro_clusters[mc])
-
-            clusters[label] = cluster
-
-        return len(clusters), clusters
 
     def _expand_cluster(self, mc, neighborhood):
         for idx in neighborhood:
@@ -416,9 +395,35 @@ class DenStream(base.Clusterer):
                         if labels[neighbor_neighbor] is not None:
                             seed_queue.append(neighbor_neighbor)
 
-        self.n_clusters, self.clusters = self._generate_clusters_for_labels(labels)
+        labels_key = {}
+        for key, mc in self.p_micro_clusters.items():
+            labels_key[key] = labels[mc]
+            mc.label = labels[mc]
 
-        return self._get_closest_cluster_key(x, self.clusters)
+        closest_key = self._get_closest_cluster_key(x, self.p_micro_clusters)
+
+        return labels_key[closest_key]
+
+    def get_summary(self):
+        self.predict_one(list(self.p_micro_clusters.values())[0].calc_center(self.timestamp))
+        p_summary = []
+        for mcid, pmc in self.p_micro_clusters.items():
+            center = pmc.calc_center(self.timestamp)
+            radius = pmc.calc_radius(self.timestamp)
+            weight = pmc.calc_weight(self.timestamp)
+            last_edit_time = pmc.last_edit_time
+            lb = pmc.label
+            p_summary.append([mcid, center, radius, weight, lb, last_edit_time])
+        o_summary = []
+        for mcid, omc in self.o_micro_clusters.items():
+            center = omc.calc_center(self.timestamp)
+            radius = omc.calc_radius(self.timestamp)
+            weight = omc.calc_weight(self.timestamp)
+            last_edit_time = omc.last_edit_time
+            lb = omc.label
+            o_summary.append([mcid, center, radius, weight, lb, last_edit_time])
+        return (p_summary, o_summary)
+
 
 
 class DenStreamMicroCluster(metaclass=ABCMeta):
@@ -433,18 +438,7 @@ class DenStreamMicroCluster(metaclass=ABCMeta):
         self.N = 1
         self.linear_sum = x
         self.squared_sum = {i: (x_val * x_val) for i, x_val in x.items()}
-
-    def calc_norm_cf1_cf2(self, fading_factor):
-        # |CF1| and |CF2| in the paper
-        sum_of_squares_cf1 = 0
-        sum_of_squares_cf2 = 0
-        for key in self.linear_sum.keys():
-            val_ls = self.linear_sum[key]
-            val_ss = self.squared_sum[key]
-            sum_of_squares_cf1 += fading_factor * val_ls * fading_factor * val_ls
-            sum_of_squares_cf2 += fading_factor * val_ss * fading_factor * val_ss
-        # return |CF1| and |CF2|
-        return math.sqrt(sum_of_squares_cf1), math.sqrt(sum_of_squares_cf2)
+        self.label = None
 
     def calc_weight(self, timestamp):
         return self._weight(self.fading_function(timestamp - self.last_edit_time))
@@ -458,6 +452,18 @@ class DenStreamMicroCluster(metaclass=ABCMeta):
         center = {key: (ff * val) / weight for key, val in self.linear_sum.items()}
         return center
 
+    def calc_norm_cf1_cf2(self, fading_factor):
+        # |CF1| and |CF2| in the paper
+        sum_of_squares_cf1 = 0
+        sum_of_squares_cf2 = 0
+        for key in self.linear_sum.keys():
+            val_ls = self.linear_sum[key]
+            val_ss = self.squared_sum[key]
+            sum_of_squares_cf1 += fading_factor * val_ls * fading_factor * val_ls
+            sum_of_squares_cf2 += fading_factor * val_ss * fading_factor * val_ss
+        # return |CF1| and |CF2|
+        return math.sqrt(sum_of_squares_cf1), math.sqrt(sum_of_squares_cf2)
+
     def calc_radius(self, timestamp):
         ff = self.fading_function(timestamp - self.last_edit_time)
         weight = self._weight(ff)
@@ -467,27 +473,16 @@ class DenStreamMicroCluster(metaclass=ABCMeta):
         return radius
 
     def insert(self, x, timestamp):
-        self.N += 1
+        ff = self.fading_function(timestamp - self.last_edit_time)
         self.last_edit_time = timestamp
+        self.N = self.N*ff + 1
         for key, val in x.items():
             try:
-                self.linear_sum[key] += val
-                self.squared_sum[key] += val * val
+                self.linear_sum[key] = self.linear_sum[key]*ff + val
+                self.squared_sum[key] = self.squared_sum[key]*ff + (val * val)
             except KeyError:
                 self.linear_sum[key] = val
                 self.squared_sum[key] = val * val
-
-    def merge(self, cluster):
-        self.N += cluster.N
-        for key in cluster.linear_sum.keys():
-            try:
-                self.linear_sum[key] += cluster.linear_sum[key]
-                self.squared_sum[key] += cluster.squared_sum[key]
-            except KeyError:
-                self.linear_sum[key] = cluster.linear_sum[key]
-                self.squared_sum[key] = cluster.squared_sum[key]
-        if self.last_edit_time < cluster.creation_time:
-            self.last_edit_time = cluster.creation_time
 
     def fading_function(self, time):
         return 2 ** (-self.decaying_factor * time)
