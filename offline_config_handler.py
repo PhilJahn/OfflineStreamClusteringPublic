@@ -64,16 +64,19 @@ def get_offline_configspace(method, data_points, labels, args):
         predecon_1 = Float("eps", (0, (d**0.5)/2), default=0.5)
         predecon_2 = Integer("min_samples", (1, 25), default=5)
         predecon_3 = Categorical("enforce_max_pref_dimensionality", [True, False], default=False)
-        predecon_4 = Integer("max_pref_dimensionality", (1, d-1), default=d-1)
+        if d-1 > 1:
+            predecon_4 = Integer("max_pref_dimensionality", (1, d-1), default=d-1)
+        else:
+            predecon_4 = Constant("max_pref_dimensionality", 1)
         predecon_5 = Float("variance_threshold", (0, 0.01), default=0.0005) #equivalent to 5 for 100, capped at 100 for 100
-        predecon_6 = Float("kappa", (1,100), default=100)
+        predecon_6 = Integer("kappa", (1,100), default=100)
         config_space.add([predecon_1, predecon_2, predecon_3, predecon_4, predecon_5, predecon_6])
         predecon_cond_1 = EqualsCondition(config_space['max_pref_dimensionality'], config_space['enforce_max_pref_dimensionality'], True)
         config_space.add(predecon_cond_1)
     elif method == "adjacency":
         adjacency_1 = Integer("weight", (0, 50), default=1)
         config_space.add([adjacency_1])
-        if args.online_method in ["clustream", "denstream"]:
+        if args.online in ["clustream", "denstream"]:
             adjacency_2 = Float("range", (1, 10), default=1)
             config_space.add([adjacency_2])
 

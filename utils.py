@@ -5,6 +5,8 @@ import itertools
 import ast
 import copy
 
+from sklearn.metrics import pairwise_distances
+
 
 def dict_to_np(dp):
     value_list = [value for key, value in sorted(dp.items())]
@@ -54,3 +56,29 @@ def get_data_properties(data_points, labels):
     gt_cls = np.where(all_lb >= 0)[0]
     gt_cls_num = max(1,len(gt_cls))
     return d, gt_cls_num
+
+def distance_calc(pos1, pos2, dist):
+    if dist == "euclidean":
+        if len(pos1.shape) == 1:
+            return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
+        elif len(pos2.shape) == 1:
+            return np.array([np.sqrt(np.sum(np.square(pos - pos2), axis=-1)) for pos in pos1])
+        else:
+            return np.array([[np.sqrt(np.sum(np.square(pos - post), axis=-1)) for post in pos2] for pos in pos1])
+    elif dist == "manhattan":
+        return np.sum(np.abs(pos1 - pos2), axis=-1)
+    else:
+        if len(pos1.shape) == 1 and len(pos2.shape) == 1:
+            return pairwise_distances(pos1.reshape(1, -1), pos2.reshape(1, -1), dist)[0][0]
+        elif len(pos1.shape) == 1:
+            return pairwise_distances(pos1.reshape(1, -1), pos2, dist)[0]
+        elif len(pos2.shape) == 1:
+            return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
+        else:
+            return pairwise_distances(pos1, pos2, dist)
+
+if __name__ == "__main__":
+    pos1 = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12]])
+    pos2 = np.array([[3,4,5], [6,7,8], [9,10,11]])
+    dist = distance_calc(pos1, pos2, "euclidean")
+    print(dist, dist.shape)

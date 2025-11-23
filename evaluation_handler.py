@@ -107,8 +107,8 @@ def evaluate_clustering(data_batches, label_batches, clusterings, eval_mode):
             sdbw = S_Dbw(cur_data, cur_preds, centers_id=None, method='Tong', alg_noise='bind',
                          centr='mean', nearest_centr=True, metric='euclidean')
             metrics["s_dbw"] += sdbw * len(cur_labels)
-    print(len(data_points))
-    print(len(labels))
+    #print(len(data_points))
+    #print(len(labels))
 
     if eval_mode == "all":
         min_clu = 0

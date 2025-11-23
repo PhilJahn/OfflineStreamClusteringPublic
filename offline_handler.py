@@ -11,7 +11,7 @@ from datahandler import load_data
 from evaluation_handler import evaluate_clustering
 from offline.adjacency import get_adjacency_mc
 from offline.density_peak_clustering import DensityPeakClustering
-from utils import get_noise_labels, dict_to_np
+from utils import get_noise_labels, dict_to_np, dps_to_np
 import numpy as np
 import pandas as pd
 
@@ -37,7 +37,7 @@ def get_summary_clustering(data_points, offline_method, config_dict, seed):
                   "gaussian": True, "use_min_rho": False, "min_rho": None, "use_min_delta": False, "min_delta": None,
                   "hard_assign": False, "halo": True, "halo_avg": True, "halo_noise": True
                   } | config_dict
-        print(config)
+        #print(config)
         dpc = DensityPeakClustering(metric=config["metric"], distance_threshold=config["distance_threshold"],
                                     gaussian=config["gaussian"], min_rho=config["min_rho"],
                                     min_delta=config["min_delta"], hard_assign=config["hard_assign"],
@@ -85,6 +85,7 @@ def load_summaries(ds, online, batch_id, config_dict, load_default=False):
         for line in param_log_file:
             if (not default and not load_default) or (default and load_default):
                 line = line.strip("\n")
+                #print(line, flush=True)
                 lineSplit = line.split(";")
                 score = float(lineSplit[2])
                 if score < best_score:
@@ -129,7 +130,7 @@ def process_summary(summary, assignments, data_points, online, postprocessing, b
             variances.append(variance)
             radius = float(mc[2])
             radii.append(radius)
-        if postprocessing is None:
+        if postprocessing is None or postprocessing == "none":
             return [centers], [assignments]
         elif postprocessing == "weighted":
             weights = np.array(weights)
@@ -155,7 +156,11 @@ def process_summary(summary, assignments, data_points, online, postprocessing, b
         else:
             raise NotImplementedError
     elif online == "batch":
+        return [summary], [assignments]#
+    elif online == "batchkmeans":
         return [summary], [assignments]
+    elif online == "streamkmeans":
+        return [dps_to_np(summary[:,1])], [assignments]
     else:
         raise NotImplementedError
 
@@ -169,7 +174,7 @@ def process_adjacency(summary, assignments, config_dict):
     return [clustering]
 
 
-def evaluate_offline_clustering(batch_id, method, config_dict, seed=0):
+def evaluate_offline_clustering(batch_id, method, config_dict, seed=0, verbose=False):
     data_points_full, labels_full = load_data(config_dict["ds"], 0, config_dict["batch_size"], config_dict["batch_max"])
     start = config_dict["batch_size"] * batch_id
     stop = min(config_dict["batch_size"] * (batch_id + 1), len(data_points_full))
@@ -203,23 +208,27 @@ def evaluate_offline_clustering(batch_id, method, config_dict, seed=0):
             for j in range(len(summary_data_points_set)):
                 summary_data_points_list.append(summary_data_points_set[j])
                 assignment_list.append(assignments_set[j])
+
     for i in range(len(summary_data_points_list)):
         summary_data_points = summary_data_points_list[i]
+        #print(summary_data_points)
         assignment = assignment_list[i]
-        print(summary_data_points)
-        print(assignment)
         summary_clustering = get_summary_clustering(summary_data_points, method, config_dict, seed)
-        print(summary_clustering)
+
+        if verbose:
+            #print("sdp", summary_data_points)
+            #print("a", assignment)
+            print("sc", summary_clustering)
         clustering = get_offline_clustering(assignment, summary_clustering)
         clusterings.append(clustering)
 
-
-        plt.figure(figsize=(8, 8))
-        plt.scatter(data_batch[:, 0], data_batch[:, 1], c=clustering)
-        if config_dict["online"] != "batch":
-            plt.scatter(np.unique(summary_data_points, axis=0)[:, 0], np.unique(summary_data_points, axis=0)[:, 1], s=100,
-                        c="black")
-        plt.show()
+        if verbose:
+            plt.figure(figsize=(8, 8))
+            plt.scatter(data_batch[:, 0], data_batch[:, 1], c=clustering)
+            if config_dict["online"] != "batch":
+                plt.scatter(np.unique(summary_data_points, axis=0)[:, 0], np.unique(summary_data_points, axis=0)[:, 1], s=100,
+                            c="black")
+            plt.show()
 
         metrics = evaluate_clustering(data_batches=[data_batch], label_batches=[labels_batch], clusterings=[clustering],
                                       eval_mode="ariami")
@@ -234,17 +243,17 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     config_dict = {}
-    config_dict["online"] = "clustream"
-    config_dict["offline"] = "adjacency"
-    config_dict["ds"] = "densired2"
+    config_dict["online"] = "streamkmeans"
+    config_dict["offline"] = "dbscan"
+    config_dict["ds"] = "complex9"
     config_dict["batch_size"] = 1000
     config_dict["batch_max"] = 3
-    config_dict["postprocess"] = None
+    config_dict["postprocess"] = "none"
     config_dict["batch_id"] = 0
     config_dict["batch_budget"] = 30
     batch_size = config_dict["batch_size"]
     batch_id = config_dict["batch_id"]
-    evaluate_offline_clustering(batch_id, config_dict["offline"], config_dict)
+    evaluate_offline_clustering(batch_id, config_dict["offline"], config_dict, verbose=True)
 
     # summaries, assignments, _ = load_summaries("densired2", "clustream", config_dict["batch_id"], config_dict, False)
     # # summary = summaries[0]

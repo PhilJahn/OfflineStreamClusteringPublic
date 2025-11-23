@@ -66,7 +66,7 @@ def _predecon(X: np.ndarray, metric: str, epsilon: float, min_samples: int, max_
 
 
 
-
+#TODO: use numpy to speed up rather than loop
 
 def pref_weighted_similarity(X, w, ip, iq):
     dim = len(X[0])

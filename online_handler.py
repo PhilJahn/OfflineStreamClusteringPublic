@@ -1,95 +1,77 @@
-import numpy as np
-from online.batch_learn import BatchLearn
-from online.clustream import CluStream
-from utils import dps_to_np, get_noise_labels
-from evaluation_handler import evaluate_clustering
-from sklearn.neighbors import BallTree, KDTree
+from scipy.spatial.distance import euclidean
+
+from clustream import CluStream
+from denstream import DenStream
+from dstream import DStream
+from emcstream import EMCStream
+from gbfuzzystream import GBFuzzyStream
+from hddstream import HDDStream
+from stmstream import STMStream
+from streamkmeans import STREAMKmeans
+from streamkmplus import STREAMKMPlus
 
 
 def get_online_method(method, config_dict, seed):
-    if method == "clustream_online" or method == "clustream":
-        param_dict = {"n_macro_clusters": 10, "mmc": 100, "time_gap": 100000000, "mu": 0.5,
-                      "sigma": 0.5, "mc_r_factor": 2.0} | config_dict
-        method = CluStream(n_macro_clusters=param_dict["n_macro_clusters"], max_micro_clusters=param_dict["mmc"],
-                           micro_cluster_r_factor=param_dict["mc_r_factor"],
-                           time_gap=param_dict["time_gap"], time_window=param_dict["time_window"],
-                           sigma=param_dict["sigma"],
-                           mu=param_dict["mu"],
-                           seed=seed)
-    elif method == "batch":
-        method = BatchLearn()
+    if method == "clustream":
+        param_dict = {"max_mc": 100, "init_num": 2000, "mbf": 2.0, "m": 10, "delta": 512,
+                      "dist": "euclidean"} | config_dict
+        param_dict["b"] = 1
+        param_dict["l"] = 0
+        param_dict["window"] = None
+        method = CluStream(max_mc=param_dict["max_mc"], init_num=param_dict["init_num"],
+                           mbf=param_dict["mbf"], m=param_dict["m"], delta=param_dict["delta"],
+                           random_state=seed, b=param_dict["b"], l=param_dict["l"], dist=param_dict["dist"],
+                           verbose=False)
+
+    elif method == "denstream":
+        param_dict = {"init_num": 1000, "mu": 10, "beta": 0.2, "epsilon": 16.0, "b": 2, "l": 0.25, "stream_speed": 1000,
+                      "alpha": 0.5, "heuristic": 1, "distance": "euclidean"} | config_dict
+        param_dict["heuristic"] = param_dict["heuristic"] == 1
+        method = DenStream(init_num=param_dict["init_num"], mu=param_dict["mu"], beta=param_dict["beta"],
+                           epsilon= param_dict["epsilon"], b=param_dict["b"], l=param_dict["l"],
+                           stream_speed=param_dict["stream_speed"], alpha=param_dict["alpha"],
+                           heuristic=param_dict["heuristic"], distance=param_dict["distance"], verbose=False)
+    elif method == "hddstream":
+        param_dict = {"init_num": 1000, "window": 1000, "mu": 10, "beta": 0.5, "epsilon": 0.2, "delta":0.001, "pi":30, "kappa":1000, "b": 2, "l": 0.5} | config_dict
+        method = HDDStream(init_num=param_dict["init_num"], window=param_dict["window"], mu=param_dict["mu"], beta=param_dict["beta"],
+                           epsilon=param_dict["epsilon"], delta=param_dict["delta"], pi=param_dict["pi"], kappa=param_dict["kappa"],
+                           b=param_dict["b"], l=param_dict["l"], verbose = False)
+    elif method == "streamkmeans":
+        param_dict = {"k": 100, "chunk_size": 1000, "prototype_num": 500} | config_dict
+        method = STREAMKmeans(k=param_dict["k"], chunk_size=param_dict["chunk_size"],
+                              prototype_num=param_dict["prototype_num"], random_state=seed)
+    elif method == "streamkmplus":
+        param_dict = {"m": 100} | config_dict
+        method = STREAMKMPlus(m=param_dict["m"], random_state=seed)
+    elif method == "dstream":
+        param_dict = {"dim_grid_num": 30, "dim": 2, "value_ranges": 1, "cm": 3.0, "cl": 0.8, "window": 1, "l": 0.998,
+                      "beta": 0.3} | config_dict
+        method = DStream(dim_grid_num=param_dict["dim_grid_num"], dim=param_dict["dim"],
+                         value_ranges=param_dict["value_ranges"], cm=param_dict["cm"], cl=param_dict["cl"],
+                         window=param_dict["window"], l=param_dict["l"], beta=param_dict["beta"])
+    elif method == "emcstream":
+        param_dict = {"k": 10, "horizon": 1000, "init_num_factor": 2, "drift_num_factor": 5,
+                      "drift_num_factor_change": 1, "drift_inc_delay": 2, "consistency_threshold": 1.0, "consistency_drift": 0.001,
+                      "consistency_delay": 4} | config_dict
+        method = EMCStream(k=param_dict["k"], horizon=param_dict["horizon"],
+                           init_num_factor=param_dict["init_num_factor"],
+                           drift_num_factor=param_dict["drift_num_factor"],
+                           drift_num_factor_change=param_dict["drift_num_factor_change"],
+                           drift_inc_delay=param_dict["drift_inc_delay"],
+                           consistency_threshold=param_dict["consistency_threshold"],
+                           consistency_drift=param_dict["consistency_drift"],
+                           consistency_delay=param_dict["consistency_delay"],
+                           random_state=seed, verbose=False)
+    elif method == "gbfuzzystream":
+        param_dict = {"l": 0.2, "threshold": 0.3, "m": 2, "eps": 10, "dist": "euclidean", "window": 1000} | config_dict
+        method = GBFuzzyStream(l=param_dict["l"], threshold=param_dict["threshold"], m=param_dict["m"], eps=param_dict["eps"],
+                               dist=param_dict["dist"], window=param_dict["window"])
+    elif method == "stmstream":
+        param_dict = {"epsilon": 0.1, "k": 10, "window": 1000, "stride": 500, "init_num": 1000, "dist": "euclidean",
+                      "u_radius": 0.05 } | config_dict
+        method = STMStream(epsilon=param_dict["epsilon"], k=param_dict["k"], window=param_dict["window"], stride=param_dict["stride"],
+                           init_num=param_dict["init_num"], dist=param_dict["dist"], u_radius=param_dict["u_radius"],
+                           random_state=seed, verbose=False)
     else:
         raise NotImplementedError(f"Method {method} is not implemented.")
     return method
-
-
-def get_online_assignments(method, summary, batch):
-    if method == "clustream_online" or method == "clustream":
-        centers = np.array(summary)[:, 1]
-    else:
-        centers = summary
-    if method in dict_methods:
-        centers = dps_to_np(centers)
-    if len(batch[0]) > 3:
-        nnTree = BallTree(centers)
-    else:
-        nnTree = KDTree(centers)
-    cur_preds = nnTree.query(batch, 1)[1]
-    return cur_preds # make sure that id num = order in summary
-
-
-incremental = ["clustream", "clustream_online"]
-dict_methods = ["clustream", "clustream_online"]
-
-
-def get_online_clustering(data_points, method_name, config_dict, batch_size, return_summary, seed):
-    online_method = get_online_method(method_name, config_dict, seed)
-    i = 0
-    cur_batch = []
-    summaries = []
-    preds = []
-    for x in data_points:
-        if method_name in dict_methods:
-            dp = dict(enumerate(x))
-        else:
-            dp = x
-        if method_name in incremental:
-            online_method.learn_one(dp)
-        cur_batch.append(x)
-        if len(cur_batch) == batch_size:
-            if method_name not in incremental:
-                online_method.learn(cur_batch)
-            summary = online_method.get_summary()
-            summaries.append(summary)
-            cur_preds = get_online_assignments(method_name, summary, cur_batch)
-            preds.append(cur_preds)
-            cur_batch = []
-        i += 1
-    if len(cur_batch) > 0:
-        summary = online_method.get_summary()
-        summaries.append(summary)
-        cur_preds = get_online_assignments(method_name, summary, cur_batch)
-        preds.append(cur_preds)
-
-    if return_summary:
-        return preds, summaries
-    else:
-        return preds
-
-
-def evaluate_online_clustering(data_points, labels, method, config_dict, batch_size, return_summary=False,
-                               eval_mode="all", seed=0):
-    clusterings = get_online_clustering(data_points, method, config_dict, batch_size, return_summary, seed)
-    if return_summary:
-        clusterings, summaries = clusterings
-    labels = get_noise_labels(labels)
-    batch_idxs = range(batch_size, len(labels), batch_size)
-    label_batches = np.split(labels, batch_idxs)
-    data_batches = np.split(data_points, batch_idxs)
-
-    metrics = evaluate_clustering(data_batches=data_batches, label_batches=label_batches, clusterings=clusterings, data_points=data_points, labels=labels, eval_mode=eval_mode)
-
-    if return_summary:
-        return metrics, clusterings, summaries
-    else:
-        return metrics, clusterings
