@@ -34,10 +34,10 @@ from river import base, cluster, stats, utils
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class CluStream(base.Clusterer):
-    """CluStream
+class CluStreamRiver(base.Clusterer):
+    """CluStreamRiver
 
-    The CluStream algorithm [^1] maintains statistical information about the
+    The CluStreamRiver algorithm [^1] maintains statistical information about the
     data using micro-clusters. These micro-clusters are temporal extensions of
     cluster feature vectors. The micro-clusters are stored at snapshots in time
     following a pyramidal pattern. This pattern allows to recall summary
@@ -122,7 +122,7 @@ class CluStream(base.Clusterer):
     ...     [5, 4]
     ... ]
 
-    >>> clustream = cluster.CluStream(
+    >>> CluStreamRiver = cluster.CluStreamRiver(
     ...     n_macro_clusters=3,
     ...     max_micro_clusters=5,
     ...     time_gap=3,
@@ -131,15 +131,15 @@ class CluStream(base.Clusterer):
     ... )
 
     >>> for x, _ in stream.iter_array(X):
-    ...     clustream.learn_one(x)
+    ...     CluStreamRiver.learn_one(x)
 
-    >>> clustream.predict_one({0: 1, 1: 1})
+    >>> CluStreamRiver.predict_one({0: 1, 1: 1})
     1
 
-    >>> clustream.predict_one({0: -4, 1: 3})
+    >>> CluStreamRiver.predict_one({0: -4, 1: 3})
     2
 
-    >>> clustream.predict_one({0: 4, 1: 3.5})
+    >>> CluStreamRiver.predict_one({0: 4, 1: 3.5})
     0
 
     """
@@ -165,7 +165,7 @@ class CluStream(base.Clusterer):
         self.kwargs = kwargs
 
         self.centers: dict[int, defaultdict] = {}
-        self.micro_clusters: dict[int, CluStreamMicroCluster] = {}
+        self.micro_clusters: dict[int, CluStreamRiverMicroCluster] = {}
 
         self._timestamp = -1
         self._initialized = False
@@ -185,7 +185,7 @@ class CluStream(base.Clusterer):
                 break
 
         if del_id is not None:
-            self.micro_clusters[del_id] = CluStreamMicroCluster(
+            self.micro_clusters[del_id] = CluStreamRiverMicroCluster(
                 x=x,
                 w=w,
                 timestamp=self._timestamp,
@@ -207,7 +207,7 @@ class CluStream(base.Clusterer):
                     closest_b = j
 
         self.micro_clusters[closest_a] += self.micro_clusters[closest_b]
-        self.micro_clusters[closest_b] = CluStreamMicroCluster(
+        self.micro_clusters[closest_b] = CluStreamRiverMicroCluster(
             x=x,
             w=w,
             timestamp=self._timestamp,
@@ -232,7 +232,7 @@ class CluStream(base.Clusterer):
         self._timestamp += 1
 
         if not self._initialized:
-            self.micro_clusters[len(self.micro_clusters)] = CluStreamMicroCluster(
+            self.micro_clusters[len(self.micro_clusters)] = CluStreamRiverMicroCluster(
                 x=x,
                 w=w,
                 # When initialized, all micro clusters generated previously will have the timestamp reset to the current
@@ -299,7 +299,7 @@ class CluStream(base.Clusterer):
         return summary
 
 
-class CluStreamMicroCluster(base.Base):
+class CluStreamRiverMicroCluster(base.Base):
     """Micro-cluster class."""
 
     def __init__(
@@ -381,7 +381,7 @@ class CluStreamMicroCluster(base.Base):
 
         return res
 
-    def __iadd__(self, other: CluStreamMicroCluster):
+    def __iadd__(self, other: CluStreamRiverMicroCluster):
         self.var_time += other.var_time
         self.var_x = {k: self.var_x[k] + other.var_x.get(k, stats.Var()) for k in self.var_x}
         return self
