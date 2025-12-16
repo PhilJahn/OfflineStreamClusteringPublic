@@ -12,7 +12,7 @@ import numpy as np
 
 class GBFuzzyStream(StreamClusterer):
 
-    def __init__(self, l=0.2, threshold=0.3, m=2, eps=10, dist="euclidean", window=1000):
+    def __init__(self, l=0.2, threshold=0.3, m=2.0, eps=10, dist="euclidean", window=1000):
         super().__init__()
         self.l = l
         self.threshold = threshold
@@ -49,15 +49,20 @@ class GBFuzzyStream(StreamClusterer):
         radii = []
         for fgb in initial_fgbs:
             radii.append(fgb.radius)
+        #print(initial_fgbs)
         radius_threshold = 1.5 * max(np.mean(radii), np.median(radii))
+        #print(radius_threshold)
         final_fgbs = []
         while len(initial_fgbs) > 0:
             new_fgbs = []
             for fgb in initial_fgbs:
                 if fgb.radius > radius_threshold:
                     fgb_new1, fgb_new2, dm_new = fgb.split()
-                    new_fgbs.append(fgb_new1)
-                    new_fgbs.append(fgb_new2)
+                    if fgb_new1 is not None and fgb_new2 is not None:
+                        new_fgbs.append(fgb_new1)
+                        new_fgbs.append(fgb_new2)
+                    else: # can't actually split further
+                        final_fgbs.append(fgb)
                 else:
                     final_fgbs.append(fgb)
             initial_fgbs = new_fgbs
@@ -85,15 +90,22 @@ class GBFuzzyStream(StreamClusterer):
                     self.fmbs.append(fmb)
                 self.initialized = True
             else:
+                #print(len(fgbs), len(self.cur_data))
                 for fgb in fgbs:
                     fmb_centers = [fmb.center for fmb in self.fmbs]
-                    fgb_dist = utils.distance_calc(fgb.center, np.array(fmb_centers), dist=self.dist)
-                    #print(fgb_dist)
-                    closest_fmb = np.argmin(fgb_dist)
-                    closest_dist = fgb_dist[closest_fmb]
+                    if len(fmb_centers) >= 1:
+                        fgb_dist = utils.distance_calc(fgb.center, np.array(fmb_centers), dist=self.dist)
+                        #print(fgb_dist)
+                        closest_fmb = np.argmin(fgb_dist)
+                        closest_dist = fgb_dist[closest_fmb]
+                    else:
+                        closest_dist = np.inf
 
-                    fmb_dists = utils.distance_calc(fmb_centers[closest_fmb], np.array(fmb_centers), dist=self.dist)
-                    nn_dist = np.partition(fmb_dists,1)[1]
+                    if len(fmb_centers) > 1:
+                        fmb_dists = utils.distance_calc(fmb_centers[closest_fmb], np.array(fmb_centers), dist=self.dist)
+                        nn_dist = np.partition(fmb_dists,1)[1]
+                    else:
+                        nn_dist = 0
 
                     if nn_dist < closest_dist + fgb.radius:
                         fmb = FuzzyMicroBall(fgb.samples, fgb.sample_ids, np.array([self.t] * len(fgb.samples)), dist=self.dist, eps=self.eps,
@@ -170,12 +182,12 @@ class FuzzyGranularBall:
             dists_p1 = utils.distance_calc(self.samples, self.samples[p1], dist=self.dist)
             p2 = np.argmax(dists_p1)
 
-            o1 = (self.center + p1) / 2
-            o2 = (self.center + p2) / 2
+            o1 = (self.center + self.samples[p1]) / 2
+            o2 = (self.center + self.samples[p2]) / 2
             #print(o1, o2)
             o1, o2, u_ball = self.iterate_child_centers(o1, o2)
-            #print(u_ball)
             assignment = np.argmax(u_ball, axis=0)
+            #print(assignment)
             assignment1 = np.where(assignment == 0)[0]
             assignment2 = np.where(assignment == 1)[0]
 
@@ -185,26 +197,29 @@ class FuzzyGranularBall:
                 dm2 = child2.dm
                 dm_child = (len(assignment1) / len(self.samples)) * dm1 + (len(assignment2) / len(self.samples)) * dm2
             else:
+                #print("assign", assignment)
                 return None, None, -np.inf
             if len(self.samples) > 7 and len(child1.samples) > 1 and len(child2.samples) > 1: # based on original implementation
                 return child1, child2, dm_child
             else:
+                #print("self", len(self.samples), "c1", len(child1.samples), "c2", len(child2.samples))
                 return child1, child2, -np.inf
         else:
+            #print("one")
             return None, None, -np.inf
 
     def iterate_child_centers(self, o1, o2):
         u_ball = self.compute_u(o1, o2)
         #print(u_ball)
-        o1_new = np.sum(u_ball[0].reshape(-1, 1) ** self.m * self.samples, axis=0) / np.sum(u_ball[0] ** self.m)
-        o2_new = np.sum(u_ball[1].reshape(-1, 1) ** self.m * self.samples, axis=0) / np.sum(u_ball[1] ** self.m)
+        o1_new = np.sum((u_ball[0].reshape(-1, 1) ** self.m) * self.samples, axis=0) / np.sum(u_ball[0] ** self.m)
+        o2_new = np.sum((u_ball[1].reshape(-1, 1) ** self.m) * self.samples, axis=0) / np.sum(u_ball[1] ** self.m)
         u_ball_new = self.compute_u(o1_new, o2_new)
         #print(o1_new, o2_new)
         #print(u_ball_new)
         while (np.sum(np.abs(u_ball - u_ball_new)) >= self.eps):
             u_ball = u_ball_new
-            o1_new = np.sum(u_ball[0].reshape(-1, 1) ** self.m * self.samples, axis=0) / np.sum(u_ball[0] ** self.m)
-            o2_new = np.sum(u_ball[1].reshape(-1, 1) ** self.m * self.samples, axis=0) / np.sum(u_ball[1] ** self.m)
+            o1_new = np.sum((u_ball[0].reshape(-1, 1) ** self.m) * self.samples, axis=0) / np.sum(u_ball[0] ** self.m)
+            o2_new = np.sum((u_ball[1].reshape(-1, 1) ** self.m) * self.samples, axis=0) / np.sum(u_ball[1] ** self.m)
             u_ball_new = self.compute_u(o1_new, o2_new)
             #print(o1_new, o2_new)
             #print(u_ball_new)
@@ -214,8 +229,8 @@ class FuzzyGranularBall:
         dists1 = utils.distance_calc(np.array(o1), self.samples, dist="euclidean")
         dists2 = utils.distance_calc(np.array(o2), self.samples, dist="euclidean")
         m_exp = 2 / (self.m - 1)
-        div1 = ((dists1 ** 2 / dists2 ** 2) ** m_exp) + 1
-        div2 = ((dists2 ** 2 / dists1 ** 2) ** m_exp) + 1
+        div1 = (((dists1 ** 2) / (dists2 ** 2)) ** m_exp) + 1
+        div2 = (((dists2 ** 2) / (dists1 ** 2)) ** m_exp) + 1
         u1 = 1 / div1
         u2 = 1 / div2
         return np.array([u1, u2])
@@ -271,7 +286,7 @@ class FuzzyMicroBall(FuzzyGranularBall):
     def update_wav(self, timestamp):
         timestamp_vals, timestamp_nums = np.unique(np.array(self.timestamps), return_counts=True)
         assert sum(timestamp_nums) == len(self.samples)
-        weights = [timestamp_nums[i]/len(self.samples) * 2.0**(-1*self.l*(timestamp-timestamp_vals[i])) for i in range(len(timestamp_nums))]
+        weights = [(timestamp_nums[i]/len(self.samples)) * (2.0**(-1*self.l*(timestamp-timestamp_vals[i]))) for i in range(len(timestamp_nums))]
         #print(timestamp_nums, timestamp_vals, weights)
         self.wav = np.sum(weights)
 
@@ -298,33 +313,34 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 if __name__ == "__main__":
     make_fig = True
-    stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
+    stream, labels = load_data("complex9")  # [[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
     gbstream = GBFuzzyStream(l=1)
     for i in range(len(stream)):
         cell_id, event_log = gbstream.learn_one(stream[i], ts[i])
-        if (i+1) % 1000 == 0:
+        if (i + 1) % 1000 == 0:
             batch_start = max(0, i + 1 - 1000)
             print(i)
             summary = gbstream.get_summary()
             plt.figure(figsize=(8, 8))
-            for fmb in summary:
+            for fmb in summary.values():
                 mc_patch = ptc.Circle((float(fmb.center[0]), float(fmb.center[1])), fmb.radius, alpha=0.4,
                                       color="lightgrey")
                 plt.gca().add_patch(mc_patch)
                 plt.scatter(x=fmb.center[0], y=fmb.center[1], alpha=1, c="black", s=50)
-                plt.scatter(x=fmb.samples[:,0], y=fmb.samples[:,1], c="pink", alpha=1, marker="x", s=70)
+                plt.scatter(x=fmb.samples[:, 0], y=fmb.samples[:, 1], c="pink", alpha=1, marker="x", s=70)
             plt.scatter(x=np.array(stream)[batch_start:i + 1][:, 0], y=np.array(stream)[batch_start:i + 1][:, 1],
                         cmap=plt.get_cmap("jet"), c=labels[batch_start:i + 1], s=10)
             plt.ylim((0, 1))
             plt.xlim((0, 1))
-            plt.title("Number of FMBs: " + str(len(summary)) + " Number of Samples: " + str(sum([len(fmb.samples) for fmb in summary])))
+            plt.title("Number of FMBs: " + str(len(summary)) + " Number of Samples: " + str(
+                sum([len(fmb.samples) for fmb in summary.values()])))
             plt.savefig(f"test_figures/gbfuzzystream/complex9_gbfuzzystream_{i}.png", bbox_inches='tight')
             plt.close()
-            for j in np.arange(batch_start, i+1):
+            for j in np.arange(batch_start, i + 1):
                 data_point = stream[j]
                 problem = False
-                for fmb in summary:
+                for fmb in summary.values():
                     if j in fmb.sample_ids:
                         if data_point in fmb.samples:
                             print(j, "found")
@@ -337,7 +353,7 @@ if __name__ == "__main__":
                             problem = fmb
                 if problem:
                     print(j, data_point)
-                    for fmb in summary:
+                    for fmb in summary.values():
                         if j in fmb.sample_ids:
                             print(fmb)
                         if data_point in fmb.samples:

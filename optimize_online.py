@@ -19,6 +19,7 @@ from online_config_handler import get_online_configspace
 from online_handler import get_online_method
 from summary_handler import process_summary
 from time_handler import time_limit
+from datetime import datetime
 
 global opt_log_file
 
@@ -111,6 +112,17 @@ def online_runner(config: Configuration, seed: int = 0) -> float:
         print("Timed out!", flush=True)
         final_score = np.inf
         raise WallTimeoutException("Timed out!")
+    except AssertionError:
+        if not os.path.exists("./assertion_error_logs/"):
+            os.makedirs("./assertion_error_logs/", exist_ok=True)
+        timestr = datetime.now().strftime("%H_%M_%S_%d_%m_%Y")
+        assertion_error_file = open(f'./assertion_error_logs/assert_{name}_{timestr}.txt', 'w', buffering=1)
+        assertion_error_file.write(str(config_dict))
+        assertion_error_file.write("\n")
+        assertion_error_file.write(traceback.format_exc())
+        assertion_error_file.close()
+        print(traceback.format_exc(), flush=True)
+        final_score = np.inf
     except Exception:
         print(traceback.format_exc(), flush=True)
         final_score = np.inf
@@ -150,9 +162,10 @@ def online_runner(config: Configuration, seed: int = 0) -> float:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ds', default="complex9", type=str, help='Dataset')
-    parser.add_argument('--online', default="stmstream", type=str, help='Online Summarization Method')
-    parser.add_argument('--batch_budget', default=30
+    parser.add_argument('--ds', default="pendigits", type=str,
+                        help='Dataset')
+    parser.add_argument('--online', default="streamkmeans", type=str, help='Online Summarization Method')
+    parser.add_argument('--batch_budget', default=10
                         , type=int, help='SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
 #    parser.add_argument('--batch_max', default=3, type=int, help='Maximum number of batches')

@@ -26,13 +26,33 @@ class STREAMKmeans(StreamClusterer):
         self.cur_timestamps.append(t)
 
         if len(self.cur_data) == self.chunk_size:
+            self.cur_data = np.array(self.cur_data)
+
             kmeans = KMeans(n_clusters=self.k, random_state=self.random_state)
             clustering = kmeans.fit_predict(self.cur_data)
-            clu_labels, cluster_sizes = np.unique(clustering, return_counts=True)
-            centroids = kmeans.cluster_centers_
-            for c in range(len(centroids)):
-                center = centroids[c]
+
+            clu_labels, index_cluster, inverse_cluster, cluster_sizes = np.unique(clustering, return_index = True, return_counts=True, return_inverse=True)
+            #print(inverse_cluster)
+            #centroids = kmeans.cluster_centers_
+            # print(centroids)
+            # unicentroids, inverse_centroid = np.unique(kmeans.cluster_centers_, axis=0, return_inverse=True)
+            # print(inverse_centroid)
+
+            #print(len(np.unique(centroids, axis=0)), len(centroids))
+            #print(clu_labels, cluster_sizes)#, centroids)
+            #print(inverse_cluster, inverse_centroid)
+            #print(inverse_cluster)
+            for c in range(len(clu_labels)):
+                #center = centroids[c]
+                clu_points = self.cur_data[np.where(inverse_cluster == c)[0]]
+                center = np.mean(clu_points, axis=0)
                 weight = cluster_sizes[c]
+                # if center not in centroids:
+                #     print(center)
+                #     print(centroids)
+                #assert center in centroids
+                #print(c, clu_labels[c], weight, len(clu_points), flush=True)
+                assert len(clu_points) == weight
                 p = StreamPrototype(center, weight)
                 self.prototypes.append(p)
 
@@ -82,15 +102,17 @@ class StreamPrototype():
 
 import matplotlib.pyplot as plt
 if __name__ == "__main__":
-    make_fig = True
-    stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
+    make_fig = False
+
+    stream, labels = load_data("kddcup")  #[[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
     cstream = STREAMKmeans(k=100, chunk_size=100, prototype_num=100)
     for i in range(len(stream)):
         cell_id, event_log = cstream.learn_one(stream[i], ts[i])
         batch_start = max(0, 0)
         if ";" in event_log:
-            print(i, event_log)
+            print(i, event_log.replace("\n", ""))
+            batch_end = min(len(stream), i + 1)
             summaries = cstream.get_summary()
             if make_fig:
                 plt.figure(figsize=(8, 8))

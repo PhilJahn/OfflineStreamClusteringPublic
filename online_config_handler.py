@@ -21,6 +21,8 @@ def get_online_configspace(method, data_points, labels, args):
     window_sizes = [100, 200, 250, 500, 1000]
     if args.batch == 10000:
         window_sizes.extend([2500, 5000, 10000])
+    if args.batch == 6000:
+        window_sizes.extend([2000, 3000, 6000])
 
     d, gt_cls_num = get_data_properties(data_points, labels)
 
@@ -97,7 +99,7 @@ def get_online_configspace(method, data_points, labels, args):
         #param_dict = {"dim_grid_num": 30, "dim": 2, "value_ranges": 1, "cm": 3.0, "cl": 0.8, "window": 1, "l": 0.998,
         #             "beta": 0.3}
         dstream_1 = Integer("dim_grid_num", (2, 100), default=30)
-        dstream_2 = Constant("d", d)
+        dstream_2 = Constant("dim", d)
         dstream_3 = Constant("value_ranges", 1)
         dstream_4 = Float("cm", (1, 10), default=3)
         dstream_5 = Float("cl", (0.01, 1), default=0.8)

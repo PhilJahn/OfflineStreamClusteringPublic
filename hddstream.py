@@ -35,7 +35,7 @@ class HDDStream(StreamClusterer):
 
         self.initialized = False
         self.init_storage = []
-        self.init_timestamps = []
+        #self.init_timestamps = []
 
         self.window = window
         self.d_ctr = 0
@@ -68,22 +68,33 @@ class HDDStream(StreamClusterer):
                     pref_dist = projected_distance(instance1, instance2, dim_pref_vector)
                     if pref_dist <= self.epsilon:
                         pref_eps_nn.append(j)
-                #print(len(pref_dims), len(pref_eps_nn))
-                if len(pref_dims) <= self.pi and len(pref_eps_nn) >= self.beta * self.mu:
-                    mc = self.make_mc(instance1, self.init_timestamps[i])
+                cf2_proj = np.sum(self.init_storage[pref_eps_nn] ** 2, axis=0)
+                cf1_proj = np.sum(self.init_storage[pref_eps_nn], axis=0)
+                w_proj = len(pref_eps_nn)
+                pref_dims_proj = calc_preferred_dims(cf1_proj, cf2_proj, w_proj, self.delta)
+
+                # print(len(pref_dims), len(pref_eps_nn))
+                if len(pref_dims_proj) <= self.pi and w_proj >= self.beta * self.mu:
+                    mc = self.make_mc(instance1, self.t) # implied that inital all weighted same
                     for j in pref_eps_nn:
                         if j != i:
                             instance2 = self.init_storage[j]
                             cf12, cf22, w2 = instance_to_hddstream_features(instance2)
-                            mc.insert(cf12, cf22, w2, self.init_timestamps[j])
+                            mc.insert(cf12, cf22, w2, self.t)
                         indices.remove(j)
                         for h in copy(eps_nns_list[j]):
                             eps_nns_list[h].remove(j)
                             if h != j:
                                 eps_nns_list[j].remove(h)
+                    # print(mc)
+                    # print(mc.cf1, cf1, cf1_proj)
+                    # print(mc.cf2, cf2, cf2_proj)
+                    # print(pref_dims, len(pref_dims))
+                    # print(pref_dims_proj, len(pref_dims_proj))
+                    # print(mc.preferred_dims, len(mc.preferred_dims))
                     assert mc.status != "outlier"
                     if mc.radius <= self.epsilon: #skip anything that violates the epsilon criterion
-                        print(mc)
+                        #print(mc)
                         self.pmcs[mc.mc_id] = mc
         self.initialized = True
 
@@ -98,7 +109,7 @@ class HDDStream(StreamClusterer):
         if not self.initialized:
             if len(self.init_storage) < self.init_num:
                 self.init_storage.append(x)
-                self.init_timestamps.append(self.t)
+                #self.init_timestamps.append(self.t)
             if len(self.init_storage) == self.init_num:
                 self.initialization()
                 self.initialized = True
@@ -339,13 +350,20 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 if __name__ == "__main__":
     make_fig = True
-    stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
+    #{'b': 2, 'batch_budget': 1800, 'batch_size': 1000, 'beta': 0.4036270526434, 'delta': 0.0082182551841,
+    # 'ds': 'densired10', 'epsilon': 0.0749471238297, 'init_num': 1000, 'kappa': 5, 'l': 0.1743064853777,
+    # 'mu': 9, 'offline': None, 'online': 'hddstream', 'pi': 5, 'window': 1000}
+    stream, labels = load_data("densired10")  #[[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
-    hddstream = HDDStream(epsilon=0.05, l=0.25, beta=0.2, mu=20, init_num=100, window=100)
+    hddstream = HDDStream(epsilon=0.0749471238297, l=0.1743064853777, kappa=5, b=2, mu=9, init_num=1000, pi=5, window=200,
+                          delta=0.0082182551841, beta= 0.4036270526434
+                          )
     for i in range(len(stream)):
         nmc_id, event_log = hddstream.learn_one(stream[i], ts[i])
         print(i, event_log)
-        pmcs, omcs = hddstream.get_summary()
+        summary = hddstream.get_summary()
+        pmcs = summary["pmcs"]
+        omcs = summary["omcs"]
         if i > 100 and make_fig:
             insert_id = None
             if "insert" in event_log:

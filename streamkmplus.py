@@ -61,8 +61,6 @@ class STREAMKMPlus(StreamClusterer):
         return dict(zip(list(range(len(summary))), summary))
 
     def get_coreset(self, points):
-        if len(points) <= self.m:
-            return points
         q1 = self.random_generator.choice(points)
         #print(q1)
         dists = utils.distance_calc(q1, points, "euclidean")
@@ -70,11 +68,15 @@ class STREAMKMPlus(StreamClusterer):
         coreset = [q1]
 
         root = CoreSetTreeNode(None, q1, points, weight)
-        while len(coreset) < self.m:
+        while len(coreset) < self.m and root.weight > 0:
             node = root
+            #lvl = 0
             while not node.is_leaf():
+                #print(lvl)
                 rand_val = self.random_generator.random()
                 node = node.get_child(rand_val)
+                #lvl += 1
+            #print("at leaf")
             child_node = False
             while not child_node:
                 rand_val2 = self.random_generator.random()
@@ -100,9 +102,12 @@ class CoreSetTreeNode():
         return self.child1 is None
 
     def get_child(self, rand_val):
+        #print(self.weight, self.child1.weight, self.child2.weight)
         if self.child1.weight == 0:
+            #print("child2", self.child2.weight)
             return self.child2
         elif self.child2.weight == 0:
+            #print("child1",self.child1.weight)
             return self.child1
         else:
             if self.child1.weight/self.weight < rand_val:
@@ -112,12 +117,15 @@ class CoreSetTreeNode():
 
     def split(self, rand_val):
         dists_org = utils.distance_calc(self.sample_point, self.data_points, "euclidean")
-        sample_weights = dists_org/self.weight
-        #print(dists_org, self.weight)
+
+        #print(self.weight, sum(dists_org))
+        if self.weight == 0:
+            raise Exception
+        sample_weights = dists_org/sum(dists_org)
         cumulative_weights = np.cumsum(sample_weights)
         #print(sample_weights)
         #print(cumulative_weights)
-        assert(0.99999 < sum(sample_weights) < 1.00001)
+        #assert(0.999 < sum(sample_weights) < 1.001)
         chosen = np.searchsorted(cumulative_weights, rand_val, side='left')
         if dists_org[chosen] == 0:
             return False
@@ -156,7 +164,7 @@ class CoreSetTreeNode():
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    stream, labels = load_data("complex9")
+    stream, labels = load_data("kddcup")
     ts = list(range(len(stream)))
     print(stream.shape)
     data = stream
@@ -175,20 +183,21 @@ if __name__ == "__main__":
         nmc_id, event_log = streamkm.learn_one(stream[i], ts[i])
         buckets = streamkm.get_buckets()
         corepoints = streamkm.get_summary()
-        if ";" in event_log:
-            print(i, event_log)
-            #print(buckets)
-            plt.figure(figsize=(8, 8))
-            plt.scatter(x=np.array(stream)[:i + 1][:, 0], y=np.array(stream)[:i + 1][:, 1],
-                        cmap=plt.get_cmap("jet"), c=labels[:i + 1], s=10)
-            for j in range(len(buckets)):
-                if len(buckets[j]) > 0:
-                    plt.scatter(x=np.array(buckets[j])[:, 0], y=np.array(buckets[j])[:, 1], c="black", alpha=1, s=10*j)
-            plt.scatter(x=np.array(corepoints)[:, 0], y=np.array(corepoints)[:, 1], c="grey", alpha=1, s=30)
-            plt.ylim((0, 1))
-            plt.xlim((0, 1))
-            plt.savefig(f"test_figures/streamkmplus/complex9_streamkmplus_{i}.png", bbox_inches='tight')
-            plt.close()
+        print(i)
+        # if ";" in event_log:
+        #     print(i, event_log)
+        #     #print(buckets)
+        #     plt.figure(figsize=(8, 8))
+        #     plt.scatter(x=np.array(stream)[:i + 1][:, 0], y=np.array(stream)[:i + 1][:, 1],
+        #                 cmap=plt.get_cmap("jet"), c=labels[:i + 1], s=10)
+        #     for j in range(len(buckets)):
+        #         if len(buckets[j]) > 0:
+        #             plt.scatter(x=np.array(buckets[j])[:, 0], y=np.array(buckets[j])[:, 1], c="black", alpha=1, s=10*j)
+        #     plt.scatter(x=np.array(corepoints)[:, 0], y=np.array(corepoints)[:, 1], c="grey", alpha=1, s=30)
+        #     plt.ylim((0, 1))
+        #     plt.xlim((0, 1))
+        #     plt.savefig(f"test_figures/streamkmplus/complex9_streamkmplus_{i}.png", bbox_inches='tight')
+        #     plt.close()
 
     # sample = np.array([1,1])
     # allpoints = np.array([[1,1], [2,1], [3,5], [1,2], [1.5, 0.9]])

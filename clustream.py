@@ -80,7 +80,7 @@ class CluStream (StreamClusterer):
                 return -1, "initialization;"
         else:
             closest_mc_id, nn_dist = self.find_closest_mc_id(x, return_distance=True)
-            if nn_dist < self.mcs[closest_mc_id].boundary:
+            if nn_dist <= self.mcs[closest_mc_id].boundary: # within the maximum boundary vs outside of maximum boundary, edge case 0 distance with 0 radius (due to duplicates) produces constant influx of micro-clusters, so interpreted as less and equals for insertion
                 self.mcs[closest_mc_id].insert_one(x, self.t)
                 self.update_mc(self.mcs[closest_mc_id])
                 if self.verbose:
@@ -108,14 +108,16 @@ class CluStream (StreamClusterer):
                         if mc_id in self.mc_nn.keys():
                             mc2_id = self.mc_nn[mc_id]
                             dist = mc.nn_dist
+                            # for sanity check
+                            dist2 = mc.get_distance(self.mcs[mc2_id].mean)
 
-                            #TODO: drop assert for final version
-                            #dist = mc.get_distance(self.mcs[mc2_id].mean)
+                            ##TODO: drop assert for final version
                             #mc3_id, dist3 = self.find_closest_mc_id(mc.mean, [mc_id], return_distance=True)
-                            #print(mc_id, t, ":", mc2_id, dist, mc3_id, dist3)
+                            #print(mc_id, t, ":", mc2_id, dist, dist2, mc3_id, dist3)
                             #print(self.mcs[mc_id], self.mcs[mc2_id], self.mcs[mc3_id])
                             #assert mc2_id == mc3_id
-                            #assert dist == mc.nn_dist
+                            assert dist == dist2
+                            #assert dist == dist3
                         else:
                             mc2_id, dist = self.find_closest_mc_id(mc.mean, [mc_id], return_distance=True)
                         if dist < min_dist:
@@ -156,7 +158,7 @@ class CluStream (StreamClusterer):
                     else:
                         mc.update_nn_dist(dist)
                 else:
-                    if dist < mc.nn_dist: #closer than prior closest
+                    if dist < mc.nn_dist or (dist == mc.nn_dist and updated_mc_id < self.mc_nn[mc_id]): #closer than prior closest
                         self.mc_nn[mc_id] = updated_mc_id
                         mc.update_nn_dist(dist)
 
@@ -394,8 +396,12 @@ import matplotlib.patches as ptc
 
 if __name__ == '__main__':
 
-    stream, labels = load_data("complex9")#[[0],[1],[3],[7],[8],[9]]
+    stream, labels = load_data("kddcup")#[[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
+
+    #{'batch_budget': 1800, 'batch_size': 6000, 'delta': 1713,
+    # 'ds': 'kddcup', 'init_num': 2000, 'm': 11, 'mbf': 3.4549739469849, 'mmc': 100, 'offline': None, 'online': 'clustream'}
+
 
     # clustream_river = CluStreamRiver(max_micro_clusters=100)
     # start = default_timer()
@@ -406,11 +412,11 @@ if __name__ == '__main__':
     #         print(i)
     # final_time_river = default_timer() - start
     make_fig = False
-    clustream = CluStream(max_mc=100, init_num=100, verbose=True)
+    clustream = CluStream(max_mc=100, init_num=2000, mbf=3.4549739469849, delta=1713, m=11, verbose=True)
     start = default_timer()
     for i in range(len(stream)):
         nmc_id, event_log = clustream.learn_one(stream[i], ts[i])
-        print(i, event_log)
+        #print(i, event_log)
         mcs = clustream.get_summary()
         if i > 100 and make_fig:
             merge_id = None
