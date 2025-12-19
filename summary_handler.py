@@ -53,7 +53,7 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
         assignment = np.argmin(assignment_dists, axis=1)
     elif online_alg == "dstream":
         ex_grid_cell = summary[list(summary.keys())[0]]
-        radius = (ex_grid_cell.upper_bound[0] - ex_grid_cell.lower_bound[0]) / 2 + 0.000001 # acount for roudning error
+        radius = (ex_grid_cell.upper_bound[0] - ex_grid_cell.lower_bound[0]) / 2 + 0.000001 # account for rounding error
         #print(radius)
         cm = ex_grid_cell.cm
         cl = ex_grid_cell.cl

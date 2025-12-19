@@ -9,7 +9,7 @@ from online.stream_clustering import StreamClusterer
 
 class Betula(StreamClusterer):
 
-    def __init__(self, max_leaf_entry_num=1000, L=4, B=2, closeness="D0", absorption="R"):
+    def __init__(self, max_leaf_entry_num=1000, L=4, B=2, closeness="D0", absorption="R", outlier_ratio=0.1, outlier_batch=100):
         super().__init__()
         self.threshold = 0
         self.leaf_entry_ctr = 0
@@ -22,9 +22,14 @@ class Betula(StreamClusterer):
                                    closeness=self.closeness, absorption=self.absorption)
         self.d_ctr = 0
         self.left_most_leaf = self.cf_tree_root
+        self.outlier_ratio = outlier_ratio
 
-    def find_new_threshold(self):
+        self.outlier_disk = []
+        self.outlier_batch = outlier_batch
+
+    def find_new_threshold_and_outlier_ratio(self):
         closenesses = []
+        size = []
         node = self.left_most_leaf
         while node is not None:
             for child1 in node.children:
@@ -35,9 +40,10 @@ class Betula(StreamClusterer):
                         if cand_closeness < min_closesness:
                             min_closesness = cand_closeness
                 closenesses.append(min_closesness)
+                size.append(child1.n)
             node = node.right
         print(closenesses)
-        return np.median(closenesses)
+        return np.mean(closenesses), np.mean(size) # Betula prefers median, but doesn't use it
 
     def get_all_entries(self):
         entries = []
@@ -56,11 +62,14 @@ class Betula(StreamClusterer):
             self.cf_tree_root = self.cf_tree_root.parent
         assert self.cf_tree_root.parent is None
         if self.cf_tree_root.entry_count >= self.max_leaf_entry_num:
-            self.threshold = self.find_new_threshold()
+            self.threshold, avg_entry_size = self.find_new_threshold_and_outlier_ratio()
+            outlier_threshold = self.outlier_ratio * avg_entry_size
+            print("thresholds", self.threshold, outlier_threshold)
             new_root = CFNode(parent=None, children=[], L=self.L, B=self.B, threshold=self.threshold,
                                        closeness=self.closeness, absorption=self.absorption)
             old_count = self.cf_tree_root.n
             node = self.cf_tree_root
+            self.left_most_leaf = node
             print(self.cf_tree_root)
             while len(node.children) != 0 and node is not None:
                 if not node.is_leaf: # edge case of root is leaf-node
@@ -68,7 +77,14 @@ class Betula(StreamClusterer):
                 if node.is_leaf:
                     for entry in node.children:
                         entry.update_parent(None)
-                        new_root.insert(entry)
+                        print("size", entry.n)
+                        if entry.n >= outlier_threshold:
+                            new_root.insert(entry)
+                            if new_root.parent is not None:
+                                new_root = new_root.parent
+                                assert new_root.parent is None
+                        else:
+                            self.outlier_disk.append(entry)
                     node.children = []
                 if len(node.children) == 0:
                     node_parent = node.parent
@@ -77,10 +93,29 @@ class Betula(StreamClusterer):
                         del node
                         node = node_parent
 
-            print(self.cf_tree_root)
+            print("old root", self.cf_tree_root)
             self.cf_tree_root = new_root
-            print(self.cf_tree_root)
-            assert self.cf_tree_root.n == old_count
+            print("new root", self.cf_tree_root)
+            outlier_n = sum([outlier.n for outlier in self.outlier_disk])
+            assert self.cf_tree_root.n + outlier_n == old_count
+            reinserted = []
+            for outlier in self.outlier_disk:
+                _, inserted = self.cf_tree_root.insert(outlier, outlier=True)
+                if inserted:
+                    reinserted.append(outlier)
+            for reinsert in reinserted:
+                self.outlier_disk.remove(reinsert)
+
+        if self.d_ctr % self.outlier_batch == 0: # periodically check for reinsertion
+            print("Check outliers")
+            reinserted = []
+            for outlier in self.outlier_disk:
+                _, inserted = self.cf_tree_root.insert(outlier, outlier=True)
+                if inserted:
+                    reinserted.append(outlier)
+            for reinsert in reinserted:
+                self.outlier_disk.remove(reinsert)
+
         return -1, ""
 
     def learn(self, xs: list, timestamps: list = None):
@@ -98,7 +133,19 @@ class Betula(StreamClusterer):
         while node is not None:
             entries.extend(copy.deepcopy(node.children))
             node = node.right
-        return entries, copy.deepcopy(self.cf_tree_root)
+
+        summary_root = copy.deepcopy(self.cf_tree_root)
+        summary_outlier_disk = copy.deepcopy(self.outlier_disk)
+        reinserted = []
+
+        if self.d_ctr % self.outlier_batch == 0:  # check for reinsertion at the end -> do it on summary call without
+            for outlier in summary_outlier_disk:
+                _, inserted = summary_root.insert(outlier, outlier=True)
+                if inserted:
+                    reinserted.append(outlier)
+        for reinsert in reinserted:
+            summary_outlier_disk.remove(reinsert)
+        return entries, summary_outlier_disk, summary_root
 
 
 class CFNode():
@@ -160,9 +207,12 @@ class CFNode():
             self.n, self.mean, self.S, self.S_vec = compute_features(nA, meanA, SA, SA_vec, nB, meanB, SB, SB_vec)
             self.entry_count += child.entry_count
 
-    def insert(self, x):
+
+    def insert(self, x, outlier=False):
         if len(self.children) == 0:  # at initialization
             assert self.parent is None
+            if outlier:
+                return False, False
             self.children = [x]
             x.update_parent(self)
         else:  # pick best suited child
@@ -184,6 +234,8 @@ class CFNode():
                     print("Absorbed")
                     child.insert(x)
                 else:
+                    if outlier:
+                        return False, False
                     print("Not absorbed")
                     self.children.append(x)
                     x.update_parent(self)
@@ -201,7 +253,10 @@ class CFNode():
             assert type(self.children[0]) != CFLeafEntry
 
         self.propagate_compute_features()
-        return False
+        if outlier:
+            return False, True
+        else:
+            return False
 
     def propagate_compute_features(self):
         self.compute_features()
@@ -220,9 +275,11 @@ class CFNode():
             pair1, pair2, _ = self.find_closest_children()
             if not ((pair1 == new_child1 and pair2 == new_child2) or (pair2 == new_child1 and pair1 == new_child2)):
                 if pair2.left is not None: # don't remove first leaf entry
+                    print(pair1.left, pair2.left)
                     self.children.remove(pair2)
                     pair1.merge(pair2)
                 else:
+                    print(pair1.left, pair2.left)
                     self.children.remove(pair1)
                     pair2.merge(pair1)
             return False
@@ -370,10 +427,10 @@ class CFLeafEntry():
     def get_dict(self):
         dic = {}
         dic['n'] = self.n
-        dic["entry"] = self.entry
+        #dic["entry"] = self.entry
         dic['mean'] = self.mean
         dic['parent'] = str([self.parent]).split(" ")[-1][:-2]
-        #dic['S'] = self.S
+        dic['S'] = self.S
         #dic['S_vec'] = self.S_vec
         #dic['radius'] = self.radius
         return dic
@@ -438,15 +495,16 @@ def compute_absorption(absorption, n, mean, S):
 
 if __name__ == "__main__":
     stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
-    stream = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[12],[13],[14],[15],[16], [17], [2.5], [2.6]]
+    #stream = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[12],[13],[14],[15],[16], [17], [2.5], [2.6]]
     ts = list(range(len(stream)))
     make_fig = False
-    betula = Betula(max_leaf_entry_num=8, closeness="D1")
+    betula = Betula(max_leaf_entry_num=100, closeness="D1")
     for i in range(len(stream)):
         print("TS", i, "started")
         nmc_id, event_log = betula.learn_one(stream[i], ts[i])
-        entries, tree = betula.get_summary()
+        entries, outliers, tree = betula.get_summary()
         print("TS", i, "done")
-        print(tree)
+        print("tree", tree)
+        print("outliers", outliers)
 
 
