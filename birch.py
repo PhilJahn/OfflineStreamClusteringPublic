@@ -66,7 +66,7 @@ class Birch(StreamClusterer):
         if self.cf_tree_root.entry_count >= self.max_leaf_entry_num:
             self.threshold, avg_entry_size = self.find_new_threshold_and_outlier_ratio()
             outlier_threshold = self.outlier_ratio * avg_entry_size
-            print("thresholds", self.threshold, outlier_threshold)
+            #print("thresholds", self.threshold, outlier_threshold)
             new_root = CFNode(parent=None, children=[], L=self.L, B=self.B, threshold=self.threshold,
                                        closeness=self.closeness, absorption=self.absorption)
             self.left_most_leaf = new_root
@@ -86,7 +86,7 @@ class Birch(StreamClusterer):
                             if new_root.parent is not None:
                                 new_root = new_root.parent
                                 assert new_root.parent is None
-                            print(new_root)
+                            #print(new_root)
                         else:
                             self.outlier_disk.append(entry)
                     node.children = []
@@ -137,11 +137,6 @@ class Birch(StreamClusterer):
         return mc_ids, event_logs
 
     def get_summary(self):
-        node = self.left_most_leaf
-        entries = []
-        while node is not None:
-            entries.extend(copy.deepcopy(node.children))
-            node = node.right
 
         summary_root = copy.deepcopy(self.cf_tree_root)
         summary_outlier_disk = copy.deepcopy(self.outlier_disk)
@@ -154,7 +149,18 @@ class Birch(StreamClusterer):
                     reinserted.append(outlier)
         for reinsert in reinserted:
             summary_outlier_disk.remove(reinsert)
-        return entries, summary_outlier_disk, summary_root
+
+        node = summary_root
+        while len(node.children) > 0 and not node.is_leaf:
+            node = node.children[0]
+        while node.left is not None:
+            node = node.left
+        assert node.left is None
+        summary_entries = []
+        while node is not None:
+            summary_entries.extend(copy.deepcopy(node.children))
+            node = node.right
+        return {"entries": summary_entries, "outliers": summary_outlier_disk, "tree": summary_root}
 
 
 class CFNode():
@@ -351,7 +357,7 @@ class CFNode():
                     farthest_closeness = close
         i_children = []
         j_children = []
-        print("split seeds", self.children[farthest_i], self.children[farthest_j])
+        #print("split seeds", self.children[farthest_i], self.children[farthest_j])
         for h in range(len(self.children)):
             close_i = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_i])
             close_j = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_j])

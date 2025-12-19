@@ -8,7 +8,7 @@ from online_handler import get_online_method
 
 
 def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_pseudoclustering):
-    if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmplus"]:
+    if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmplus", "birch"]:
         if online_alg == "clustream":
             positions = np.array([mc.mean for mc in summary.values()])
             radii = np.array([mc.boundary for mc in summary.values()])
@@ -48,6 +48,27 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
             weights = np.ones(len(summary))
             id_map = np.arange(len(summary))
             status = np.array(["dense"] * len(weights))
+        elif online_alg == "birch":
+            entries = summary["entries"]
+            positions = [entry.mean for entry in entries]
+            radii = [entry.radius for entry in entries]
+            weights = [entry.n for entry in entries]
+            id_map = np.arange(len(entries)).tolist()
+            status = np.array(["dense"] * len(weights)).tolist()
+
+            outliers = summary["outliers"]
+            positions.extend([outlier.mean for outlier in outliers])
+            radii.extend([outlier.radius for outlier in outliers])
+            weights.extend([outlier.n for outlier in outliers])
+            id_map.extend((np.arange(len(outliers))+len(id_map)).tolist())
+            status.extend(["outlie"] * len(outliers))
+
+            positions = np.array(positions)
+            radii = np.array(radii)
+            weights = np.array(weights)
+            id_map = np.array(id_map)
+            status = np.array(status)
+
         #print(utils.distance_calc(batch_datapoints, positions, dist="euclidean").shape)
         assignment_dists = utils.distance_calc(batch_datapoints, positions, dist="euclidean")
         assignment = np.argmin(assignment_dists, axis=1)
@@ -150,7 +171,7 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
     min_store = {"id_map": id_map, "center": positions, "radii": radii, "weights": weights, "status": status}
     if do_pseudoclustering:
         if online_alg in ["clustream", "denstream", "hddstream", "dstream", "gbfuzzystream",
-                          "stmstream"]:  # connected components
+                          "stmstream", "birch"]:  # connected components
             mc_dists = utils.distance_calc(positions, positions, dist="euclidean")
             two_radii = np.array([radii + radii[i] for i in range(len(positions))])
             connected = np.where(mc_dists <= two_radii, True, False)
@@ -187,7 +208,7 @@ from clustpy.metrics.clustering_metrics import purity
 
 if __name__ == "__main__":
     stream, labels = load_data("complex9")
-    online_alg = "emcstream"
+    online_alg = "birch"
     stream_alg = get_online_method(online_alg, {"dim_grid_num":10}, 0)
     batch_size = 1000
     batch_ids = np.arange(0, len(stream), step=batch_size).tolist()

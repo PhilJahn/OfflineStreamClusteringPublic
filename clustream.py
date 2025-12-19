@@ -389,7 +389,6 @@ class CluStreamMicroCluster:
     def __str__(self):
         return str(self.get_dict())
 
-from online.clustream_river import CluStreamRiver
 from pprint import pprint
 import matplotlib.pyplot as plt
 import matplotlib.patches as ptc

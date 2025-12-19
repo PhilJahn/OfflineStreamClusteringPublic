@@ -1,5 +1,6 @@
 from scipy.spatial.distance import euclidean
 
+from birch import Birch
 from clustream import CluStream
 from denstream import DenStream
 from dstream import DStream
@@ -72,6 +73,11 @@ def get_online_method(method, config_dict, seed):
         method = STMStream(epsilon=param_dict["epsilon"], k=param_dict["k"], window=param_dict["window"], stride=param_dict["stride"],
                            init_num=param_dict["init_num"], dist=param_dict["dist"], u_radius=param_dict["u_radius"],
                            random_state=seed, verbose=False)
+    elif method == "birch":
+        param_dict = {"max_leaf_entry_num": 100, "L": 4, "B": 2, "closeness": "D0", "absorption": "R", "outlier_ratio": 0.1, "outlier_batch": 100} | config_dict
+        method = Birch(max_leaf_entry_num=param_dict["max_leaf_entry_num"], L=param_dict["L"], B=param_dict["B"],
+                       closeness=param_dict["closeness"], absorption=param_dict["absorption"],
+                       outlier_ratio=param_dict["outlier_ratio"], outlier_batch=param_dict["outlier_batch"])
     else:
         raise NotImplementedError(f"Method {method} is not implemented.")
     return method

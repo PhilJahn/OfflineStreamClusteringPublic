@@ -5,12 +5,12 @@ import os
 from pandas.core.window import online
 from sklearn.cluster import AgglomerativeClustering, KMeans, DBSCAN
 from sklearn.neighbors import kneighbors_graph
-from predecon import PreDeCon
 
 from datahandler import load_data
 from evaluation_handler import evaluate_clustering
 from offline.adjacency import get_adjacency_mc
 from offline.density_peak_clustering import DensityPeakClustering
+from offline.predecon import PreDeCon
 from utils import get_noise_labels, dict_to_np, dps_to_np
 import numpy as np
 import pandas as pd
@@ -52,10 +52,10 @@ def get_summary_clustering(data_points, offline_method, config_dict, seed):
             config["enforce_max_pref_dimensionality"] = np.inf
 
         predecon_clusterer = PreDeCon(eps=config["eps"], min_samples=config["min_samples"],
-                                      max_dimensions=config["max_pref_dimensionality"],
-                                      variance_thres=config["variance_threshold"],
-                                      kappa=config["kappa"])
-        predecon_clusterer.fit(pd_dps)
+                                      max_pref_dimensionality=config["max_pref_dimensionality"],
+                                      variance_threshold=config["variance_threshold"],
+                                      k=config["kappa"])
+        predecon_clusterer.fit(pd_dps, y=None)
         clustering = predecon_clusterer.labels_
     elif offline_method == "adjacency":  # handled by process_summaries
         labels = np.arange(len(data_points)+1)

@@ -141,6 +141,18 @@ def get_online_configspace(method, data_points, labels, args):
         config_space.add([stmstream_1, stmstream_2, stmstream_3, stmstream_4, stmstream_5, stmstream_6])
         stmstream_cond_1 = ForbiddenLessThanRelation(config_space['window'], config_space['stride'])
         config_space.add(stmstream_cond_1)
+    elif method == "birch":
+        if args.offline is None:
+            birch_1 = Constant("max_leaf_entry_num", 100)
+        else:
+            birch_1 = Integer("max_leaf_entry_num", (1, 100), default=gt_cls_num)
+        birch_2 = Integer("L", (1, 10), default=4)
+        birch_3 = Integer("B", (1, 4), default=2)
+        birch_4 = Categorical("closeness", ["D0", "D1", "D2", "D3", "D4"], default="D0")
+        birch_5 = Categorical("absorption", ["R", "D", "euclidean"], default="R")
+        birch_6 = Float("outlier_ratio", (0.01, 0.5), default=0.1)
+        birch_7 = Constant("outlier_batch", 100)
+        config_space.add([birch_1, birch_2, birch_3, birch_4, birch_5, birch_6, birch_7])
     else:
         raise NotImplementedError(method)
     return config_space
