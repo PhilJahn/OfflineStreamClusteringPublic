@@ -7,7 +7,7 @@ from datahandler import load_data
 from online.stream_clustering import StreamClusterer
 
 
-class Betula(StreamClusterer):
+class Birch(StreamClusterer):
 
     def __init__(self, max_leaf_entry_num=1000, L=4, B=2, closeness="D0", absorption="R", outlier_ratio=0.1, outlier_batch=100):
         super().__init__()
@@ -27,22 +27,23 @@ class Betula(StreamClusterer):
         self.outlier_disk = []
         self.outlier_batch = outlier_batch
 
-    def find_new_threshold_and_outlier_ratio(self):
+    def find_new_threshold_and_outlier_ratio(self) -> (float, float):
         closenesses = []
         size = []
         node = self.left_most_leaf
         while node is not None:
             for child1 in node.children:
                 min_closesness = np.inf
-                for child2 in node.children:
-                    if child1 != child2:
-                        cand_closeness = compute_closeness_nodes(self.closeness, child1, child2)
-                        if cand_closeness < min_closesness:
-                            min_closesness = cand_closeness
-                closenesses.append(min_closesness)
+                if len(node.children) > 1: # ignore if no other entry in leaf
+                    for child2 in node.children:
+                        if child1 != child2:
+                            cand_closeness = compute_closeness_nodes(self.closeness, child1, child2)
+                            if cand_closeness < min_closesness:
+                                min_closesness = cand_closeness#
+                    closenesses.append(min_closesness)
                 size.append(child1.n)
             node = node.right
-        print(closenesses)
+        #print(closenesses)
         return np.mean(closenesses), np.mean(size) # Betula prefers median, but doesn't use it
 
     def get_all_entries(self):
@@ -54,6 +55,7 @@ class Betula(StreamClusterer):
         return entries
 
     def learn_one(self, x, t: int = None):
+        event_log = ""
         self.d_ctr += 1
         x = np.array(x)
         virtual_leaf_node = CFLeafEntry(n=1, mean=x, S=0, S_vec=np.zeros(len(x)))
@@ -67,36 +69,43 @@ class Betula(StreamClusterer):
             print("thresholds", self.threshold, outlier_threshold)
             new_root = CFNode(parent=None, children=[], L=self.L, B=self.B, threshold=self.threshold,
                                        closeness=self.closeness, absorption=self.absorption)
+            self.left_most_leaf = new_root
             old_count = self.cf_tree_root.n
             node = self.cf_tree_root
-            self.left_most_leaf = node
-            print(self.cf_tree_root)
-            while len(node.children) != 0 and node is not None:
-                if not node.is_leaf: # edge case of root is leaf-node
+            #print(self.cf_tree_root)
+            while node is not None:
+                if (not node.is_leaf) and len(node.children) > 0: # edge case of root is leaf-node
                     node = node.children[0]
+                #print(str([node]).split(" ")[-1][:-2])
                 if node.is_leaf:
                     for entry in node.children:
                         entry.update_parent(None)
-                        print("size", entry.n)
+                        #print("size", entry.n)
                         if entry.n >= outlier_threshold:
                             new_root.insert(entry)
                             if new_root.parent is not None:
                                 new_root = new_root.parent
                                 assert new_root.parent is None
+                            print(new_root)
                         else:
                             self.outlier_disk.append(entry)
                     node.children = []
                 if len(node.children) == 0:
                     node_parent = node.parent
+                    #print("empty", str([node]).split(" ")[-1][:-2])
                     if node_parent is not None:
                         node_parent.children.remove(node)
                         del node
-                        node = node_parent
-
-            print("old root", self.cf_tree_root)
+                    node = node_parent
+                    #print("move up", str([node]).split(" ")[-1][:-2])
+                event_log += "reconstructed;"
+            #print("old root", self.cf_tree_root)
             self.cf_tree_root = new_root
-            print("new root", self.cf_tree_root)
+            #print("new root", self.cf_tree_root)
             outlier_n = sum([outlier.n for outlier in self.outlier_disk])
+            #print(self.cf_tree_root.n)
+            #print(outlier_n)
+            #print(old_count)
             assert self.cf_tree_root.n + outlier_n == old_count
             reinserted = []
             for outlier in self.outlier_disk:
@@ -105,9 +114,9 @@ class Betula(StreamClusterer):
                     reinserted.append(outlier)
             for reinsert in reinserted:
                 self.outlier_disk.remove(reinsert)
-
+                event_log += "reins;"
         if self.d_ctr % self.outlier_batch == 0: # periodically check for reinsertion
-            print("Check outliers")
+            #print("Check outliers")
             reinserted = []
             for outlier in self.outlier_disk:
                 _, inserted = self.cf_tree_root.insert(outlier, outlier=True)
@@ -116,7 +125,7 @@ class Betula(StreamClusterer):
             for reinsert in reinserted:
                 self.outlier_disk.remove(reinsert)
 
-        return -1, ""
+        return -1, event_log
 
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
@@ -231,20 +240,20 @@ class CFNode():
                 child = self.children[best_i]
                 absorption_value = compute_absorption_nodes(self.absorption, child, x)
                 if absorption_value <= self.threshold:
-                    print("Absorbed")
+                    #print("Absorbed")
                     child.insert(x)
                 else:
                     if outlier:
                         return False, False
-                    print("Not absorbed")
+                    #print("Not absorbed")
                     self.children.append(x)
                     x.update_parent(self)
                     if len(self.children) > self.L:  # splitting needed
-                        print("Split needed", len(self.children))
+                        #print("Split needed", len(self.children))
                         new_root = self.split()
                         return new_root
             else:
-                print("Move down")
+                #print("Move down")
                 self.children[best_i].insert(x)
 
         if self.is_leaf:
@@ -270,21 +279,25 @@ class CFNode():
         new_child2.update_parent(self)
         assert new_child1.parent is self
         if len(self.children) <= self.B * 2:
-            print("no split for parent")
+            #print("no split for parent")
             self.propagate_compute_features()
             pair1, pair2, _ = self.find_closest_children()
             if not ((pair1 == new_child1 and pair2 == new_child2) or (pair2 == new_child1 and pair1 == new_child2)):
                 if pair2.left is not None: # don't remove first leaf entry
-                    print(pair1.left, pair2.left)
+                    #print("pair 1", pair1)
+                    #print("pair 2", pair2)
+                    #print(pair1.left, pair2.left)
                     self.children.remove(pair2)
                     pair1.merge(pair2)
                 else:
-                    print(pair1.left, pair2.left)
+                    #print("pair 1", pair1)
+                    #print("pair 2", pair2)
+                    #print(pair1.left, pair2.left)
                     self.children.remove(pair1)
                     pair2.merge(pair1)
             return False
         else:
-            print("split for parent")
+            #print("split for parent")
             return self.split()
 
     def find_closest_children(self):
@@ -301,13 +314,14 @@ class CFNode():
         return self.children[closest_i], self.children[closest_j], closest_closeness
 
     def merge(self, x):
-        print("merge")
+        #print("merge")
         self.children.extend(x.children)
         for child in x.children:
             child.update_parent(self)
         x_left = x.left
         x_right = x.right
-        x_left.update_right(x_right)
+        if self.is_leaf:
+            x_left.update_right(x_right)
         if x_right is not None:
             x_right.update_left(x_left)
         self.propagate_compute_features()
@@ -337,7 +351,7 @@ class CFNode():
                     farthest_closeness = close
         i_children = []
         j_children = []
-        #print(self.children[farthest_i], self.children[farthest_j])
+        print("split seeds", self.children[farthest_i], self.children[farthest_j])
         for h in range(len(self.children)):
             close_i = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_i])
             close_j = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_j])
@@ -387,6 +401,8 @@ class CFNode():
        # dic['S'] = self.S
        # dic['S_vec'] = self.S_vec
         dic['leaf'] = self.is_leaf
+        dic['left'] = str([self.left]).split(" ")[-1][:-2]
+        dic['right'] = str([self.right]).split(" ")[-1][:-2]
         #dic['absorption'] = self.absorption
         #dic['closeness'] = self.closeness
         #dic['threshold'] = self.threshold
@@ -492,19 +508,40 @@ def compute_absorption(absorption, n, mean, S):
     else:
         raise ValueError("Invalid absorption parameter")
 
-
+import matplotlib.pyplot as plt
+import matplotlib.patches as ptc
 if __name__ == "__main__":
     stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
     #stream = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[12],[13],[14],[15],[16], [17], [2.5], [2.6]]
     ts = list(range(len(stream)))
-    make_fig = False
-    betula = Betula(max_leaf_entry_num=100, closeness="D1")
+    make_fig = True
+    betula = Birch(max_leaf_entry_num=100, closeness="D0")
     for i in range(len(stream)):
         print("TS", i, "started")
         nmc_id, event_log = betula.learn_one(stream[i], ts[i])
-        entries, outliers, tree = betula.get_summary()
         print("TS", i, "done")
-        print("tree", tree)
-        print("outliers", outliers)
+        if make_fig and ("recon" in event_log or (i+1) % 100 == 0):
+            entries, outliers, tree = betula.get_summary()
+            #print("entries", len(entries))
+            #print("tree", tree)
+            #print("outliers", outliers)
+            entry_parents = [str([entry.parent]).split(" ")[-1][:-2] for entry in entries]
+            entry_parents_unique = np.unique(sorted(entry_parents)).tolist()
+
+            plt.figure(figsize=(8,8))
+            batch_start = max(0, i + 1 - 500)
+            for entry in entries:
+                parent_id = entry_parents_unique.index(str([entry.parent]).split(" ")[-1][:-2])
+                mc_patch = ptc.Circle((float(entry.mean[0]), float(entry.mean[1])), entry.radius, alpha=0.4, color="lightgrey")
+                plt.scatter(x=entry.mean[0], y=entry.mean[1], c=parent_id, alpha=1, s=100)
+                plt.gca().add_patch(mc_patch)
+                plt.text(entry.mean[0]+0.02, entry.mean[1], s=parent_id)
+                #plt.text(entry.mean[0], entry.mean[1]-0.05, s=entry.mean)
+            if "recon" in event_log:
+                plt.title("Reconstruction")
+            plt.scatter(x=np.array(stream)[batch_start:i+1][:,0], y=np.array(stream)[batch_start:i+1][:,1], cmap=plt.get_cmap("jet"), c=labels[batch_start:i+1], s=10)
+            plt.scatter(x=np.array(stream)[i:i+1][:,0], y=np.array(stream)[i:i+1][:,1], c="pink", s=25)
+            plt.savefig(f"test_figures/birch/complex9_birch_{i}.png", bbox_inches='tight')
+            plt.close()
 
 

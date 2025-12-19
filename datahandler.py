@@ -203,5 +203,6 @@ def load_data(dsname, seed=0, batch=None, batch_max=None, scale=True, standard=F
     return X, y
 
 if __name__ == "__main__":
-    data, label = load_data("pendigits")
+    data, label = load_data("complex9")
+    print(data[0:40])
     print(data.shape, label.shape)
