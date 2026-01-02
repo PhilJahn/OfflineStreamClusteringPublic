@@ -25,6 +25,7 @@ def get_summary_clustering(data_points, offline_method, config_dict, seed):
         config = {"n_clusters": 8, "init": "k-means++"} | config_dict
         kmeans = KMeans(n_clusters=config["n_clusters"], init=config["init"], random_state=seed)
         clustering = kmeans.fit_predict(data_points, None)
+        # TODO maybe pomegranate
     elif offline_method == "agglomerative":
         config = {"n_clusters": 8, "connectivity": None, "linkage": "ward"} | config_dict
         if config["connectivity"] == "kneighbors_graph":
@@ -63,6 +64,9 @@ def get_summary_clustering(data_points, offline_method, config_dict, seed):
         labellist = labels.tolist()
         labellist.extend(negative_labels.tolist())
         return np.array(labellist)
+    elif offline_method == "em":
+        #TODO: pomegranate weighted gmm
+        raise NotImplementedError
     else:
         raise NotImplementedError
     clustering = get_noise_labels(clustering)

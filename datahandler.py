@@ -113,15 +113,15 @@ def read_file(dsname):
         elif dsname == "hyper":
             if not os.path.exists("./data/capymoa_download/"):
                 os.mkdir("./data/capymoa_download/")
-            #if not os.path.exists("./data/capymoa_download/hyper100k.arff"):
+            #if not os.path.exists("./data/capymoa_download/Hyper100k.arff"):
                 #Hyper100k(directory="./data/capymoa_download/")
-            file = open("./data/capymoa_download/hyper100k.arff", "r")
+            file = open("./data/capymoa_download/Hyper100k.arff", "r")
         elif dsname == "rbfm":
             if not os.path.exists("./data/capymoa_download/"):
                 os.mkdir("./data/capymoa_download/")
-            #if not os.path.exists("./data/capymoa_download/rbfm_100k.arff"):
+            #if not os.path.exists("./data/capymoa_download/RBFm_100k.arff"):
                 #RBFm_100k(directory="./data/capymoa_download/")
-            file = open("./data/capymoa_download/rbfm_100k.arff", "r")
+            file = open("./data/capymoa_download/RBFm_100k.arff", "r")
         else:
             try:
                 file = open("./data/synthetic_milaan9" + "/" + dsname + ".arff", "r")
@@ -203,6 +203,6 @@ def load_data(dsname, seed=0, batch=None, batch_max=None, scale=True, standard=F
     return X, y
 
 if __name__ == "__main__":
-    data, label = load_data("complex9")
-    print(data[0:40])
+    data, label = load_data("complex8")
+    #print(data[0:40])
     print(data.shape, label.shape)

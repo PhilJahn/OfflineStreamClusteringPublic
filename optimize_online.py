@@ -123,7 +123,16 @@ def online_runner(config: Configuration, seed: int = 0) -> float:
         assertion_error_file.close()
         print(traceback.format_exc(), flush=True)
         final_score = np.inf
-    except Exception:
+    # https://stackoverflow.com/questions/9823936/how-do-i-determine-what-type-of-exception-occurred
+    except Exception as ex:
+        if not os.path.exists("./error_logs/"):
+            os.makedirs("./error_logs/", exist_ok=True)
+        timestr = datetime.now().strftime("%H_%M_%S_%d_%m_%Y")
+        error_file = open(f'./error_logs/error_{type(ex).__name__}_{name}_{timestr}.txt', 'w', buffering=1)
+        error_file.write(str(config_dict))
+        error_file.write("\n")
+        error_file.write(traceback.format_exc())
+        error_file.close()
         print(traceback.format_exc(), flush=True)
         final_score = np.inf
     finally:

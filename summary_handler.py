@@ -8,7 +8,7 @@ from online_handler import get_online_method
 
 
 def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_pseudoclustering):
-    if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmplus", "birch"]:
+    if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmplus", "birch", "swclustering"]:
         if online_alg == "clustream":
             positions = np.array([mc.mean for mc in summary.values()])
             radii = np.array([mc.boundary for mc in summary.values()])
@@ -17,12 +17,16 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
             status = np.array(["dense"] * len(weights))
         elif online_alg == "denstream" or online_alg == "hddstream":
             pmcs = summary["pmcs"]  # DenStream discards omcs for clustering
-            mu = pmcs[list(pmcs.keys())[0]].mu
             positions = [pmc.mean for pmc in pmcs.values()]
             radii = [pmc.radius for pmc in pmcs.values()]
             weights = [pmc.w for pmc in pmcs.values()]
+            if len(pmcs.keys()) > 0:
+                mu = pmcs[list(pmcs.keys())[0]].mu
+                status = np.where(np.array(weights) >= mu, "dense", "normal").tolist()
+            else:
+                status = []
             id_map = list(pmcs.keys())
-            status = np.where(np.array(weights) >= mu, "dense", "normal").tolist()
+
 
             omcs = summary["omcs"]
             positions.extend([omc.mean for omc in omcs.values()])
@@ -68,6 +72,12 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
             weights = np.array(weights)
             id_map = np.array(id_map)
             status = np.array(status)
+        elif online_alg == "swclustering":
+            positions = np.array([ehcf.mean for ehcf in summary.values()])
+            radii = np.array([ehcf.boundary for ehcf in summary.values()])
+            weights = np.array([ehcf.n for ehcf in summary.values()])
+            id_map = np.array(list(summary.keys()))
+            status = np.array(["dense"] * len(weights))
 
         #print(utils.distance_calc(batch_datapoints, positions, dist="euclidean").shape)
         assignment_dists = utils.distance_calc(batch_datapoints, positions, dist="euclidean")
@@ -171,7 +181,7 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
     min_store = {"id_map": id_map, "center": positions, "radii": radii, "weights": weights, "status": status}
     if do_pseudoclustering:
         if online_alg in ["clustream", "denstream", "hddstream", "dstream", "gbfuzzystream",
-                          "stmstream", "birch"]:  # connected components
+                          "stmstream", "birch", "swclustering"]:  # connected components
             mc_dists = utils.distance_calc(positions, positions, dist="euclidean")
             two_radii = np.array([radii + radii[i] for i in range(len(positions))])
             connected = np.where(mc_dists <= two_radii, True, False)
@@ -207,9 +217,11 @@ import matplotlib.patches as ptc
 from clustpy.metrics.clustering_metrics import purity
 
 if __name__ == "__main__":
-    stream, labels = load_data("complex9")
+    stream, labels = load_data("densired2")
+
     online_alg = "birch"
-    stream_alg = get_online_method(online_alg, {"dim_grid_num":10}, 0)
+    config_dict = {'B': 1, 'L': 3, 'absorption': 'euclidean', 'batch_budget': 1800, 'batch_size': 1000, 'closeness': 'D3', 'ds': 'densired2', 'max_leaf_entry_num': 100, 'offline': None, 'online': 'birch', 'outlier_batch': 100, 'outlier_ratio': 0.2455760137573}
+    stream_alg = get_online_method(online_alg, config_dict, 0)
     batch_size = 1000
     batch_ids = np.arange(0, len(stream), step=batch_size).tolist()
     batch_ids.append(len(stream))

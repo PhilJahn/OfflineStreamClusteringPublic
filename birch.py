@@ -9,7 +9,7 @@ from online.stream_clustering import StreamClusterer
 
 class Birch(StreamClusterer):
 
-    def __init__(self, max_leaf_entry_num=1000, L=4, B=2, closeness="D0", absorption="R", outlier_ratio=0.1, outlier_batch=100):
+    def __init__(self, max_leaf_entry_num=1000, L=4, B=2, closeness="D2", absorption="D", outlier_ratio=0.25, outlier_batch=100):
         super().__init__()
         self.threshold = 0
         self.leaf_entry_ctr = 0
@@ -98,7 +98,7 @@ class Birch(StreamClusterer):
                         del node
                     node = node_parent
                     #print("move up", str([node]).split(" ")[-1][:-2])
-                event_log += "reconstructed;"
+            event_log += "reconstructed;"
             #print("old root", self.cf_tree_root)
             self.cf_tree_root = new_root
             #print("new root", self.cf_tree_root)
@@ -112,18 +112,27 @@ class Birch(StreamClusterer):
                 _, inserted = self.cf_tree_root.insert(outlier, outlier=True)
                 if inserted:
                     reinserted.append(outlier)
+                    if self.cf_tree_root.parent is not None:
+                        self.cf_tree_root = self.cf_tree_root.parent
+                        assert self.cf_tree_root.parent is None
             for reinsert in reinserted:
                 self.outlier_disk.remove(reinsert)
-                event_log += "reins;"
+                event_log += "reinserted;"
         if self.d_ctr % self.outlier_batch == 0: # periodically check for reinsertion
             #print("Check outliers")
             reinserted = []
+            event_log += "outlier check;"
             for outlier in self.outlier_disk:
                 _, inserted = self.cf_tree_root.insert(outlier, outlier=True)
                 if inserted:
                     reinserted.append(outlier)
+                    if self.cf_tree_root.parent is not None:
+                        self.cf_tree_root = self.cf_tree_root.parent
+                        assert self.cf_tree_root.parent is None
             for reinsert in reinserted:
                 self.outlier_disk.remove(reinsert)
+            print("outlier check")
+            print(self.cf_tree_root)
 
         return -1, event_log
 
@@ -190,6 +199,8 @@ class CFNode():
                 assert type(self.children[0]) == CFLeafEntry
             else:
                 assert type(self.children[0]) != CFLeafEntry
+
+        self.current_split_lock = []
 
     def update_left(self, new_left):
         self.left = new_left
@@ -284,11 +295,14 @@ class CFNode():
         self.children.append(new_child2)
         new_child2.update_parent(self)
         assert new_child1.parent is self
+        self.current_split_lock.append(new_child1)
+        self.current_split_lock.append(new_child2)
         if len(self.children) <= self.B * 2:
             #print("no split for parent")
             self.propagate_compute_features()
             pair1, pair2, _ = self.find_closest_children()
-            if not ((pair1 == new_child1 and pair2 == new_child2) or (pair2 == new_child1 and pair1 == new_child2)):
+            #if not ((pair1 == new_child1 and pair2 == new_child2) or (pair2 == new_child1 and pair1 == new_child2)):
+            if not (pair1 in self.current_split_lock or pair2 in self.current_split_lock):
                 if pair2.left is not None: # don't remove first leaf entry
                     #print("pair 1", pair1)
                     #print("pair 2", pair2)
@@ -301,9 +315,12 @@ class CFNode():
                     #print(pair1.left, pair2.left)
                     self.children.remove(pair1)
                     pair2.merge(pair1)
+            self.current_split_lock = []
             return False
         else:
+            self.current_split_lock = []
             #print("split for parent")
+            #print(len(self.children))
             return self.split()
 
     def find_closest_children(self):
@@ -357,11 +374,11 @@ class CFNode():
                     farthest_closeness = close
         i_children = []
         j_children = []
-        #print("split seeds", self.children[farthest_i], self.children[farthest_j])
         for h in range(len(self.children)):
             close_i = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_i])
             close_j = compute_closeness_nodes(self.closeness, self.children[h], self.children[farthest_j])
-            if close_i < close_j:
+            #print(close_i, close_j)
+            if (close_i < close_j and farthest_j != h) or farthest_i == h:
                 i_children.append(self.children[h])
             else:
                 j_children.append(self.children[h])
@@ -376,6 +393,8 @@ class CFNode():
         j_node = CFNode(parent=self.parent, children=j_children, is_leaf=self.is_leaf, L=self.L, B=self.B, threshold=self.threshold,
                         closeness=self.closeness, absorption=self.absorption)
         assert j_node.parent == self.parent
+        if self.parent is not None:
+            assert self in self.parent.children
         if self.is_leaf:
             #print("I was here")
             j_node.update_left(self)
@@ -389,8 +408,10 @@ class CFNode():
         self.propagate_compute_features()
 
         if self.parent is not None:  # not root
+            #print("not root")
             return self.parent.propagate_split(self, j_node)
         else:
+            #print("root")
             self.parent = CFNode(parent=None, children=[self, j_node], is_leaf=False, L=self.L, B=self.B,
                                  threshold=self.threshold, closeness=self.closeness, absorption=self.absorption)
             j_node.update_parent(self.parent)
@@ -404,16 +425,16 @@ class CFNode():
         dic['n'] = self.n
         dic['mean'] = self.mean
         dic['entry'] = self.entry_count
-       # dic['S'] = self.S
-       # dic['S_vec'] = self.S_vec
+        dic['S'] = self.S
+        dic['S_vec'] = self.S_vec
         dic['leaf'] = self.is_leaf
         dic['left'] = str([self.left]).split(" ")[-1][:-2]
         dic['right'] = str([self.right]).split(" ")[-1][:-2]
-        #dic['absorption'] = self.absorption
-        #dic['closeness'] = self.closeness
-        #dic['threshold'] = self.threshold
-        #dic['B'] = self.B
-       # dic['L'] = self.L
+        dic['absorption'] = self.absorption
+        dic['closeness'] = self.closeness
+        dic['threshold'] = self.threshold
+        dic['B'] = self.B
+        dic['L'] = self.L
         return dic
 
     def __str__(self):
@@ -449,12 +470,12 @@ class CFLeafEntry():
     def get_dict(self):
         dic = {}
         dic['n'] = self.n
-        #dic["entry"] = self.entry
+        dic["entry"] = self.entry
         dic['mean'] = self.mean
         dic['parent'] = str([self.parent]).split(" ")[-1][:-2]
         dic['S'] = self.S
-        #dic['S_vec'] = self.S_vec
-        #dic['radius'] = self.radius
+        dic['S_vec'] = self.S_vec
+        dic['radius'] = self.radius
         return dic
 
     def __str__(self):
@@ -484,12 +505,12 @@ def compute_closeness(closeness, nA, meanA, SA, nB, meanB, SB):
         return utils.distance_calc(meanA, meanB, "manhattan")
     elif closeness == "D2":
         euc_dist = utils.distance_calc(meanA, meanB, "euclidean")
-        return (1 / nA * SA + 1 / nB * SB + (euc_dist ** 2)) ** 0.5
+        return ((1 / nA) * SA + ((1 / nB) * SB) + (euc_dist ** 2)) ** 0.5
     elif closeness == "D3":
         euc_dist = utils.distance_calc(meanA, meanB, "euclidean")
         nAB = nA + nB
-        inner = nAB * (SA + SB) + nA + nB * (euc_dist ** 2)
-        return (2 * inner / (nAB * (nAB - 1))) ** 0.5
+        inner = (nAB * (SA + SB)) + nA * nB * (euc_dist ** 2)
+        return ((2 * inner) / (nAB * (nAB - 1))) ** 0.5
     elif closeness == "D4":
         euc_dist = utils.distance_calc(meanA, meanB, "euclidean")
         nAB = nA + nB
@@ -517,15 +538,14 @@ def compute_absorption(absorption, n, mean, S):
 import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 if __name__ == "__main__":
-    stream, labels = load_data("complex9")  #[[0],[1],[3],[7],[8],[9]]
+    stream, labels = load_data("densired2")  #[[0],[1],[3],[7],[8],[9]]
     #stream = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[12],[13],[14],[15],[16], [17], [2.5], [2.6]]
     ts = list(range(len(stream)))
-    make_fig = True
-    betula = Birch(max_leaf_entry_num=100, closeness="D0")
+    make_fig = False
+    betula = Birch(B=1, L=9, absorption ='euclidean', closeness='D2', max_leaf_entry_num=100, outlier_ratio =0.3724614128401)
     for i in range(len(stream)):
-        print("TS", i, "started")
         nmc_id, event_log = betula.learn_one(stream[i], ts[i])
-        print("TS", i, "done")
+        print("TS", i, event_log)
         if make_fig and ("recon" in event_log or (i+1) % 100 == 0):
             entries, outliers, tree = betula.get_summary()
             #print("entries", len(entries))

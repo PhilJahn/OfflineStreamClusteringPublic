@@ -62,6 +62,8 @@ def distance_calc(pos1, pos2, dist):
         if len(pos1.shape) == 1:
             return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
         elif len(pos2.shape) == 1:
+            print(pos1.shape, pos2.shape)
+            print(pos2)
             return np.array([np.sqrt(np.sum(np.square(pos - pos2), axis=-1)) for pos in pos1])
         else:
             return np.array([[np.sqrt(np.sum(np.square(pos - post), axis=-1)) for post in pos2] for pos in pos1])

@@ -146,13 +146,22 @@ def get_online_configspace(method, data_points, labels, args):
             birch_1 = Constant("max_leaf_entry_num", 100)
         else:
             birch_1 = Integer("max_leaf_entry_num", (1, 100), default=gt_cls_num)
-        birch_2 = Integer("L", (1, 10), default=4)
+        birch_2 = Integer("L", (2, 10), default=4) # needs to be 2+ as expansion onyl comapres within leaf -> no additional leafs, no expansion
         birch_3 = Integer("B", (1, 4), default=2)
-        birch_4 = Categorical("closeness", ["D0", "D1", "D2", "D3", "D4"], default="D0")
-        birch_5 = Categorical("absorption", ["R", "D", "euclidean"], default="R")
-        birch_6 = Float("outlier_ratio", (0.01, 0.5), default=0.1)
+        birch_4 = Categorical("closeness", ["D0", "D1", "D2", "D3", "D4"], default="D2")
+        birch_5 = Categorical("absorption", ["R", "D", "euclidean"], default="D")
+        birch_6 = Float("outlier_ratio", (0.01, 0.5), default=0.25)
         birch_7 = Constant("outlier_batch", 100)
         config_space.add([birch_1, birch_2, birch_3, birch_4, birch_5, birch_6, birch_7])
+    elif method == "swclustering":
+        swclustering_1 = Float("epsilon", (0.05, 1), default=0.1)
+        swclustering_2 = Float("beta", (0.1, 5.0), default=2.0)
+        if args.offline is None:
+            swclustering_3 = Constant("mmc", 100)
+        else:
+            swclustering_3 = Integer("mmc", (1, 100), default=gt_cls_num)
+        swclustering_4 = Categorical("N", [200000, 10000, 5000, 2000, 1000], default=10000)
+        config_space.add([swclustering_1, swclustering_2, swclustering_3, swclustering_4])
     else:
         raise NotImplementedError(method)
     return config_space

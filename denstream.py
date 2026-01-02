@@ -15,7 +15,7 @@ class DenStream(StreamClusterer):
     # init_num: initN
     def __init__(self, init_num: int = 1000, mu: int = 10, beta: float = 0.2, epsilon: float = 16.0, b=2,
                  l: float = 0.25,
-                 stream_speed: int = 1000, alpha=None, heuristic=False, distance="euclidean", verbose=False):
+                 stream_speed: int = 1000, alpha=None, heuristic=False, verbose=False):
         super().__init__()
         self.t = 0
         self.d_ctr = 0
@@ -26,8 +26,6 @@ class DenStream(StreamClusterer):
         self.init_storage = []
         self.init_timestamps = []
         self.initialized = False
-
-        self.distance = distance
 
         if not (1 >= beta > 0):
             raise ValueError("beta must be between 0 and 1")
@@ -87,7 +85,7 @@ class DenStream(StreamClusterer):
             cluster_eps_nn_sizes = np.array(list(sizes.values()))[non_noise]
             self.mu = np.floor(np.mean(cluster_eps_nn_sizes))
             if self.mu * self.beta < 1:
-                self.mu = 1.0001 / self.beta
+                self.beta = 1.0001 / self.mu
 
         #print(sizes)
         max_nn = max(sizes.values())

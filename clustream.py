@@ -395,12 +395,11 @@ import matplotlib.patches as ptc
 
 if __name__ == '__main__':
 
-    stream, labels = load_data("kddcup")#[[0],[1],[3],[7],[8],[9]]
+    stream, labels = load_data("aggregation")#[[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
 
     #{'batch_budget': 1800, 'batch_size': 6000, 'delta': 1713,
     # 'ds': 'kddcup', 'init_num': 2000, 'm': 11, 'mbf': 3.4549739469849, 'mmc': 100, 'offline': None, 'online': 'clustream'}
-
 
     # clustream_river = CluStreamRiver(max_micro_clusters=100)
     # start = default_timer()
@@ -411,7 +410,7 @@ if __name__ == '__main__':
     #         print(i)
     # final_time_river = default_timer() - start
     make_fig = False
-    clustream = CluStream(max_mc=100, init_num=2000, mbf=3.4549739469849, delta=1713, m=11, verbose=True)
+    clustream = CluStream(max_mc=100, init_num=1000, mbf=4.5500448772662, delta=444, m=43, verbose=True)
     start = default_timer()
     for i in range(len(stream)):
         nmc_id, event_log = clustream.learn_one(stream[i], ts[i])

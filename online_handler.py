@@ -10,6 +10,7 @@ from hddstream import HDDStream
 from stmstream import STMStream
 from streamkmeans import STREAMKmeans
 from streamkmplus import STREAMKMPlus
+from swclustering import SWClustering
 
 
 def get_online_method(method, config_dict, seed):
@@ -29,14 +30,17 @@ def get_online_method(method, config_dict, seed):
                       "alpha": 0.5, "heuristic": 1, "distance": "euclidean"} | config_dict
         param_dict["heuristic"] = param_dict["heuristic"] == 1
         method = DenStream(init_num=param_dict["init_num"], mu=param_dict["mu"], beta=param_dict["beta"],
-                           epsilon= param_dict["epsilon"], b=param_dict["b"], l=param_dict["l"],
+                           epsilon=param_dict["epsilon"], b=param_dict["b"], l=param_dict["l"],
                            stream_speed=param_dict["stream_speed"], alpha=param_dict["alpha"],
                            heuristic=param_dict["heuristic"], distance=param_dict["distance"], verbose=False)
     elif method == "hddstream":
-        param_dict = {"init_num": 1000, "window": 1000, "mu": 10, "beta": 0.5, "epsilon": 0.2, "delta":0.001, "pi":30, "kappa":1000, "b": 2, "l": 0.5} | config_dict
-        method = HDDStream(init_num=param_dict["init_num"], window=param_dict["window"], mu=param_dict["mu"], beta=param_dict["beta"],
-                           epsilon=param_dict["epsilon"], delta=param_dict["delta"], pi=param_dict["pi"], kappa=param_dict["kappa"],
-                           b=param_dict["b"], l=param_dict["l"], verbose = False)
+        param_dict = {"init_num": 1000, "window": 1000, "mu": 10, "beta": 0.5, "epsilon": 0.2, "delta": 0.001, "pi": 30,
+                      "kappa": 1000, "b": 2, "l": 0.5} | config_dict
+        method = HDDStream(init_num=param_dict["init_num"], window=param_dict["window"], mu=param_dict["mu"],
+                           beta=param_dict["beta"],
+                           epsilon=param_dict["epsilon"], delta=param_dict["delta"], pi=param_dict["pi"],
+                           kappa=param_dict["kappa"],
+                           b=param_dict["b"], l=param_dict["l"], verbose=False)
     elif method == "streamkmeans":
         param_dict = {"k": 100, "chunk_size": 1000, "prototype_num": 500} | config_dict
         method = STREAMKmeans(k=param_dict["k"], chunk_size=param_dict["chunk_size"],
@@ -52,7 +56,8 @@ def get_online_method(method, config_dict, seed):
                          window=param_dict["window"], l=param_dict["l"], beta=param_dict["beta"])
     elif method == "emcstream":
         param_dict = {"k": 10, "horizon": 1000, "init_num_factor": 2, "drift_num_factor": 5,
-                      "drift_num_factor_change": 1, "drift_inc_delay": 2, "consistency_threshold": 1.0, "consistency_drift": 0.001,
+                      "drift_num_factor_change": 1, "drift_inc_delay": 2, "consistency_threshold": 1.0,
+                      "consistency_drift": 0.001,
                       "consistency_delay": 4} | config_dict
         method = EMCStream(k=param_dict["k"], horizon=param_dict["horizon"],
                            init_num_factor=param_dict["init_num_factor"],
@@ -65,19 +70,26 @@ def get_online_method(method, config_dict, seed):
                            random_state=seed, verbose=False)
     elif method == "gbfuzzystream":
         param_dict = {"l": 0.2, "threshold": 0.3, "m": 2, "eps": 10, "dist": "euclidean", "window": 1000} | config_dict
-        method = GBFuzzyStream(l=param_dict["l"], threshold=param_dict["threshold"], m=param_dict["m"], eps=param_dict["eps"],
+        method = GBFuzzyStream(l=param_dict["l"], threshold=param_dict["threshold"], m=param_dict["m"],
+                               eps=param_dict["eps"],
                                dist=param_dict["dist"], window=param_dict["window"])
     elif method == "stmstream":
         param_dict = {"epsilon": 0.1, "k": 10, "window": 1000, "stride": 500, "init_num": 1000, "dist": "euclidean",
-                      "u_radius": 0.05 } | config_dict
-        method = STMStream(epsilon=param_dict["epsilon"], k=param_dict["k"], window=param_dict["window"], stride=param_dict["stride"],
+                      "u_radius": 0.05} | config_dict
+        method = STMStream(epsilon=param_dict["epsilon"], k=param_dict["k"], window=param_dict["window"],
+                           stride=param_dict["stride"],
                            init_num=param_dict["init_num"], dist=param_dict["dist"], u_radius=param_dict["u_radius"],
                            random_state=seed, verbose=False)
     elif method == "birch":
-        param_dict = {"max_leaf_entry_num": 100, "L": 4, "B": 2, "closeness": "D0", "absorption": "R", "outlier_ratio": 0.1, "outlier_batch": 100} | config_dict
+        param_dict = {"max_leaf_entry_num": 100, "L": 4, "B": 2, "closeness": "D0", "absorption": "R",
+                      "outlier_ratio": 0.1, "outlier_batch": 100} | config_dict
         method = Birch(max_leaf_entry_num=param_dict["max_leaf_entry_num"], L=param_dict["L"], B=param_dict["B"],
                        closeness=param_dict["closeness"], absorption=param_dict["absorption"],
                        outlier_ratio=param_dict["outlier_ratio"], outlier_batch=param_dict["outlier_batch"])
+    elif method == "swclustering":
+        param_dict = {"max_ehcf_num": 100, "epsilon": 0.1, "N": 10000, "beta": 2, "distance": "euclidean"} | config_dict
+        method = SWClustering(max_ehcf_num=param_dict["max_ehcf_num"], epsilon=param_dict["epsilon"], N=param_dict["N"],
+                              beta=param_dict["beta"], distance=param_dict["distance"])
     else:
         raise NotImplementedError(f"Method {method} is not implemented.")
     return method
