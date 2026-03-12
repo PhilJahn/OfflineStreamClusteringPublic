@@ -7,6 +7,8 @@ import copy
 
 from sklearn.metrics import pairwise_distances
 
+def x_to_dict(x):
+    return dict(enumerate(x))
 
 def dict_to_np(dp):
     value_list = [value for key, value in sorted(dp.items())]
@@ -62,8 +64,8 @@ def distance_calc(pos1, pos2, dist):
         if len(pos1.shape) == 1:
             return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
         elif len(pos2.shape) == 1:
-            print(pos1.shape, pos2.shape)
-            print(pos2)
+            #print(pos1.shape, pos2.shape)
+            #print(pos2)
             return np.array([np.sqrt(np.sum(np.square(pos - pos2), axis=-1)) for pos in pos1])
         else:
             return np.array([[np.sqrt(np.sum(np.square(pos - post), axis=-1)) for post in pos2] for pos in pos1])
@@ -78,6 +80,11 @@ def distance_calc(pos1, pos2, dist):
             return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
         else:
             return pairwise_distances(pos1, pos2, dist)
+
+def compute_SAB(SA, SB, nB, meanA, meanB, meanAB):
+    SAB = SA + SB + (nB * np.dot((meanB - meanA), (meanB - meanAB)))
+    #print(SAB, SA, SB, nB, np.dot((meanB - meanA), (meanB - meanAB)))
+    return SAB
 
 if __name__ == "__main__":
     pos1 = np.array([[1,2,3], [4,5,6], [7,8,9], [10,11,12]])
