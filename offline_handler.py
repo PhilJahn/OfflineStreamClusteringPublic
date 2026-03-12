@@ -7,9 +7,9 @@ from sklearn.cluster import AgglomerativeClustering, KMeans, DBSCAN
 from sklearn.neighbors import kneighbors_graph
 
 from datahandler import load_data
-from offline.adjacency import get_adjacency_mc
+#from offline.adjacency import get_adjacency_mc
 from density_peak_clustering import DensityPeakClustering
-from offline.predecon import PreDeCon
+#from offline.predecon import PreDeCon
 import numpy as np
 import pandas as pd
 
