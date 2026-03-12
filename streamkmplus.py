@@ -19,7 +19,7 @@ class STREAMKMPlus(StreamClusterer):
 
     def learn_one(self, x, t: int = None):
         event_log = ""
-        x = np.array(x)
+        x = CoreSetPoint(np.array(x), 1)
         if len(self.buckets[0]) < self.m:
             self.buckets[0].append(x)
             if len(self.buckets[0]) == self.m:
@@ -63,12 +63,12 @@ class STREAMKMPlus(StreamClusterer):
     def get_coreset(self, points):
         q1 = self.random_generator.choice(points)
         #print(q1)
-        dists = utils.distance_calc(q1, points, "euclidean")
-        weight = np.sum(dists)
-        coreset = [q1]
-
-        root = CoreSetTreeNode(None, q1, points, weight)
-        while len(coreset) < self.m and root.weight > 0:
+        positions = [point.position for point in points]
+        dists = utils.distance_calc(q1.position, positions, "euclidean")
+        dist_weight = np.sum(dists**2)
+        root = CoreSetTreeNode(None, q1, points, dist_weight)
+        coreset_size = 1
+        while coreset_size < self.m and root.weight > 0:
             node = root
             #lvl = 0
             while not node.is_leaf():
@@ -77,25 +77,35 @@ class STREAMKMPlus(StreamClusterer):
                 node = node.get_child(rand_val)
                 #lvl += 1
             #print("at leaf")
+            #print("node", node)
             child_node = False
             while not child_node:
                 rand_val2 = self.random_generator.random()
                 child_node = node.split(rand_val2)
-            coreset.append(child_node.sample_point)
+            coreset_size += 1
+            #print("tree", root)
+        coreset_leaves = root.get_all_leafs()
+        #print(coreset_leaves)
+        coreset = []
+        cum_weight = 0
+        for coreset_leaf in coreset_leaves:
+            coreset.append(CoreSetPoint(coreset_leaf.sample_point.position, coreset_leaf.data_weight))
+            cum_weight += coreset_leaf.data_weight
         return coreset
 
 
 
 
 class CoreSetTreeNode():
-    def __init__(self, parent, sample_point, data_points, weight):
+    def __init__(self, parent, sample_point, data_points, dist_weight):
         self.parent = parent
         self.child1 = None
         self.child2 = None
         self.data_points = np.array(data_points)
         self.sample_point = sample_point
-
-        self.weight = weight
+        self.dist_weight = dist_weight
+        self.data_weight = np.sum([data_point.weight for data_point in data_points])
+        self.weight = self.dist_weight * self.data_weight
         self.size = len(data_points)
 
     def is_leaf(self):
@@ -115,34 +125,47 @@ class CoreSetTreeNode():
             else:
                 return self.child1
 
-    def split(self, rand_val):
-        dists_org = utils.distance_calc(self.sample_point, self.data_points, "euclidean")
+    def get_all_leafs(self):
+        if not self.is_leaf():
+            leaves = self.child1.get_all_leafs()
+            leaves.extend(self.child2.get_all_leafs())
+            return leaves
+        else:
+            return [self]
 
+    def split(self, rand_val):
+
+        positions = [point.position for point in self.data_points]
+        dists_org = utils.distance_calc(self.sample_point.position, positions, "euclidean")
+        data_weights = [data_point.weight for data_point in self.data_points]
+        data_weights = np.array(data_weights)
         #print(self.weight, sum(dists_org))
         if self.weight == 0:
             raise Exception
-        sample_weights = dists_org/sum(dists_org)
+
+        weighted_dists_org = dists_org * data_weights
+        sample_weights = weighted_dists_org/sum(weighted_dists_org)
         cumulative_weights = np.cumsum(sample_weights)
         #print(sample_weights)
         #print(cumulative_weights)
-        #assert(0.999 < sum(sample_weights) < 1.001)
+        #assert(np.isclose(sum(sample_weights), 1))
         chosen = np.searchsorted(cumulative_weights, rand_val, side='left')
         if dists_org[chosen] == 0:
             return False
         sample_point_new = self.data_points[chosen]
         #print(sample_point_new)
-        dists_new = utils.distance_calc(sample_point_new, self.data_points, "euclidean")
+        dists_new = utils.distance_calc(sample_point_new.position, positions, "euclidean")
         closer_org = np.where(dists_org - dists_new <= 0)[0]
         closer_new = np.where(dists_org - dists_new > 0)[0]
         #print(closer_org, closer_new)
         assert(len(closer_org)+len(closer_new)==self.size)
         data_points_org = self.data_points[closer_org]
-        weight_org = np.sum(dists_org[closer_org])
+        dist_weight_org = np.sum(dists_org[closer_org]**2)
         data_points_new = self.data_points[closer_new]
-        weight_new = np.sum(dists_new[closer_new])
+        dist_weight_new = np.sum(dists_new[closer_new]**2)
 
-        self.child1 = CoreSetTreeNode(self, self.sample_point, data_points_org, weight_org)
-        self.child2 = CoreSetTreeNode(self, sample_point_new, data_points_new, weight_new)
+        self.child1 = CoreSetTreeNode(self, self.sample_point, data_points_org, dist_weight_org)
+        self.child2 = CoreSetTreeNode(self, sample_point_new, data_points_new, dist_weight_new)
         self.data_points = None
         self.propagate_weights()
 
@@ -157,6 +180,11 @@ class CoreSetTreeNode():
     def __str__(self):
         return f"[{self.sample_point}:{self.weight},{self.size}: {self.child1} {self.child2}]"
 
+class CoreSetPoint:
+    def __init__(self, position, weight):
+        self.position = position
+        self.weight = weight
+
 # def cost(sample, ps):
 #     return np.sum(np.sqrt(np.sum(np.square(sample - ps), axis=-1)))
 
@@ -164,7 +192,7 @@ class CoreSetTreeNode():
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    stream, labels = load_data("kddcup")
+    stream, labels = load_data("stream_densired")
     ts = list(range(len(stream)))
     print(stream.shape)
     data = stream
@@ -180,10 +208,11 @@ if __name__ == "__main__":
 
     make_fig = False
     for i in range(len(stream)):
+        print("i", i)
         nmc_id, event_log = streamkm.learn_one(stream[i], ts[i])
         buckets = streamkm.get_buckets()
         corepoints = streamkm.get_summary()
-        print(i)
+
         # if ";" in event_log:
         #     print(i, event_log)
         #     #print(buckets)

@@ -110,6 +110,9 @@ class STMStream(StreamClusterer):
                     cell_time = timestamps[cell_id]
                     new_cell = Cell(cell_id, cell_samples, cell_samples_ids, cell_time, self.dist, self.window, self.u_radius)
                     self.cells[cell_id] = new_cell
+
+                for cell_id in self.cells.keys():
+                    self.cells[cell_id].update_metrics()
                 self.cell_id = len(samples)
                 self.initialized = True
                 self.init_data = []
@@ -191,8 +194,8 @@ class Cell:
         self.noise = False
         self.noised_out = False
         self.update_metrics()
-        self.aged_out = False # reset for new ones
         self.noise = False # reset for new ones
+        self.aged_out = False # reset for new ones
         self.noised_out = False # reset for new ones
 
 
@@ -320,7 +323,7 @@ if __name__ == "__main__":
 
 
     make_fig = True
-    stream, labels = load_data("complex9")  # [[0],[1],[3],[7],[8],[9]]
+    stream, labels = load_data("stream_densired")  # [[0],[1],[3],[7],[8],[9]]
     ts = list(range(len(stream)))
     stmstream = STMStream()
 
