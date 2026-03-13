@@ -1,0 +1,2 @@
+0;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'har', 'offline': None, 'online': 'random', 'sampling_size': 100};0.08641615690843774;-;-1;online_summaries/har/random/summary_har_random_b1000_t1800_s0_i1;-1;online_assignments/har/random/assignment_har_random_b1000_t1800_s0_i1
+0;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'har', 'offline': None, 'online': 'random', 'sampling_size': 100};0.08641615690843774;1;online_summaries/har/random/summary_har_random_b1000_t1800_s0_i1;online_assignments/har/random/assignment_har_random_b1000_t1800_s0_i1

@@ -1,0 +1,2 @@
+1;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'rbf3', 'offline': None, 'online': 'random', 'sampling_size': 100};0.0712299999999999;-;-1;online_summaries/rbf3/random/summary_rbf3_random_b1000_t1800_s1_i1;-1;online_assignments/rbf3/random/assignment_rbf3_random_b1000_t1800_s1_i1
+1;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'rbf3', 'offline': None, 'online': 'random', 'sampling_size': 100};0.0712299999999999;1;online_summaries/rbf3/random/summary_rbf3_random_b1000_t1800_s1_i1;online_assignments/rbf3/random/assignment_rbf3_random_b1000_t1800_s1_i1

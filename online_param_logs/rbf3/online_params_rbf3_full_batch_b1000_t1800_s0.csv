@@ -1,0 +1,2 @@
+0;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'rbf3', 'offline': None, 'online': 'full_batch'};0.0;-;-1;online_summaries/rbf3/full_batch/summary_rbf3_full_batch_b1000_t1800_s0_i1;-1;online_assignments/rbf3/full_batch/assignment_rbf3_full_batch_b1000_t1800_s0_i1
+0;{'batch_budget': 1800, 'batch_size': 1000, 'ds': 'rbf3', 'offline': None, 'online': 'full_batch'};0.0;1;online_summaries/rbf3/full_batch/summary_rbf3_full_batch_b1000_t1800_s0_i1;online_assignments/rbf3/full_batch/assignment_rbf3_full_batch_b1000_t1800_s0_i1
