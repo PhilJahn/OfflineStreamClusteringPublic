@@ -203,7 +203,7 @@ if __name__ == '__main__':
     parser.add_argument('--ds', default="stream_densired", type=str,
                         help='Dataset')
     parser.add_argument('--online', default="gbfuzzystream_original", type=str, help='Online Summarization Method')
-    parser.add_argument('--batch_budget', default=10
+    parser.add_argument('--batch_budget', default=1800
                         , type=int, help='SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--smac_seed', default=42, type=int, help='Seed for SMAC Optimization')

@@ -16,7 +16,7 @@ The optimization for the online phase is done with ```optimize_online.py```.
 | --ds           | stream_densired        | Dataset                       |
 | --online       | gbfuzzystream_original | Online Method                 |
 | --batch        | 1000                   | Evaluation batch size         |
-| --batch_budget | 10                     | Duration in seconds per batch |
+| --batch_budget | 1800                   | Duration in seconds per batch |
 | --smac_seed    | 42                     | Seed of SMAC seed             |
 
 Supported Online Methods:
@@ -60,13 +60,13 @@ The optimization for the online phase is done with ```optimize_offline.py```.
 
 The pure offline optimization is done with ```optimize_pure_offline```
 
-| **Parameter**  | **Default Value**      | **Function**                                                                                  |
-|----------------|------------------------|-----------------------------------------------------------------------------------------------|
-| --ds           | stream_densired        | Dataset                                                                                       |
-| --offline      | dbscan                 | Offline Method                                                                                |
-| --batch        | 1000                   | Evaluation batch size                                                                         |
-| --batch_budget | 10                     | Duration in seconds per batch                                                                 |
-| --smac_seed    | 42                     | Seed of SMAC seed                                                                             |
+| **Parameter**  | **Default Value** | **Function**                                                                                  |
+|----------------|-------------------|-----------------------------------------------------------------------------------------------|
+| --ds           | stream_densired   | Dataset                                                                                       |
+| --offline      | dbscan            | Offline Method                                                                                |
+| --batch        | 1000              | Evaluation batch size                                                                         |
+| --batch_budget | 3600             | Duration in seconds per batch                                                                 |
+| --smac_seed    | 42                | Seed of SMAC seed                                                                             |
 
 Supported Online Methods:
 

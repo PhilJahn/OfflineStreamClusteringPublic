@@ -123,7 +123,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ds', default="stream_densired", type=str, help='Dataset')
     parser.add_argument('--offline', default="kmeans", type=str, help='Offline Clustering Method')
-    parser.add_argument('--batch_budget', default=10
+    parser.add_argument('--batch_budget', default=3600
                         , type=int, help='Offline SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--smac_seed', default=42, type=int, help='Seed for SMAC Optimization')
