@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 13, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.047244717529, 'min_samples': 4, 'offline': 'dbscan', 'online': 'stmstream+'};1.1228858839280484;-;offline_labels/rbf3/stmstream+/dbscan/13/rbf3_stmstream+_dbscan_b1000_t1800_c13_o1_i1
+{'batch_budget': 1800, 'batch_id': 13, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.0390303971339, 'min_samples': 42, 'offline': 'dbscan', 'online': 'stmstream+'};0.9289227744077577;344;offline_labels/rbf3/stmstream+/dbscan/13/rbf3_stmstream+_dbscan_b1000_t1800_c13_o1_i161

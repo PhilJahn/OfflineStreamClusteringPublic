@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'electricity', 'init': 'k-means++', 'n_clusters': 2, 'offline': 'kmeans', 'online': 'protras'};1.988842935866019;-;offline_labels/electricity/protras/kmeans/4/electricity_protras_kmeans_b1000_t1800_c4_o1_i1
+{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'electricity', 'init': 'k-means++', 'n_clusters': 100, 'offline': 'kmeans', 'online': 'protras'};1.917071655957249;94;offline_labels/electricity/protras/kmeans/4/electricity_protras_kmeans_b1000_t1800_c4_o1_i49

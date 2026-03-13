@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 15, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.2092798581206, 'min_samples': 4, 'offline': 'dbscan', 'online': 'protras'};1.9916426185953695;-;offline_labels/rbf3/protras/dbscan/15/rbf3_protras_dbscan_b1000_t1800_c15_o0_i1
+{'batch_budget': 1800, 'batch_id': 15, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.053790742484, 'min_samples': 43, 'offline': 'dbscan', 'online': 'protras'};0.4983648949910604;2447;offline_labels/rbf3/protras/dbscan/15/rbf3_protras_dbscan_b1000_t1800_c15_o0_i36

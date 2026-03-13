@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 23, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.1891385261482, 'min_samples': 4, 'offline': 'dbscan', 'online': 'streamkmeans_river'};2.0;-;offline_labels/rbf3/streamkmeans_river/dbscan/23/rbf3_streamkmeans_river_dbscan_b1000_t1800_c23_o2_i1
+{'batch_budget': 1800, 'batch_id': 23, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.0843203383215, 'min_samples': 4, 'offline': 'dbscan', 'online': 'streamkmeans_river'};0.6190136012893115;1029;offline_labels/rbf3/streamkmeans_river/dbscan/23/rbf3_streamkmeans_river_dbscan_b1000_t1800_c23_o2_i410

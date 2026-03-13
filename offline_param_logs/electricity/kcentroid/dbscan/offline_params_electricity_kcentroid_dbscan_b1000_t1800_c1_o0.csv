@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 1, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.3706758072437, 'min_samples': 16, 'offline': 'dbscan', 'online': 'kcentroid'};2.0;-;offline_labels/electricity/kcentroid/dbscan/1/electricity_kcentroid_dbscan_b1000_t1800_c1_o0_i1
+{'batch_budget': 1800, 'batch_id': 1, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.1230087233355, 'min_samples': 4, 'offline': 'dbscan', 'online': 'kcentroid'};1.906981005442762;2410;offline_labels/electricity/kcentroid/dbscan/1/electricity_kcentroid_dbscan_b1000_t1800_c1_o0_i2362

@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.4660008832042, 'min_samples': 16, 'offline': 'dbscan', 'online': 'streamkmplus+'};2.0;-;offline_labels/electricity/streamkmplus+/dbscan/4/electricity_streamkmplus+_dbscan_b1000_t1800_c4_o0_i1
+{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.1775890815626, 'min_samples': 12, 'offline': 'dbscan', 'online': 'streamkmplus+'};1.9256403874024863;2350;offline_labels/electricity/streamkmplus+/dbscan/4/electricity_streamkmplus+_dbscan_b1000_t1800_c4_o0_i2200

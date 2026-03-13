@@ -1,0 +1,2 @@
+{'batch_budget': 1800, 'batch_id': 2, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.1143500727845, 'min_samples': 400, 'offline': 'fdbscan', 'online': 'denstream_river'};0.9069950982299635;-;offline_labels/rbf3/denstream_river/fdbscan/2/rbf3_denstream_river_fdbscan_b1000_t1800_c2_o2_i1
+{'batch_budget': 1800, 'batch_id': 2, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.0713141756381, 'min_samples': 4895, 'offline': 'fdbscan', 'online': 'denstream_river'};0.20108449283049534;1232;offline_labels/rbf3/denstream_river/fdbscan/2/rbf3_denstream_river_fdbscan_b1000_t1800_c2_o2_i5
