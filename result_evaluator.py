@@ -17,7 +17,8 @@ from clustpy.metrics import purity, unsupervised_clustering_accuracy, \
     fair_normalized_mutual_information
 from cmm import get_cmm
 from datahandler import load_data
-from metrics.disco import disco_score
+# DISCO disabled for public
+##from metrics.disco import disco_score
 from temporalsilhouette.TSindex import tempsil
 
 warnings.simplefilter("ignore")
@@ -473,8 +474,10 @@ if __name__ == "__main__":
             #                  centr='mean', nearest_centr=True, metric='euclidean')
             # batch_metrics["s_dbw"] = cur_sdbw
 
-            batch_disco = disco_score(batch_data_points, batch_cluster_labels, min_points=5)
-            batch_metrics["disco"].append(batch_disco)
+
+            # DISCO disabled
+            #batch_disco = disco_score(batch_data_points, batch_cluster_labels, min_points=5)
+            #batch_metrics["disco"].append(batch_disco)
 
 
 
