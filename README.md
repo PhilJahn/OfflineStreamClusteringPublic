@@ -53,7 +53,7 @@ The optimization for the online phase is done with ```optimize_offline.py```.
 | --online       | gbfuzzystream_original | Online Method                                                                                 |
 | --offline      | dbscan                 | Offline Method                                                                                |
 | --batch        | 1000                   | Evaluation batch size                                                                         |
-| --batch_budget | 10                     | Duration in seconds per batch                                                                 |
+| --batch_budget | 1800                   | Duration in seconds per batch                                                                 |
 | --batch_id     | -1                     | Batch to optimize (if set to value, optimizes over chunk of 10 starting with specified batch) |
 | --mult         | 0                      | Online summaries optimized with alternate penalty (unused)                                    |
 | --smac_seed    | 42                     | Seed of SMAC seed                                                                             |
