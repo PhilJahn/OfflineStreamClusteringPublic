@@ -15,10 +15,20 @@ warnings.warn("runtimewarning", RuntimeWarning)
 smaller_better_metrics = ["davies_bouldin_score", "offline_score", "online_score"]
 smaller_better_metrics_noninverted = ["davies_bouldin_score"]
 
-metric_short_names = {"ari": "ARI", "acc": "Acc.", "ami": "AMI", "purity": "Pur.", "batch_ts_avg": "TS",
-                      "offline_score": "ACI", "calinski_harabasz_score": "CH"}
-metric_long_names = {"ari": "ARI", "acc": "Accuracy", "ami": "AMI", "purity": "Purity", "batch_ts_avg": "TS",
-                     "offline_score": "Sum of ARI and AMI (ACI)"}
+metric_short_names = {"ari": "ARI", "accuracy": "Acc.", "ami": "AMI", "purity": "Pur.", "batch_ts_avg": "TS",
+                      "offline_score": "ACI",
+                      "cmm": "CMM", "cmm_alt": "CMM+", "fowlkes_mallows": "FMI", "nmi": "NMI",
+                      "homogeneity": "HOM", "completeness": "COM", "fair_nmi": "FNMI", "variation_of_information": "VI",
+                      "davies_bouldin_score": "DBI", "calinski_harabasz_score": "CH", "disco": "DISCO"
+                      }
+
+metric_long_names = {"ari": "ARI", "accuracy": "Clustering accuracy", "ami": "AMI", "purity": "Purity", "batch_ts_avg": "TS",
+                     "offline_score": "Sum of ARI and AMI (ACI)",
+
+                     "cmm": "CMM", "cmm_alt": "CMM+", "fowlkes_mallows": "FMI", "nmi": "NMI",
+                     "homogeneity": "HOM", "completeness": "COM", "fair_nmi": "FNMI", "variation_of_information": "VI",
+                     "davies_bouldin_score": "DBI", "calinski_harabasz_score": "CH", "disco": "DISCO"
+                     }
 
 dataset_names = {"stream_densired": "SDENS", "rbf3": "RBF-3", "har": "HAR", "electricity": "Elec", "insects_abrupt": "InsA", "insects_incremental": "InsI", "gassensor": "GasS", "rank": "Avg. Rank"}
 
@@ -29,27 +39,40 @@ online_method_names = {"full_batch": "Full Batch", "random": "Random", "lwc": "L
                        }
 
 offline_method_description = {"dbscan": "for DBSCAN", "kmeans": "for $k$-Means", "dpc": "for DPC", "pure_online": "without any post-processing of the summaries",
-                              "adjacency": "with adjacency post-processing", "none": "with adjacency post-processing", "online": "for the online phase"
+                              "adjacency": "according to the purity", "none": "with adjacency post-processing", "online": "for the online phase"
                               }
 
 offline_optimization = {"dbscan": "according to the sum of ARI and AMI", "dpc": "according to the sum of ARI and AMI", "kmeans": "according to the sum of ARI and AMI", "pure_online": "according to the sum of ARI and AMI",
-                        "adjacency": "", "none": "according to the purity after adjacency processing", "online": "according to the purity after adjacency processing"
+                        "adjacency": "according to the purity after adjacency processing", "none": "according to the purity after adjacency processing", "online": "according to the purity after adjacency processing"
                         }
 
-def make_table(ds_list, metric_list, online_list, offline):
+def make_table(ds_list, metric_list, online_list, offline, appendix):
+
+    #if not appendix:
+    while "break" in online_list:
+        online_list.remove("break")
+
     description = "\caption{"
     for metric in metric_list[:-1]:
         description += metric_long_names[metric] + " and "
-    description += metric_short_names[metric_list[-1]]
-    if offline == "adjacency":
-        description += " results for the evaluated datasets "
-    elif offline == "online":
-        description += " results using the individual summaries for the evaluated datasets for best-performing hyperparameters "
+    description += metric_long_names[metric_list[-1]]
+    if not ("davies_bouldin_score" in metric_list or "calinski_harabasz_score" in metric_list or "noise_ratio" in metric_list or "clu_num" in metric_list or "clu_dist" in metric_list) and offline == "online":
+        description += " (in \\%)"
+    if offline == "online":
+        description += " using the individual summaries without adjacency processing. Results correspond to the "
     else:
-        description += " results for the evaluated datasets for best-performing hyperparameters "
+        description += " results"
+    if offline == "adjacency":
+        description += " for adjacency processing "
+    if not ("davies_bouldin_score" in metric_list or "calinski_harabasz_score" in metric_list or "noise_ratio" in metric_list or "clu_num" in metric_list or "clu_dist" in metric_list) and offline != "online":
+        description += " (in \\%)"
+    #if offline == "adjacency":
+    #    description += " for the evaluated datasets "
+    if offline != "online":
+        description += " for the evaluated datasets for best-performing hyperparameters "
     description += offline_method_description[offline] + " " + offline_optimization[offline]
-    if not ("davies_bouldin_score" in metric_list or "noise_ratio" in metric_list or "clu_num" in metric_list or "clu_dist" in metric_list):
-        description += " ($\\times 100$)"
+    #if not ("davies_bouldin_score" in metric_list or "noise_ratio" in metric_list or "clu_num" in metric_list or "clu_dist" in metric_list) and offline != "online":
+    #    description += " (in \\%)"
     description += "."
     if not ("clu_num" in metric_list or "clu_dist" in metric_list):
         description += " The best scores are marked as \\textbf{bold}, and the second-best scores are \\underline{underlined}. A lower rank is better."
@@ -58,7 +81,17 @@ def make_table(ds_list, metric_list, online_list, offline):
     elif offline == "kmeans":
         description += " The scores for $k$-Means are averaged over $5$ seeds."
 
-    table = "\\begin{table*}[tb]\n\\centering\n"
+    if len(metric_list) == 1:
+        description += " We report the standard-deviation for "
+        if offline == "online":
+            description += " the non-deterministic online phase summarizations and "
+        description += " the average rank."
+
+
+    if appendix:
+        table = "\\begin{table*}[h]\n\\centering\n"
+    else:
+        table = "\\begin{table*}[tb]\n\\centering\n"
     table += description
 
     table += "}\n\\label{tab:results_"
@@ -66,6 +99,9 @@ def make_table(ds_list, metric_list, online_list, offline):
         table += metric + "_"
     table += offline
     table += "}\n"
+
+    if appendix and "calinski_harabasz_score" in metric_list:
+        table += "\\resizebox{\\textwidth}{!}{\n"
 
     table += "\\begin{tabular}{|l |"
 
@@ -100,20 +136,29 @@ def make_table(ds_list, metric_list, online_list, offline):
 
 
     result_store = {}
+    std_store = {}
     for ds in ds_list:
         result_store[ds] = {}
+        std_store[ds] = {}
         for metric in metric_list:
             result_store[ds][metric] = {}
+            std_store[ds][metric] = {}
         for online in online_list:
-            store_name = f"result_evals/{ds}_{online}_{offline}_1000_1800.npy"
+
+            if (online == "denstream_river" or online == "dstream") and offline == "dbscan":
+                store_name = f"result_evals/{ds}_{online}_fdbscan_1000_1800.npy"
+            else:
+                store_name = f"result_evals/{ds}_{online}_{offline}_1000_1800.npy"
             if os.path.exists(store_name):
                 results = np.load(store_name, allow_pickle=True).item()
                 for metric in metric_list:
                     result_store[ds][metric][online] = round(results["all"][metric], 3)
+                    std_store[ds][metric][online] = round(results["all_std"][metric], 3)
             else:
                 print(store_name, "is missing")
                 for metric in metric_list:
                     result_store[ds][metric][online] = np.nan
+                    std_store[ds][metric][online] = np.nan
 
     sorted_ds_metric = {}
     for ds in ds_list:
@@ -143,6 +188,7 @@ def make_table(ds_list, metric_list, online_list, offline):
                 rank = sorted_results.tolist().index(result) + 1
                 ranks[online][metric][ds] = rank
             ranks[online][metric]["all"] = np.mean(list(ranks[online][metric].values()))
+            ranks[online][metric]["all_std"] = np.std(list(ranks[online][metric].values()))
 
     for ds in ds_list:
         for metric in metric_list:
@@ -251,21 +297,30 @@ def make_table(ds_list, metric_list, online_list, offline):
                         #        table += f"100"
                         #    else:
                         #        table += f"{result*50:.1f}"
-                        if metric not in ["davies_bouldin_score", "noise_ratio", "clu_num", "clu_dist"]:
+                        if metric not in ["davies_bouldin_score", "calinski_harabasz_score", "noise_ratio", "clu_num", "clu_dist"]:
                             if result == 1.0 and metric != "offline_score":
                                 table += f"100"
                             elif result < 0:
                                 table += f"{result*100:.0f}"
                             else:
                                 table += f"{result*100:.1f}"
+                            if len(metric_list) == 1 and offline == "online":
+                                result_std = std_store[ds][metric][online]
+                                if not math.isnan(result_std):
+                                    table += f" $\\pm$ {result_std*100:.1f}"
                         else:
                             table += f"{result}"
+                            if len(metric_list) == 1 and offline == "online":
+                                 result_std = std_store[ds][metric][online]
+                                 if not math.isnan(result_std):
+                                     table += f" $\\pm$ {result_std:.1f}"
                         if need_closure:
                             table += "}"
                         table += "\\ "
             for metric in metric_list:
                 table += " & "
                 own_rank = ranks[online][metric]['all']
+
                 random_rank = ranks["random"][metric]['all']
                 if own_rank > random_rank:
                     table += "\\cellcolor{red!"
@@ -275,21 +330,31 @@ def make_table(ds_list, metric_list, online_list, offline):
                 table += str(round(scale * 50))
                 table += "}"
 
+
                 table += f"{ranks[online][metric]['all']}"
+
+                if len(metric_list) == 1:
+                    rank_std = ranks[online][metric]['all_std']
+                    table += f"$\\pm$ {rank_std:.1f}"
             table += "\\\\\\hline\n"
 
 
 
 
 
-    table += "\\end{tabular}\n\\end{table*}"
+    table += "\\end{tabular}\n"
+    if appendix and "calinski_harabasz_score" in metric_list:
+        table += "}\n"
+    table += "\\end{table*}"
+
+
 
     return table
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--variant', default="paper", type=str, help='Online Summarization Method')
+    parser.add_argument('--variant', default="appendix_main", type=str, help='Online Summarization Method')
     #parser.add_argument('--offline', default="online", type=str, help='Offline Clustering Method')
     args = parser.parse_args()
 
@@ -300,8 +365,13 @@ if __name__ == "__main__":
                 metric_lists = [["offline_score", "batch_ts_avg"]]
             else:
                 metric_lists = [["purity", "batch_ts_avg"]]
+        elif args.variant == "appendix_main":
+            metric_lists = [["offline_score", "batch_ts_avg"]]
         elif args.variant == "appendix":
-            metric_lists = [["ari"], ["ami"], ["accuracy"], ["purity"], ["batch_ts_avg"]]
+            metric_lists = [["ari"], ["ami"], ["purity"], ["cmm"], ["cmm_alt"], ["nmi"],
+                            ["accuracy"],
+                            ["batch_ts_avg"], ["davies_bouldin_score"], ["calinski_harabasz_score"], ["disco"]
+                            ]
 
         online_list = []
 
@@ -331,7 +401,9 @@ if __name__ == "__main__":
 
         dslist = ["stream_densired", "rbf3", "har", "electricity", "insects_abrupt"]#, "insects_incremental"]
 
-        for metric_list in metric_lists:
-            table = make_table(dslist, metric_list, online_list, args.offline)
-            with open(f"table_{args.offline}.tex", "w") as f:
+        with open(f"table_{args.offline}_{args.variant}.tex", "w") as f:
+            for metric_list in metric_lists:
+                table = make_table(dslist, metric_list, online_list, args.offline, args.variant != "paper")
                 f.write(table)
+            if args.variant != "paper":
+                f.write("\n\\clearpage\n")

@@ -31,7 +31,10 @@ def make_result_figure(ds_list, metric, online_list, offline):
         result_store[ds] = {}
         result_store[ds][metric] = {}
         for online in online_list:
-            store_name = f"result_evals/{ds}_{online}_{offline}_1000_1800.npy"
+            if (online == "denstream_river" or online == "dstream") and offline == "dbscan":
+                store_name = f"result_evals/{ds}_{online}_fdbscan_1000_1800.npy"
+            else:
+                store_name = f"result_evals/{ds}_{online}_{offline}_1000_1800.npy"
             if os.path.exists(store_name):
                 results = np.load(store_name, allow_pickle=True).item()
                 result_store[ds][metric][online] = results["all"][metric]
