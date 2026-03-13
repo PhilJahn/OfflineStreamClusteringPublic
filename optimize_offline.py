@@ -221,8 +221,8 @@ def get_batch_summary(args, batch_id, best_s, best_i, best_nds):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ds', default="stream_densired", type=str, help='Dataset')
-    parser.add_argument('--online', default="streamkmplus", type=str, help='Online Summarization Method')
-    parser.add_argument('--offline', default="fdbscan", type=str, help='Offline Clustering Method')
+    parser.add_argument('--online', default="gbfuzzystream_original", type=str, help='Online Summarization Method')
+    parser.add_argument('--offline', default="dbscan", type=str, help='Offline Clustering Method')
     parser.add_argument('--batch_budget', default=1800
                         , type=int, help='Offline SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
