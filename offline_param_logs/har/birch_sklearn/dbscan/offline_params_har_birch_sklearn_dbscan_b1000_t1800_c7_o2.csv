@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 7, 'batch_size': 1000, 'ds': 'har', 'eps': 10.3540924732918, 'min_samples': 15, 'offline': 'dbscan', 'online': 'birch_sklearn'};2.0;-;offline_labels/har/birch_sklearn/dbscan/7/har_birch_sklearn_dbscan_b1000_t1800_c7_o2_i1
-{'batch_budget': 1800, 'batch_id': 7, 'batch_size': 1000, 'ds': 'har', 'eps': 2.1109386276606, 'min_samples': 8, 'offline': 'dbscan', 'online': 'birch_sklearn'};1.0943133026576084;1473;offline_labels/har/birch_sklearn/dbscan/7/har_birch_sklearn_dbscan_b1000_t1800_c7_o2_i79

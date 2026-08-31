@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 0, 'batch_size': 1000, 'ds': 'har', 'init': 'k-means++', 'n_clusters': 6, 'offline': 'kmeans', 'online': 'dstream'};1.6229874730437301;-;offline_labels/har/dstream/kmeans/0/har_dstream_kmeans_b1000_t1800_c0_o1_i1
-{'batch_budget': 1800, 'batch_id': 0, 'batch_size': 1000, 'ds': 'har', 'init': 'random', 'n_clusters': 3, 'offline': 'kmeans', 'online': 'dstream'};1.5994237236732631;97;offline_labels/har/dstream/kmeans/0/har_dstream_kmeans_b1000_t1800_c0_o1_i15

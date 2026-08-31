@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 30, 'batch_size': 1000, 'ds': 'insects_abrupt', 'eps': 0.709592508954, 'min_samples': 50, 'offline': 'dbscan', 'online': 'random'};2.0;-;offline_labels/insects_abrupt/random/dbscan/30/insects_abrupt_random_dbscan_b1000_t1800_c30_o2_i1
-{'batch_budget': 1800, 'batch_id': 30, 'batch_size': 1000, 'ds': 'insects_abrupt', 'eps': 0.3475772272971, 'min_samples': 3, 'offline': 'dbscan', 'online': 'random'};1.7537897810666612;2419;offline_labels/insects_abrupt/random/dbscan/30/insects_abrupt_random_dbscan_b1000_t1800_c30_o2_i919

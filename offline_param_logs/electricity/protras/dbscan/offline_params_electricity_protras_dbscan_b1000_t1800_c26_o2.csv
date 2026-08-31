@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.5014557409234, 'min_samples': 16, 'offline': 'dbscan', 'online': 'protras'};2.0;-;offline_labels/electricity/protras/dbscan/26/electricity_protras_dbscan_b1000_t1800_c26_o2_i1
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.1958242993573, 'min_samples': 32, 'offline': 'dbscan', 'online': 'protras'};1.8038855427453657;2359;offline_labels/electricity/protras/dbscan/26/electricity_protras_dbscan_b1000_t1800_c26_o2_i1045

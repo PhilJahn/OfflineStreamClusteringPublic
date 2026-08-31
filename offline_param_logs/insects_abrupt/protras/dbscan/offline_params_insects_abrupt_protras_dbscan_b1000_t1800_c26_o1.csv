@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'insects_abrupt', 'eps': 1.0136711509038, 'min_samples': 50, 'offline': 'dbscan', 'online': 'protras'};2.0;-;offline_labels/insects_abrupt/protras/dbscan/26/insects_abrupt_protras_dbscan_b1000_t1800_c26_o1_i1
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'insects_abrupt', 'eps': 0.4107939189676, 'min_samples': 4, 'offline': 'dbscan', 'online': 'protras'};1.624843012756751;2395;offline_labels/insects_abrupt/protras/dbscan/26/insects_abrupt_protras_dbscan_b1000_t1800_c26_o1_i1418

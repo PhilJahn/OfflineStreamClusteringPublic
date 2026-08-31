@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 31, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.2086893671972, 'min_samples': 4, 'offline': 'dbscan', 'online': 'clustream_river'};2.0;-;offline_labels/rbf3/clustream_river/dbscan/31/rbf3_clustream_river_dbscan_b1000_t1800_c31_o1_i1
-{'batch_budget': 1800, 'batch_id': 31, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.07771162365, 'min_samples': 44, 'offline': 'dbscan', 'online': 'clustream_river'};0.24722922525112434;1015;offline_labels/rbf3/clustream_river/dbscan/31/rbf3_clustream_river_dbscan_b1000_t1800_c31_o1_i248

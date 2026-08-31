@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 23, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.4891109448499, 'min_samples': 16, 'offline': 'dbscan', 'online': 'random'};2.0;-;offline_labels/electricity/random/dbscan/23/electricity_random_dbscan_b1000_t1800_c23_o0_i1
-{'batch_budget': 1800, 'batch_id': 23, 'batch_size': 1000, 'ds': 'electricity', 'eps': 0.1787901101245, 'min_samples': 42, 'offline': 'dbscan', 'online': 'random'};1.7208518572611937;2424;offline_labels/electricity/random/dbscan/23/electricity_random_dbscan_b1000_t1800_c23_o0_i138

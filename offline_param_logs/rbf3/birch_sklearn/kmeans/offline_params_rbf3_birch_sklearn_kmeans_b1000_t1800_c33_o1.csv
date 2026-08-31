@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 33, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'k-means++', 'n_clusters': 8, 'offline': 'kmeans', 'online': 'birch_sklearn'};0.6574961471325733;-;offline_labels/rbf3/birch_sklearn/kmeans/33/rbf3_birch_sklearn_kmeans_b1000_t1800_c33_o1_i1
-{'batch_budget': 1800, 'batch_id': 33, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'random', 'n_clusters': 14, 'offline': 'kmeans', 'online': 'birch_sklearn'};0.6081346060492894;93;offline_labels/rbf3/birch_sklearn/kmeans/33/rbf3_birch_sklearn_kmeans_b1000_t1800_c33_o1_i28

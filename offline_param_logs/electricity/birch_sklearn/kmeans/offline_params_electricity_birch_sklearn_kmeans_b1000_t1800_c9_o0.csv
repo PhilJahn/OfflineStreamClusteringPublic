@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 9, 'batch_size': 1000, 'ds': 'electricity', 'init': 'k-means++', 'n_clusters': 2, 'offline': 'kmeans', 'online': 'birch_sklearn'};2.000846883142371;-;offline_labels/electricity/birch_sklearn/kmeans/9/electricity_birch_sklearn_kmeans_b1000_t1800_c9_o0_i1
-{'batch_budget': 1800, 'batch_id': 9, 'batch_size': 1000, 'ds': 'electricity', 'init': 'k-means++', 'n_clusters': 6, 'offline': 'kmeans', 'online': 'birch_sklearn'};1.9109392120257986;20;offline_labels/electricity/birch_sklearn/kmeans/9/electricity_birch_sklearn_kmeans_b1000_t1800_c9_o0_i6

@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'har', 'init': 'k-means++', 'n_clusters': 6, 'offline': 'kmeans', 'online': 'denstream_river'};0.8831190392331374;-;offline_labels/har/denstream_river/kmeans/4/har_denstream_river_kmeans_b1000_t1800_c4_o0_i1
-{'batch_budget': 1800, 'batch_id': 4, 'batch_size': 1000, 'ds': 'har', 'init': 'random', 'n_clusters': 3, 'offline': 'kmeans', 'online': 'denstream_river'};0.7963746396355202;43;offline_labels/har/denstream_river/kmeans/4/har_denstream_river_kmeans_b1000_t1800_c4_o0_i20

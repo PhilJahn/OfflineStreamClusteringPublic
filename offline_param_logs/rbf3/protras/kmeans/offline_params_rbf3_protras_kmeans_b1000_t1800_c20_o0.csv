@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 20, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'k-means++', 'n_clusters': 6, 'offline': 'kmeans', 'online': 'protras'};0.5440449085008414;-;offline_labels/rbf3/protras/kmeans/20/rbf3_protras_kmeans_b1000_t1800_c20_o0_i1
-{'batch_budget': 1800, 'batch_id': 20, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'k-means++', 'n_clusters': 7, 'offline': 'kmeans', 'online': 'protras'};0.5034136764607111;78;offline_labels/rbf3/protras/kmeans/20/rbf3_protras_kmeans_b1000_t1800_c20_o0_i17

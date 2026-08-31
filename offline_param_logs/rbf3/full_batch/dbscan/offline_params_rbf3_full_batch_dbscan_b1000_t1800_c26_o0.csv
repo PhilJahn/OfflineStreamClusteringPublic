@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.1297028099128, 'min_samples': 4, 'offline': 'dbscan', 'online': 'full_batch'};1.9774438483085588;-;offline_labels/rbf3/full_batch/dbscan/26/rbf3_full_batch_dbscan_b1000_t1800_c26_o0_i1
-{'batch_budget': 1800, 'batch_id': 26, 'batch_size': 1000, 'ds': 'rbf3', 'eps': 0.0371076134306, 'min_samples': 24, 'offline': 'dbscan', 'online': 'full_batch'};0.10412383950965154;2306;offline_labels/rbf3/full_batch/dbscan/26/rbf3_full_batch_dbscan_b1000_t1800_c26_o0_i432

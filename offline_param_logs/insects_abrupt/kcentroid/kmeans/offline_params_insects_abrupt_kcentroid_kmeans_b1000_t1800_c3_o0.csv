@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 3, 'batch_size': 1000, 'ds': 'insects_abrupt', 'init': 'k-means++', 'n_clusters': 6, 'offline': 'kmeans', 'online': 'kcentroid'};1.6712588045148973;-;offline_labels/insects_abrupt/kcentroid/kmeans/3/insects_abrupt_kcentroid_kmeans_b1000_t1800_c3_o0_i1
-{'batch_budget': 1800, 'batch_id': 3, 'batch_size': 1000, 'ds': 'insects_abrupt', 'init': 'random', 'n_clusters': 19, 'offline': 'kmeans', 'online': 'kcentroid'};1.6670157521244746;82;offline_labels/insects_abrupt/kcentroid/kmeans/3/insects_abrupt_kcentroid_kmeans_b1000_t1800_c3_o0_i13

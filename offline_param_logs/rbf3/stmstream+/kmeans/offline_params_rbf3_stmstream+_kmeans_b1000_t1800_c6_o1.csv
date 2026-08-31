@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 6, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'k-means++', 'n_clusters': 4, 'offline': 'kmeans', 'online': 'stmstream+'};0.5147184950381729;-;offline_labels/rbf3/stmstream+/kmeans/6/rbf3_stmstream+_kmeans_b1000_t1800_c6_o1_i1
-{'batch_budget': 1800, 'batch_id': 6, 'batch_size': 1000, 'ds': 'rbf3', 'init': 'k-means++', 'n_clusters': 4, 'offline': 'kmeans', 'online': 'stmstream+'};0.5147184950381729;92;offline_labels/rbf3/stmstream+/kmeans/6/rbf3_stmstream+_kmeans_b1000_t1800_c6_o1_i1

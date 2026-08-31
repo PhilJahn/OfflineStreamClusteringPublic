@@ -1,2 +1,0 @@
-{'batch_budget': 1800, 'batch_id': 29, 'batch_size': 1000, 'ds': 'electricity', 'init': 'k-means++', 'n_clusters': 2, 'offline': 'kmeans', 'online': 'stmstream+'};1.9435218579845845;-;offline_labels/electricity/stmstream+/kmeans/29/electricity_stmstream+_kmeans_b1000_t1800_c29_o0_i1
-{'batch_budget': 1800, 'batch_id': 29, 'batch_size': 1000, 'ds': 'electricity', 'init': 'random', 'n_clusters': 92, 'offline': 'kmeans', 'online': 'stmstream+'};1.874216714015374;102;offline_labels/electricity/stmstream+/kmeans/29/electricity_stmstream+_kmeans_b1000_t1800_c29_o0_i99
