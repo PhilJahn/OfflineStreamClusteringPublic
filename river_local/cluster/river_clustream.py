@@ -31,11 +31,12 @@ from __future__ import annotations
 
 import copy
 import math
+import time
+import tracemalloc
 from collections import defaultdict
 
 from river import base, cluster, stats, utils
-
-from utils import x_to_dict
+from utils import x_to_dict, euclidean_distance_dict
 
 
 class RiverCluStream(base.Clusterer):
@@ -126,7 +127,7 @@ class RiverCluStream(base.Clusterer):
     ...     [5, 4]
     ... ]
 
-    >>> clustream = cluster.CluStream(
+    >>> RiverCluStream = cluster.RiverCluStream(
     ...     n_macro_clusters=3,
     ...     max_micro_clusters=5,
     ...     time_gap=3,
@@ -156,6 +157,7 @@ class RiverCluStream(base.Clusterer):
         time_window: int = 1000,
         time_gap: int = 100,
         seed: int | None = None,
+        track_memory = False,
         **kwargs,
     ):
         super().__init__()
@@ -176,6 +178,7 @@ class RiverCluStream(base.Clusterer):
 
         self._mc_centers: dict[int, defaultdict] = {}
         self._kmeans_mc = None
+        self.track_memory = track_memory
 
     def _maintain_micro_clusters(self, x, w):
         # Calculate the threshold to delete old micro-clusters
@@ -196,19 +199,24 @@ class RiverCluStream(base.Clusterer):
             )
             return
 
-        # Merge the two closest micro-clusters
-        closest_a = 0
-        closest_b = 0
+        # Merge the two closest micro-clusters. Materialize centers once —
+        # `mc.center` is cached but iterating it n² times is still wasteful.
+        # Iterate `b < a` so the higher-index micro-cluster is kept as the
+        # merge target (preserves the original i>j convention).
+        ids = list(self.micro_clusters)
+        centers = [self.micro_clusters[i].center for i in ids]
+
+        closest_a = ids[0]
+        closest_b = ids[0]
         min_distance = math.inf
-        for i, mc_a in self.micro_clusters.items():
-            for j, mc_b in self.micro_clusters.items():
-                if i <= j:
-                    continue
-                dist = self._distance(mc_a.center, mc_b.center)
+        for a in range(len(ids)):
+            center_a = centers[a]
+            for b in range(a):
+                dist = self._distance(center_a, centers[b])
                 if dist < min_distance:
                     min_distance = dist
-                    closest_a = i
-                    closest_b = j
+                    closest_a = ids[a]
+                    closest_b = ids[b]
 
         self.micro_clusters[closest_a] += self.micro_clusters[closest_b]
         self.micro_clusters[closest_b] = RiverCluStreamMicroCluster(
@@ -294,26 +302,38 @@ class RiverCluStream(base.Clusterer):
             return self._kmeans_mc.predict_one(self.micro_clusters[index].center)
         except (KeyError, AttributeError):
             return 0
-
 # added to support framework
 
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
             dp = x_to_dict(xs[i])
+            if self.track_memory:
+                tracemalloc.start()
+            # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+            start = time.time()
             self.learn_one(dp)
+            stop = time.time()
+            if self.track_memory:
+                mem = tracemalloc.get_traced_memory()
+                tracemalloc.stop()
+            else:
+                mem = (-1, -1)
+            mems.append(mem[1])
+            times.append(stop - start)
             mc_ids.append(-1)
             event_logs.append("")
-        return mc_ids, event_logs
+        return mc_ids, event_logs, mems, times
 
 
     def get_summary(self):
         for mc in self.micro_clusters.values():
             mc.set_r_factor(self.micro_cluster_r_factor)
 
-        return copy.deepcopy(self.micro_clusters)
-
+        return self.micro_clusters
 
 class RiverCluStreamMicroCluster(base.Base):
     """Micro-cluster class."""
@@ -335,11 +355,14 @@ class RiverCluStreamMicroCluster(base.Base):
             self.var_x[k] = v
         self.var_time = stats.Var()
         self.var_time.update(timestamp, w)
+        self._center: dict | None = None
         self.r_factor = None
 
     @property
     def center(self):
-        return {k: var.mean.get() for k, var in self.var_x.items()}
+        if self._center is None:
+            self._center = {k: var.mean.get() for k, var in self.var_x.items()}
+        return self._center
 
     # added to store config values
     def set_r_factor(self, r_factor):
@@ -364,6 +387,7 @@ class RiverCluStreamMicroCluster(base.Base):
         self.var_time.update(timestamp, w)
         for x_idx, x_val in x.items():
             self.var_x[x_idx].update(x_val, w)
+        self._center = None
 
     def relevance_stamp(self, max_mc):
         mu_time = self.var_time.mean.get()
@@ -404,5 +428,9 @@ class RiverCluStreamMicroCluster(base.Base):
 
     def __iadd__(self, other: RiverCluStreamMicroCluster):
         self.var_time += other.var_time
-        self.var_x = {k: self.var_x[k] + other.var_x.get(k, stats.Var()) for k in self.var_x}
+        for k, var in self.var_x.items():
+            other_var = other.var_x.get(k)
+            if other_var is not None:
+                var += other_var
+        self._center = None
         return self

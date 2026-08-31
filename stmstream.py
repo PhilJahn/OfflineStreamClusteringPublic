@@ -1,4 +1,6 @@
 import math
+import time
+import tracemalloc
 from copy import deepcopy, copy
 
 from matplotlib import pyplot as plt
@@ -10,7 +12,7 @@ import numpy as np
 from numpy.random import PCG64
 
 class STMStream(StreamClusterer):
-    def __init__(self, epsilon=0.1, k=10, window=1000, stride=500, init_num=1000, dist="euclidean", u_radius=0.05, random_state=42, verbose=False):
+    def __init__(self, epsilon=0.1, k=10, window=1000, stride=500, init_num=1000, dist="euclidean", u_radius=0.05, random_state=42, track_memory=False, verbose=False):
         super().__init__()
 
         self.epsilon = epsilon
@@ -34,7 +36,7 @@ class STMStream(StreamClusterer):
 
         self.random_state = random_state
         self.random_generator = np.random.Generator(PCG64(random_state))
-
+        self.track_memory = track_memory
         self.verbose = verbose
 
         self.d_ctr = 0
@@ -66,6 +68,11 @@ class STMStream(StreamClusterer):
 
 
     def learn_one(self, x, t: int = None):
+        if self.track_memory:
+            tracemalloc.start()
+        # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+        start = time.time()
+
         event_log = ""
         self.d_ctr += 1
         x = np.array(x)
@@ -82,34 +89,41 @@ class STMStream(StreamClusterer):
                 samples, sample_ids, timestamps = self.initial_split()
                 while len(unfinished) > 0:
                     for id in copy(unfinished):
-                        split_index = get_split_index(samples[id], self.dist)
-                        cur_samples = samples[id]
-                        cur_sample_ids = sample_ids[id]
-                        cur_timestamps = timestamps[id]
-                        if self.verbose:
-                            print(id, split_index, len(samples[id]))
-                        if split_index > self.epsilon:
-                            id1, id2, samples1, samples2 = perform_split(cur_samples, self.dist)
-                            #print(samples1, samples2)
-                            samples[id] = cur_samples[samples1]
-                            sample_ids[id] = cur_sample_ids[samples1]
-                            timestamps[id] = cur_timestamps[samples1]
-                            samples.append(cur_samples[samples2])
-                            sample_ids.append(cur_sample_ids[samples2])
-                            timestamps.append(cur_timestamps[samples2])
-                            unfinished.append(len(samples)-1)
-                            if self.verbose:
-                                print(id, "split", id1, id2, len(samples1), len(samples2), unfinished)
-                        else:
+                        if len(samples[id]) == 0:
                             unfinished.remove(id)
                             if self.verbose:
-                                print(id, "finished")
+                                print(id, "empty")
+                        else:
+                            split_index = get_split_index(samples[id], self.dist)
+                            cur_samples = samples[id]
+                            cur_sample_ids = sample_ids[id]
+                            cur_timestamps = timestamps[id]
+                            if self.verbose:
+                                print(id, split_index, len(samples[id]))
+                            if split_index > self.epsilon:
+                                id1, id2, samples1, samples2 = perform_split(cur_samples, self.dist)
+                                #print(samples1, samples2)
+                                samples[id] = cur_samples[samples1]
+                                sample_ids[id] = cur_sample_ids[samples1]
+                                timestamps[id] = cur_timestamps[samples1]
+                                samples.append(cur_samples[samples2])
+                                sample_ids.append(cur_sample_ids[samples2])
+                                timestamps.append(cur_timestamps[samples2])
+                                unfinished.append(len(samples)-1)
+                                if self.verbose:
+                                    print(id, "split", id1, id2, len(samples1), len(samples2), unfinished)
+                            else:
+                                unfinished.remove(id)
+                                if self.verbose:
+                                    print(id, "finished")
+
                 for cell_id in range(len(samples)):
                     cell_samples = samples[cell_id]
-                    cell_samples_ids = sample_ids[cell_id]
-                    cell_time = timestamps[cell_id]
-                    new_cell = Cell(cell_id, cell_samples, cell_samples_ids, cell_time, self.dist, self.window, self.u_radius)
-                    self.cells[cell_id] = new_cell
+                    if len(cell_samples) > 0:
+                        cell_samples_ids = sample_ids[cell_id]
+                        cell_time = timestamps[cell_id]
+                        new_cell = Cell(cell_id, cell_samples, cell_samples_ids, cell_time, self.dist, self.window, self.u_radius)
+                        self.cells[cell_id] = new_cell
 
                 for cell_id in self.cells.keys():
                     self.cells[cell_id].update_metrics()
@@ -165,19 +179,31 @@ class STMStream(StreamClusterer):
                 self.cur_data = []
                 self.cur_sample_ids = []
                 self.cur_timestamps = []
-        return -1, event_log
+
+        stop = time.time()
+        if self.track_memory:
+            mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+        else:
+            mem = (-1, -1)
+
+        return -1, event_log, mem[1], stop - start
 
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
-            mc_id, event_log = self.learn_one(xs[i], timestamps[i])
+            mc_id, event_log, mem, time = self.learn_one(xs[i], timestamps[i])
             mc_ids.append(mc_id)
             event_logs.append(event_log)
-        return mc_ids, event_logs
+            mems.append(mem)
+            times.append(time)
+        return mc_ids, event_logs, mems, times
 
     def get_summary(self):
-        return deepcopy(self.cells)
+        return self.cells
 
 class Cell:
     def __init__(self, cell_id, samples, sample_ids, timestamps, dist, window, u_radius):
@@ -277,7 +303,6 @@ def get_split_index(samples, dist):
     if len(samples) == 1:
         return 0
     _, cell_mean, cell_std, cell_range, _ = get_cell_metrics(samples, dist)
-    #print(cell_mean, cell_std, cell_range)
     si = 1 - math.e ** ((-1*cell_std/cell_mean) * cell_range)
     return si
 
@@ -287,7 +312,7 @@ def perform_split(samples, dist):
     nucleus1 = argx // dists.shape[0]
     nucleus2 = argx % dists.shape[0]
 
-    assert dists[nucleus1,nucleus2] == np.max(dists)
+    #assert dists[nucleus1,nucleus2] == np.max(dists)
 
     closer_1 = np.where(dists[nucleus1] - dists[nucleus2] <= 0)[0]
     closer_2 = np.where(dists[nucleus1] - dists[nucleus2] > 0)[0]

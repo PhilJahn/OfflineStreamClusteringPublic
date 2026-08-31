@@ -30,6 +30,8 @@
 from __future__ import annotations
 
 import copy
+import time
+import tracemalloc
 
 from river import base, cluster, utils
 
@@ -106,7 +108,7 @@ class RiverSTREAMKMeans(base.Clusterer):
 
     """
 
-    def __init__(self, chunk_size=10, n_clusters=2, **kwargs):
+    def __init__(self, chunk_size=10, n_clusters=2, track_memory=False, **kwargs):
         super().__init__()
         self.time_stamp = 0
         self.n_clusters = n_clusters
@@ -116,6 +118,7 @@ class RiverSTREAMKMeans(base.Clusterer):
         self._kmeans = cluster.KMeans(n_clusters=self.n_clusters, **self.kwargs)
         self._temp_chunk = {}
         self.centers = {}
+        self.track_memory = track_memory
 
     def learn_one(self, x, w=None):
         self.time_stamp += 1
@@ -149,13 +152,27 @@ class RiverSTREAMKMeans(base.Clusterer):
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
             dp = x_to_dict(xs[i])
+            if self.track_memory:
+                tracemalloc.start()
+            # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+            start = time.time()
             self.learn_one(dp)
+            stop = time.time()
+            if self.track_memory:
+                mem = tracemalloc.get_traced_memory()
+                tracemalloc.stop()
+            else:
+                mem = (-1, -1)
+            mems.append(mem[1])
+            times.append(stop - start)
             mc_ids.append(-1)
             event_logs.append("")
-        return mc_ids, event_logs
+        return mc_ids, event_logs, mems, times
 
 
     def get_summary(self):
-        return copy.deepcopy(self.centers)
+        return self.centers
