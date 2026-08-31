@@ -12,8 +12,10 @@ import numpy as np
 
 
 def FCM_no_random(X, c_clusters=2, m=2, eps=10):
-    membership_mat = np.random.random((len(X), c_clusters))
-    membership_mat = np.divide(membership_mat, np.sum(membership_mat, axis=1)[:, np.newaxis])
+    #membership_mat = np.random.random((len(X), c_clusters))
+    #membership_mat = np.divide(membership_mat, np.sum(membership_mat, axis=1)[:, np.newaxis])
+    # make it actually deterministic, actually only used to compute difference in loop -> make it always have a larger difference than epsilon
+    membership_mat = np.ones((len(X), c_clusters)) * np.inf
     # In the first split, select a fixed center to remove the randomness
     center = X.mean(0)
     n, d = np.shape(X)

@@ -1,5 +1,5 @@
 # Original code by Alaettin Zubaroglu, https://gitlab.com/alaettinzubaroglu/emcstream
-
+import tracemalloc
 from copy import deepcopy
 
 from numpy.random import PCG64
@@ -68,7 +68,7 @@ def purity_score(y_true, y_pred):
 
 class OriginalEmcStream:
 
-    def __init__(self, k, horizon, ari_threshold, ari_threshold_step, seed, init_num_factor, drift_num_factor, drift_inc_delay, consistency_delay, verbose=False):
+    def __init__(self, k, horizon, ari_threshold, ari_threshold_step, seed, init_num_factor, drift_num_factor, drift_inc_delay, consistency_delay, track_memory=False, verbose=False):
         self.k = k
         self.horizon = horizon
         self.ari_threshold = ari_threshold
@@ -84,13 +84,12 @@ class OriginalEmcStream:
         self._total_embedding = None
         self._total_klabels = None
         self.verbose = verbose
+        self.track_memory = track_memory
 
     def learn(self, data, timestamps):         # turn true_labels into indices/timestamps
         verbose = True
         randomState1 = round(self.generator.random()*10000)
         randomState2 = round(self.generator.random()*20000)
-
-        start = default_timer()
 
         #print('----- new run at : {} -----'.format(datetime.datetime.now().isoformat()))
         #print("Running EmCStream")
@@ -144,13 +143,20 @@ class OriginalEmcStream:
 
         max_ari_tobe_threshold = 0
 
+        peak_mem = -1
+        if self.track_memory:
+            tracemalloc.start()
+        runtime = 0
+
+        start = time.time() # after HP setting
+
         while not no_more_data:
             # reinit umap when a concept drift occurs
             embedding = None
 
             in_init_cycle = True
             not_empty, X, tlabels = dataManager.get_data(init_size)
-            reducer = umap.UMAP(random_state = randomState1)
+            #reducer = umap.UMAP(random_state = randomState1)
             if not len(X) > 0:
                 if self.verbose:
                     print('breaking the loop because X is false, which means no more data.')
@@ -193,6 +199,7 @@ class OriginalEmcStream:
                     if self.verbose:
                         print('calculation kmeans on this window, with k={}'.format(cluster_cnt))
                         print('reinitialize umap with last [{}] data instances, to check for concept drift.'.format(added_instance_cnt))
+                    #print("embedding length", len(embedding))
                     kmeans = KMeans(n_clusters=cluster_cnt, random_state=0).fit(embedding)
                     klabels = [x for x in kmeans.labels_]
                     new_reducer = umap.UMAP(random_state = randomState2)
@@ -251,6 +258,16 @@ class OriginalEmcStream:
                         if self.verbose:
                             print('new ari drift threshold (increased) is [{}]'.format(ari_drift_threshold))
 
+                        #print(peak_mem, cur_peak_mem)
+                        stop = time.time()
+                        runtime += stop - start
+                        if self.track_memory and peak_mem != -1:
+                            cur_peak_mem = tracemalloc.get_traced_memory()[1]
+                            peak_mem = max(cur_peak_mem, peak_mem)
+                            tracemalloc.stop()
+                        else:
+                            peak_mem = -1
+
                         if very_first_loop:
                             total_embedding = np.append(total_embedding, embedding, axis = 0)
                             total_klabels = total_klabels + klabels
@@ -258,6 +275,9 @@ class OriginalEmcStream:
                             total_X = np.append(total_X, added_X, axis = 0)
 
                             very_first_loop = False
+
+                            if peak_mem == -1: # start memory tracking
+                                peak_mem = 0
                         else:
                             total_embedding = np.append(total_embedding, embedding[match_fnx_size:], axis = 0)
                             total_klabels = total_klabels + klabels[match_fnx_size:]
@@ -269,6 +289,10 @@ class OriginalEmcStream:
                             print('total klabels : [{}]'.format(len(total_klabels)))
                             print('total tlabels : [{}]'.format(total_tlabels.shape))
                             print('total X : [{}]'.format(total_X.shape))
+
+                        if self.track_memory:
+                            tracemalloc.start()
+                        start = time.time()
                     else:
                         drift_occured = True
                         consecutiveNodriftCnt = 0
@@ -304,7 +328,16 @@ class OriginalEmcStream:
                     klabels = [x for x in kmeans.labels_]
 
                     # create the match fnx
-                    prev_tomatch = total_klabels[-match_fnx_size:]
+                    if self.track_memory and peak_mem != -1:
+                        cur_peak_mem = tracemalloc.get_traced_memory()[1]
+                        peak_mem = max(cur_peak_mem, peak_mem)
+                    else:
+                        peak_mem = -1
+                    if not very_first_loop:
+                        prev_tomatch = total_klabels[-match_fnx_size:]
+                    else: # nothing to match, just match itself
+                        prev_tomatch = klabels[:match_fnx_size]
+
                     curr_tomatch = klabels[:match_fnx_size]
                     if self.verbose:
                         print('match_fnx_size',match_fnx_size, flush=True)
@@ -332,13 +365,37 @@ class OriginalEmcStream:
                     # convert labels to match previous labels
                     for i in range(len(klabels)):
                         klabels[i] = match_fnx[klabels[i]]
-                    print(len(total_embedding))
-                    total_embedding = np.append(total_embedding, embedding[match_fnx_size:], axis = 0)
-                    total_klabels = total_klabels + klabels[match_fnx_size:]
-                    total_tlabels = np.append(total_tlabels, added_tlabels[match_fnx_size:])
-                    total_X = np.append(total_X, added_X[match_fnx_size:], axis = 0)
 
-                    print(len(total_embedding))
+
+                    stop = time.time()
+                    runtime += stop - start
+
+                    if self.track_memory and peak_mem != -1:
+                        cur_peak_mem = tracemalloc.get_traced_memory()[1]
+                        peak_mem = max(cur_peak_mem, peak_mem)
+                        tracemalloc.stop()
+                    else:
+                        peak_mem = -1
+
+                    if very_first_loop:
+                        total_embedding = np.append(total_embedding, embedding, axis=0)
+                        total_klabels = total_klabels + klabels
+                        total_tlabels = np.append(total_tlabels, added_tlabels)
+                        total_X = np.append(total_X, added_X, axis=0)
+
+                        very_first_loop = False
+
+                        if peak_mem == -1:  # start memory tracking
+                            peak_mem = 0
+                    else:
+                        total_embedding = np.append(total_embedding, embedding[match_fnx_size:], axis=0)
+                        total_klabels = total_klabels + klabels[match_fnx_size:]
+                        total_tlabels = np.append(total_tlabels, added_tlabels[match_fnx_size:])
+                        total_X = np.append(total_X, added_X[match_fnx_size:], axis=0)
+
+                    if self.track_memory:
+                        tracemalloc.start()
+                    start = time.time()
                     break
 
                 embedding = np.empty(shape=[0, 2])
@@ -350,15 +407,27 @@ class OriginalEmcStream:
 
                 in_init_cycle = False
 
+        stop = time.time()
+        runtime += stop - start
+
+        if self.track_memory and peak_mem != -1:
+            cur_peak_mem = tracemalloc.get_traced_memory()[1]
+            peak_mem = max(cur_peak_mem, peak_mem)
+            tracemalloc.stop()
+        else:
+            peak_mem = -1
+
         self._tlabels = total_tlabels
         self._X = total_X
         self._total_embedding = total_embedding
         self._total_klabels = total_klabels
-        return total_klabels, []
+        return total_klabels, [], peak_mem, runtime
 
     def get_clustered_data(self):
         return self._X, self._tlabels
 
     def get_summary(self):
 
-        return {"embedding": deepcopy(self._total_embedding), "timestamps": deepcopy(self._tlabels), "labels": deepcopy(self._total_klabels)}
+
+
+        return {"embedding": self._total_embedding, "timestamps": self._tlabels, "labels": self._total_klabels}

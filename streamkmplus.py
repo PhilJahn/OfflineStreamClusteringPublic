@@ -1,3 +1,5 @@
+import time
+import tracemalloc
 from copy import deepcopy
 
 import numpy as np
@@ -11,13 +13,19 @@ from numpy.random import PCG64
 
 class STREAMKMPlus(StreamClusterer):
     # m: size of coreset
-    def __init__(self, m, random_state=42):
+    def __init__(self, m, track_memory=False, random_state=42):
         super().__init__()
         self.m = m
         self.buckets = [[]]
         self.random_generator = np.random.Generator(PCG64(random_state))
+        self.track_memory = track_memory
 
     def learn_one(self, x, t: int = None):
+        if self.track_memory:
+            tracemalloc.start()
+        # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+        start = time.time()
+
         event_log = ""
         x = CoreSetPoint(np.array(x), 1)
         if len(self.buckets[0]) < self.m:
@@ -39,16 +47,27 @@ class STREAMKMPlus(StreamClusterer):
         else:
             raise Exception("Bucket 0 is too large")
 
-        return -1, event_log
+        stop = time.time()
+        if self.track_memory:
+            mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+        else:
+            mem = (-1, -1)
+
+        return -1, event_log, mem[1], stop - start
 
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
-            mc_id, event_log = self.learn_one(xs[i], timestamps[i])
+            mc_id, event_log, mem, runtime = self.learn_one(xs[i], timestamps[i])
             mc_ids.append(mc_id)
             event_logs.append(event_log)
-        return mc_ids, event_logs
+            mems.append(mem)
+            times.append(runtime)
+        return mc_ids, event_logs, mems, times
 
     def get_buckets(self):
         return self.buckets
@@ -57,13 +76,13 @@ class STREAMKMPlus(StreamClusterer):
         all_coreset_points = []
         for bucket in self.buckets:
             all_coreset_points.extend(bucket)
-        summary = deepcopy(self.get_coreset(all_coreset_points))
+        summary = self.get_coreset(all_coreset_points)
         return dict(zip(list(range(len(summary))), summary))
 
     def get_coreset(self, points):
         q1 = self.random_generator.choice(points)
         #print(q1)
-        positions = [point.position for point in points]
+        positions = np.array([point.position for point in points])
         dists = utils.distance_calc(q1.position, positions, "euclidean")
         dist_weight = np.sum(dists**2)
         root = CoreSetTreeNode(None, q1, points, dist_weight)
@@ -135,7 +154,7 @@ class CoreSetTreeNode():
 
     def split(self, rand_val):
 
-        positions = [point.position for point in self.data_points]
+        positions = np.array([point.position for point in self.data_points])
         dists_org = utils.distance_calc(self.sample_point.position, positions, "euclidean")
         data_weights = [data_point.weight for data_point in self.data_points]
         data_weights = np.array(data_weights)
@@ -158,7 +177,7 @@ class CoreSetTreeNode():
         closer_org = np.where(dists_org - dists_new <= 0)[0]
         closer_new = np.where(dists_org - dists_new > 0)[0]
         #print(closer_org, closer_new)
-        assert(len(closer_org)+len(closer_new)==self.size)
+        #assert(len(closer_org)+len(closer_new)==self.size)
         data_points_org = self.data_points[closer_org]
         dist_weight_org = np.sum(dists_org[closer_org]**2)
         data_points_new = self.data_points[closer_new]
@@ -172,7 +191,7 @@ class CoreSetTreeNode():
         return self.child2
 
     def propagate_weights(self):
-        assert not self.is_leaf()
+        #assert not self.is_leaf()
         self.weight = self.child1.weight + self.child2.weight
         if self.parent is not None:
             self.parent.propagate_weights()

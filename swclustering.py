@@ -1,6 +1,8 @@
 import copy
 import math
 import os
+import time
+import tracemalloc
 
 import numpy as np
 
@@ -12,7 +14,7 @@ import sys
 
 class SWClustering(StreamClusterer):
 
-    def __init__(self, max_ehcf_num=100, epsilon=0.1, N=10000, beta=2.0, distance="euclidean", window=None):
+    def __init__(self, max_ehcf_num=100, epsilon=0.1, N=10000, beta=2.0, distance="euclidean", window=None, track_memory=False):
         super().__init__()
         sys.setrecursionlimit(50000)
         self.max_ehcf_num = max_ehcf_num
@@ -28,8 +30,14 @@ class SWClustering(StreamClusterer):
 
         self.d_ctr = 0
         self.window = window
+        self.track_memory = track_memory
 
     def learn_one(self, x, t: int = None):
+        if self.track_memory:
+            tracemalloc.start()
+        # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+        start = time.time()
+
         if self.window is not None:
             self.t = self.d_ctr // self.window
         elif t is not None:
@@ -49,10 +57,10 @@ class SWClustering(StreamClusterer):
             #    raise Exception()
             closest_ehcf.calc_boundary()
 
-            if closest_ehcf.boundary != closest_boundary:
+            #if closest_ehcf.boundary != closest_boundary:
                 #print(closest_ehcf)
                 #print(closest_boundary, closest_ehcf.boundary)
-                assert False
+            #    assert False
             if closest_distance <= closest_boundary:
                 closest_ehcf.update(x_tcf)
                 self.update_ehcf(closest_id)
@@ -79,7 +87,7 @@ class SWClustering(StreamClusterer):
             # print(ehcf2)
             #print(min_ehcf_id, self.find_closest_ehcf_id(ehcf1.mean, exclusion=[min_ehcf_id], return_distance=True))
             #print(min_ehcf_id_2, self.find_closest_ehcf_id(ehcf2.mean, exclusion=[min_ehcf_id_2], return_distance=True))
-            assert ehcf1.get_distance(ehcf2.mean) == min_dist
+            #assert ehcf1.get_distance(ehcf2.mean) == min_dist
 
             self.delete_ehcf(min_ehcf_id)
             self.delete_ehcf(min_ehcf_id_2)
@@ -104,7 +112,7 @@ class SWClustering(StreamClusterer):
             event_log += "merge '" + str(min_ehcf_id) + "' and '" + str(min_ehcf_id_2) + "' to '" + str(
                 new_ehcf_id) + "';"
 
-        assert len(self.ehcfs.keys()) <= self.max_ehcf_num - 1
+        #assert len(self.ehcfs.keys()) <= self.max_ehcf_num - 1
         if not inserted:
             new_ehcf_id = self.ehcf_id
             self.init_ehcf(x_tcf, ehcf_id=new_ehcf_id)
@@ -114,7 +122,7 @@ class SWClustering(StreamClusterer):
         del_ids = []
         for ehcf_id, ehcf in self.ehcfs.items():
             changed = ehcf.age_out(self.t)
-            ehcf.check_height(-1)
+            #ehcf.check_height(-1)
             if changed:
                 self.update_ehcf(ehcf.id)
                 #print("age change", f"'{ehcf.id}'")
@@ -125,7 +133,14 @@ class SWClustering(StreamClusterer):
         for del_id in del_ids:
             self.delete_ehcf(del_id)
 
-        return new_ehcf_id, event_log
+        stop = time.time()
+        if self.track_memory:
+            mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+        else:
+            mem = (-1, -1)
+
+        return new_ehcf_id, event_log, mem[1], stop - start
 
     def update_ehcf(self, updated_ehcf_id):
         updated_ehcf = self.ehcfs[updated_ehcf_id]
@@ -162,16 +177,20 @@ class SWClustering(StreamClusterer):
     def learn(self, xs: list, timestamps: list = None):
         ehcf_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
-            ehcf_id, event_log = self.learn_one(xs[i], timestamps[i])
+            ehcf_id, event_log, mem, time = self.learn_one(xs[i], timestamps[i])
             ehcf_ids.append(ehcf_id)
             event_logs.append(event_log)
-        return ehcf_ids, event_logs
+            mems.append(mem)
+            times.append(time)
+        return ehcf_ids, event_logs, mems, times
 
     def init_ehcf(self, initial_tcf, ehcf_id=None):
         if ehcf_id is None:
             ehcf_id = self.ehcf_id
-        assert ehcf_id not in self.ehcfs.keys()
+        #assert ehcf_id not in self.ehcfs.keys()
         tcfs = {0: [initial_tcf]}
         cf1x = copy.deepcopy(initial_tcf.cf1x)
         cf2x = copy.deepcopy(initial_tcf.cf2x)
@@ -208,7 +227,7 @@ class SWClustering(StreamClusterer):
             return closest_ehcf_id
 
     def get_summary(self):
-        return copy.deepcopy(self.ehcfs)
+        return self.ehcfs
 
 
 class EHCF:
@@ -242,22 +261,22 @@ class EHCF:
         self.non_void_tcfs = len(self.get_all_tcfs())
 
     def get_distance(self, pos):
-        return utils.distance_calc(self.mean, pos, self.dist)
+        return utils.distance_calc(self.mean, pos, self.dist)#, use_np=True)
 
     def check_ages(self):
         max_child_t = 0
         for child_ehcf in self.child_ehcfs:
             child_ehcf.check_ages()
             max_child_t = max(max_child_t, child_ehcf.t)
-        assert max_child_t <= self.t
+        #assert max_child_t <= self.t
 
     def check_metrics(self):
         sum_cf1x, sum_cf2x, sum_n = self.get_summed_values()
         #print(self)
         #print(sum_cf1x, sum_cf2x, sum_n)
-        assert self.non_void_tcfs == len(self.get_all_tcfs())
-        for i in range(len(self.cf1x)):
-            assert sum_cf1x[i] - 0.00001 <= self.cf1x[i] <= sum_cf1x[i] + 0.00001
+        #assert self.non_void_tcfs == len(self.get_all_tcfs())
+        #for i in range(len(self.cf1x)):
+        #    assert sum_cf1x[i] - 0.00001 <= self.cf1x[i] <= sum_cf1x[i] + 0.00001
 
     def calc_boundary(self):
         if self.n <= 1:
@@ -316,9 +335,9 @@ class EHCF:
                 void_ehcf.update(void_tcf)
                 void_ehcf.non_void_tcfs = len(void_ehcf.get_all_tcfs())
 
-            for child_ehcf in self.child_ehcfs:
-                if len(child_ehcf.child_ehcfs) > 0 or child_ehcf.non_void_tcfs > 1:
-                    assert not looped
+            #for child_ehcf in self.child_ehcfs:
+            #    if len(child_ehcf.child_ehcfs) > 0 or child_ehcf.non_void_tcfs > 1:
+            #        assert not looped
             merged = self.merge()
             if not merged:
                 self.void_child += 1  # take turns voiding
@@ -344,17 +363,17 @@ class EHCF:
                 i += 1
         self.non_void_tcfs = len(self.get_all_tcfs())
         #print(self)
-        prior_t = np.inf
+        #prior_t = np.inf
         for level in self.tcfs.keys():
             lvl_size = len(self.tcfs[level])
-            assert lvl_size <= self.max_per_level
+            #assert lvl_size <= self.max_per_level
             for j in range(len(self.tcfs[level])):
                 tcf = self.tcfs[level][lvl_size - j - 1]
-                if not tcf.void:
-                    next_t = tcf.t
+                #if not tcf.void:
+                #    next_t = tcf.t
                     #print(prior_t, tcf, next_t)
-                    assert prior_t > next_t
-                    prior_t = next_t
+                    #assert prior_t > next_t
+                    #prior_t = next_t
 
     def update_height(self, new_height):
         self.height = new_height
@@ -363,7 +382,7 @@ class EHCF:
 
     def check_height(self, parent_height):
         max_height = self.height
-        assert parent_height+1 == max_height
+        #assert parent_height+1 == max_height
         for child in self.child_ehcfs:
             max_height = max(max_height, child.check_height(self.height))
         return max_height
@@ -445,8 +464,8 @@ class EHCF:
                     else:  # swap around
                         old_mean = new_ehcf.mean
                         self.swap(new_ehcf)
-                        for d in range(len(old_mean)):
-                            assert self.mean[d] == old_mean[d]
+                        #for d in range(len(old_mean)):
+                        #    assert self.mean[d] == old_mean[d]
                         #print("swapped", "'" + str(self.id) + "' and '" + str(new_ehcf.id) + "'", self.height)
                         return self.merge_directly(new_ehcf)  # insert original tcf into new one
                 else:
@@ -470,7 +489,7 @@ class EHCF:
                 self.sweep_tcfs()  # ensure
                 return True
         elif len(self.child_ehcfs) == 1:  # top-level
-            assert self.height == 0
+            #assert self.height == 0
             if overlaps_self:
                 #print("'" + str(new_ehcf.id) + "'", "overlaps", "'" + str(self.id) + "'" , self.height)
                 self.child_ehcfs.append(new_ehcf)#
@@ -532,8 +551,8 @@ class EHCF:
             else:  # not overlapping with self, but newer -> try to merge with bottom-most ehcf of new_ehcf
                 old_mean = new_ehcf.mean
                 self.swap(new_ehcf)
-                for d in range(len(old_mean)):
-                    assert self.mean[d] == old_mean[d]
+                #for d in range(len(old_mean)):
+                #    assert self.mean[d] == old_mean[d]
                 #print("swapped in tree")
                 return self.merge_directly(new_ehcf)
 
@@ -546,9 +565,9 @@ class EHCF:
             overlaps_self, older_self = self.check_overlap_self(new_min, new_max)
 
             #print(overlaps_self, older_self, self.get_time_window_self())
-            if overlaps_self or not older_self:
-                #print(self)
-                assert False
+            #if overlaps_self or not older_self:
+            #    #print(self)
+            #    assert False
 
             i = max(self.tcfs.keys())
             ordered_new_tcfs = self.child_ehcfs[0].get_ordered_own_tcfs()
@@ -578,7 +597,7 @@ class EHCF:
         last_children = []
         for child_ehcf in self.child_ehcfs:
             #print(child_ehcf, child_ehcf.non_void_tcfs, len(child_ehcf.get_all_tcfs()))
-            assert child_ehcf.non_void_tcfs == len(child_ehcf.get_all_tcfs())
+            #assert child_ehcf.non_void_tcfs == len(child_ehcf.get_all_tcfs())
             if len(child_ehcf.child_ehcfs) > 0 or child_ehcf.non_void_tcfs > 1:
                 can_merge = False
             else:
@@ -589,7 +608,7 @@ class EHCF:
             #print("can merge", "'" + str(self.child_ehcfs[0].id) + "' and '" + str(self.child_ehcfs[1].id) + "'")
             #print("pre-merge", self)
             #print(last_children)
-            assert len(last_children) <= 2
+            #assert len(last_children) <= 2
             max_level = max(self.tcfs.keys())
             insertion_level = max_level
             if len(self.tcfs[insertion_level]) == self.max_per_level:

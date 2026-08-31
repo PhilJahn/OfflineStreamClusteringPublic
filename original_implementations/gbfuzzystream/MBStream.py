@@ -5,6 +5,7 @@ import copy
 import math
 import sys
 import time
+import tracemalloc
 
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -15,11 +16,13 @@ from sklearn.preprocessing import MinMaxScaler
 from original_implementations.gbfuzzystream.DPC import get_cluster_DPC
 from original_implementations.gbfuzzystream.granular_ball import GranularBall
 
-verbose = True
+verbose = False
 
 
 class MBStream:
-    def __init__(self, data, plot_evaluate_flag, lam=1, window=1000, threshold =0.8, m=2, eps=10, verbose=True, batchsize=1000):
+    def __init__(self, data, plot_evaluate_flag, lam=1, window=1000, threshold =0.8, m=2, eps=10, verbose=False, batchsize=1000, track_memory=False):
+        self.track_memory = track_memory
+
         self.window = window
         indices = np.reshape(np.arange(len(data)), (-1,1))
         data = np.append(data, indices, axis=1)
@@ -44,10 +47,10 @@ class MBStream:
         self.d_ctr = 0
         self.trueLabel = list(map(int, data[:, -2]))
         self.predictions = {}
-        self.micro_balls = self.init_v1(plot_evaluate_flag)
-
+        self.micro_balls, time, mem = self.init_v1(plot_evaluate_flag)
+        self.all_mems = {self.d_ctr: mem[1]}
+        self.all_times = {self.d_ctr: time}
         self.all_micro_balls = {self.d_ctr: copy.deepcopy(self.micro_balls)}
-
 
     @staticmethod
     def normalized(data):
@@ -92,7 +95,15 @@ class MBStream:
                 break
         if self.verbose:
             print(len(init_data))
-        clusters, gb_list, gb_dict = self.connect_ball_DPC(1,np.array(init_data))
+
+        peak_mem = -1
+        if self.track_memory:
+            tracemalloc.start()
+        # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+
+
+        gb_list, runtime, peak_mem = self.connect_ball_DPC(1, peak_mem, 0,np.array(init_data))
+        start = time.time()
         self.d_ctr = len(init_data)
         init_mb_list = []
         for data in gb_list:
@@ -102,17 +113,25 @@ class MBStream:
         if self.verbose:
             print("now have", len(gb_list), "micro-balls")
 
-        for label, dps in self.get_cluster(gb_dict).items():
-            for dp in dps:
-                index = int(dp[-1])
-                if index in self.predictions.keys():
-                    if self.verbose:
-                        print("Duplicate Index")
-                self.predictions[index] = label
+        # for label, dps in self.get_cluster(gb_dict).items():
+        #     for dp in dps:
+        #         index = int(dp[-1])
+        #         if index in self.predictions.keys():
+        #             if self.verbose:
+        #                 print("Duplicate Index")
+        #         self.predictions[index] = label
 
         #if plot_evaluate_flag:
         #	gb_plot(gb_dict, [], 1)
-        return init_mb_list
+        stop = time.time()
+        runtime = stop - start
+        if self.track_memory:
+            mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+        else:
+            mem = (-1, -1)
+
+        return init_mb_list, runtime, mem
 
     @staticmethod
     def get_nearest_micro_ball(sample, micro_balls):
@@ -125,13 +144,17 @@ class MBStream:
                 smallest_distance = current_distance
                 nearest_micro_ball = micro_ball
                 nearest_micro_ball_index = i
-        if nearest_micro_ball is None:
-            if verbose:
-                print("nearest_micro_ball is None")
         return nearest_micro_ball_index, nearest_micro_ball, smallest_distance
 
     def fit_predict(self, plot_evaluate_flag):
+        if self.track_memory:
+            peak_mem = -1
+            tracemalloc.start()
+        runtime = 0
+        start = time.time()
         t = self.begin + self.timeSpan
+
+
         while t <= self.stop:
             new_samples = []
             for i in range(self.timeIndex, len(self.timeSeries)):
@@ -174,8 +197,17 @@ class MBStream:
                     break
             for obj in gb_list_temp:
                 if len(obj) == 1:
+                    stop = time.time()
+                    runtime += stop - start
+                    if self.track_memory:
+                        mem = tracemalloc.get_traced_memory()
+                        peak_mem = max(mem[1], peak_mem)
+                        tracemalloc.stop()
                     if int(obj[0,-1]) not in self.predictions.keys():
                         self.predictions[int(obj[0,-1])] = -1
+                    if self.track_memory:
+                        tracemalloc.start()
+                    start = time.time()
                     continue
                 gb = GranularBall(obj)
                 if not self.micro_balls:
@@ -187,13 +219,17 @@ class MBStream:
                 if nearest_micro_ball is None:
                     if self.verbose:
                         print("nearest_micro_ball is none")
-                MIR = min((  # distance between the 1st closest center and the 2nd
-                    # 离nearest_micro_ball最近的球 的距离
-                    np.linalg.norm(center - nearest_micro_ball.center) for center in centers
-                    if center is not nearest_micro_ball.center
-                ))
+                # ---
+                if len(centers) > 1:
+                    MIR = min((  # distance between the 1st closest center and the 2nd
+                        # 离nearest_micro_ball最近的球 的距离
+                        np.linalg.norm(center - nearest_micro_ball.center) for center in centers
+                        if center is not nearest_micro_ball.center
+                    ))
+                else: # default to not merge if MIR unclear
+                    MIR = 0
                 # if smallest_distance >= radius:
-                if smallest_distance + gb.radius >= MIR and smallest_distance + gb.radius > nearest_micro_ball.radius and smallest_distance + nearest_micro_ball.radius > gb.radius:
+                if nearest_micro_ball is None or (smallest_distance + gb.radius >= MIR and smallest_distance + gb.radius > nearest_micro_ball.radius and smallest_distance + nearest_micro_ball.radius > gb.radius):
                     mb = MicroBall(gb.data, label=None, m=self.m, eps=self.eps)
                     mb.init_weight(t, len(gb.data))
                     self.micro_balls.append(mb)
@@ -211,17 +247,39 @@ class MBStream:
                 if mb.weight > self.threshold:
                     temp.append(mb)
                 else:
+                    stop = time.time()
+                    runtime += stop - start
+                    if self.track_memory:
+                        mem = tracemalloc.get_traced_memory()
+                        peak_mem = max(mem[1], peak_mem)
+                        tracemalloc.stop()
                     #print(mb.data)
                     for dp in mb.data:
                         if int(dp[-1]) not in self.predictions.keys():
                             self.predictions[int(dp[-1])] = -1
+
+                    if self.track_memory:
+                        tracemalloc.start()
+                    start = time.time()
             self.micro_balls = temp
+
             #print(self.d_ctr)
             if self.d_ctr % self.batchsize == 0 or self.d_ctr == len(self.timeSeries):
-                #print("stored", len(self.micro_balls), "micro-balls" )
+                stop = time.time()
+                if self.track_memory:
+                    mem = tracemalloc.get_traced_memory()
+                    peak_mem = max(mem[1], peak_mem)
+                    tracemalloc.stop()
+
+                self.all_mems[self.d_ctr] = peak_mem
+                self.all_times[self.d_ctr] = runtime + stop - start
                 self.all_micro_balls[self.d_ctr] = copy.deepcopy(self.micro_balls)
 
-
+                if self.track_memory:
+                    peak_mem = -1
+                    tracemalloc.start()
+                runtime = 0
+                start = time.time()
             #for mb in self.micro_balls:
             #	print(mb.data)
             #print(self.micro_balls)
@@ -235,18 +293,19 @@ class MBStream:
             #             if self.verbose:
             #                 print("Duplicate Index: ", index)
             # if self.verbose:
-            #     print(len(self.predictions.keys()))
+            # print(len(self.predictions.keys()))
             t += self.timeSpan
             # if self.verbose:
             #print("now have", len(self.micro_balls), "micro-balls")
 
-    def connect_ball_DPC(self, t, init_data=None):
+    def connect_ball_DPC(self, t, peak_mem, runtime, init_data=None):
         """
         (zt) If init_data is not empty, it is the initialization stage, otherwise it is the intermediate stage.
         Take the center of the sphere as the input data, connect the spheres, and generate clusters.
         :param init_data: Initialization data.
         :return:clusters Initialization data clustering results {cluster labels: [data1, data2,...]}
         """
+        start = time.time()
         radius = []  # Summarize all sphere radii
         gb_list_temp = []
         if init_data is not None:
@@ -286,56 +345,75 @@ class MBStream:
                 gb_center_list.append(gb[:, :-1].mean(0))
                 gb_list_temp_no_noise.append(gb)
             else:
+                stop = time.time()
+                runtime += stop - start
+                if self.track_memory:
+                    mem = tracemalloc.get_traced_memory()
+                    peak_mem = max(mem[1], peak_mem)
+                    tracemalloc.stop()
                 self.predictions[int(gb[0,-1])] = -1
-        gb_center = np.array(gb_center_list)
+                if self.track_memory:
+                    tracemalloc.start()
+                start = time.time()
+        #gb_center = np.array(gb_center_list)
         # noise
         gb_list_temp = gb_list_temp_no_noise
-        clusters_label, n = get_cluster_DPC(gb_center)
-        if self.verbose:
-            print("==================t=" + str(t) + "=================")
-            print("  c_num: " + str(n))
-        clusters = {}
-        gb_dict = {}
-        for i in range(0, len(gb_list_temp)):
-            gb_dict[i] = GB(gb_list_temp[i], clusters_label[i])
-            if clusters_label[i] in clusters.keys():
-                clusters[clusters_label[i]] = np.append(clusters[clusters_label[i]], gb_list_temp[i], axis=0)
-            else:
-                clusters[clusters_label[i]] = gb_list_temp[i]
-        return clusters, gb_list_temp, gb_dict
+        #clusters_label, n = get_cluster_DPC(gb_center)
+        # if self.verbose:
+        #     print("==================t=" + str(t) + "=================")
+        #     print("  c_num: " + str(n))
+        # clusters = {}
+        # gb_dict = {}
+        # print("clusters_label: ", clusters_label, "gb_list_temp: ", gb_list_temp)
+        # for i in range(0, len(gb_list_temp)):
+        #     gb_dict[i] = GB(gb_list_temp[i], clusters_label[i])
+        #     if clusters_label[i] in clusters.keys():
+        #         clusters[clusters_label[i]] = np.append(clusters[clusters_label[i]], gb_list_temp[i], axis=0)
+        #     else:
+        #         clusters[clusters_label[i]] = gb_list_temp[i]
+        stop = time.time()
+        runtime += stop - start
+        return gb_list_temp, peak_mem, runtime
 
 
 def start(data, plot_evaluate_flag, lam, window):
     M = MBStream(data, plot_evaluate_flag, lam, window)
     M.fit_predict(plot_evaluate_flag)
     od = collections.OrderedDict(sorted(M.predictions.items()))
-    if verbose:
-        print(od)
-        print(od.values())
+
 
 class OriginalGBFuzzyStream():
-    def __init__(self, lam, window, threshold, m, eps, batchsize):
+    def __init__(self, lam, window, threshold, m, eps, batchsize, track_memory=False):
         self.lam = lam
         self.window = window
         self.batchsize = batchsize
         self.threshold = threshold
         self.m = m
         self.eps = eps
-
+        self.track_memory = track_memory
         self.summaries = None
 
     def learn(self, data, timestamps):
         plot_evaluate_flag=False
-        mb = MBStream(data, plot_evaluate_flag, lam=self.lam, window=self.window, batchsize=self.batchsize, m=self.m, eps=self.eps, verbose=False)
+        mb = MBStream(data, plot_evaluate_flag, lam=self.lam, window=self.window, batchsize=self.batchsize, m=self.m, eps=self.eps, track_memory=self.track_memory, verbose=False)
         mb.fit_predict(plot_evaluate_flag)
         self.summaries = mb.all_micro_balls
-        return [], []
+        return [], [], mb.all_mems, mb.all_times
 
     def get_summary(self):
         summary_dict = {}
+        summary_memory_dict = {}
         for dctr, mbs in self.summaries.items():
+            if self.track_memory:
+                tracemalloc.start()
             summaries = dict(zip(list(range(len(mbs))), mbs))
             #print("dctr", dctr, len(mbs))
             summary_dict[dctr] = summaries
-        return summary_dict
+            if self.track_memory:
+                batch_summary_mem = tracemalloc.get_traced_memory()[1]
+                tracemalloc.stop()
+            else:
+                batch_summary_mem = -1
+            summary_memory_dict[dctr] = batch_summary_mem
+        return summary_dict, summary_memory_dict
 

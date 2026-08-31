@@ -1,6 +1,8 @@
 # Authors: The scikit-learn developers
 # SPDX-License-Identifier: BSD-3-Clause
 import copy
+import time
+import tracemalloc
 import warnings
 from math import sqrt
 from numbers import Integral, Real
@@ -497,7 +499,8 @@ class SklearnBirch(
         n_clusters=3,
         compute_labels=True,
         batchsize = 1000,
-        max_summaries = 100
+        max_summaries = 100,
+        track_memory = False
     ):
         self.threshold = threshold
         self.branching_factor = branching_factor
@@ -508,6 +511,9 @@ class SklearnBirch(
         self.d_ctr = 0
 
         self.all_summaries = {}
+        self.all_times = {}
+        self.all_mems = {}
+        self.track_memory = track_memory
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y=None):
@@ -574,7 +580,15 @@ class SklearnBirch(
         else:
             iter_func = _iterate_sparse_X
 
+        peak_mem = 0
+        time_sum = 0
+
         for sample in iter_func(X):
+
+            if self.track_memory:
+                tracemalloc.start()
+            start = time.time()
+
             self.d_ctr += 1
             subcluster = _CFSubcluster(linear_sum=sample)
             split = self.root_.insert_cf_subcluster(subcluster)
@@ -594,15 +608,30 @@ class SklearnBirch(
                 self.root_.append_subcluster(new_subcluster1)
                 self.root_.append_subcluster(new_subcluster2)
 
+            if self.track_memory:
+                mem = tracemalloc.get_traced_memory()
+                tracemalloc.stop()
+            else:
+                mem = (-1,-1)
+            stop = time.time()
+
+            time_sum += stop - start
+            peak_mem = max(mem[1], peak_mem)
+
             if self.d_ctr % self.batchsize == 0:
+
+
                 leaves = copy.deepcopy(np.concatenate([leaf.subclusters_ for leaf in self._get_leaves()]))
                 centroids = np.concatenate([leaf.centroids_ for leaf in self._get_leaves()])
                 assert len(leaves) == len(centroids)
                 if len(leaves) > self.max_summaries:
                     raise TooManySummariesError
                 else:
+                    self.all_times[self.d_ctr] = time_sum
+                    self.all_mems[self.d_ctr] = peak_mem
                     self.all_summaries[self.d_ctr] = leaves
-
+                    peak_mem = 0
+                    time_sum = 0
 
 
 
@@ -610,6 +639,8 @@ class SklearnBirch(
         self.subcluster_centers_ = centroids
         self._n_features_out = self.subcluster_centers_.shape[0]
         self.all_summaries[self.d_ctr] = copy.deepcopy(np.concatenate([leaf.subclusters_ for leaf in self._get_leaves()]))
+        self.all_times[self.d_ctr] = time_sum
+        self.all_mems[self.d_ctr] = peak_mem
 
         if len(self.subcluster_centers_) > self.max_summaries:
             raise TooManySummariesError
@@ -757,11 +788,21 @@ class SklearnBirch(
 
     def learn(self, X, timestamps):
         self.fit(X)
-        return [], []
+        return [], [], self.all_mems, self.all_times
 
     def get_summary(self):
         summary_dict = {}
+        summary_memory_dict = {}
         for dctr, summary in self.all_summaries.items():
+
+            if self.track_memory:
+                tracemalloc.start()
             summaries = dict(zip(list(range(len(summary))), summary))
             summary_dict[dctr] = summaries
-        return summary_dict
+            if self.track_memory:
+                batch_summary_mem = tracemalloc.get_traced_memory()[1]
+                tracemalloc.stop()
+            else:
+                batch_summary_mem = -1
+            summary_memory_dict[dctr] = batch_summary_mem
+        return summary_dict, summary_memory_dict

@@ -1,5 +1,7 @@
 import copy
 import math
+import tracemalloc
+import time
 
 from datahandler import load_data
 from online.stream_clustering import StreamClusterer
@@ -9,7 +11,7 @@ import numpy as np
 
 class DStream(StreamClusterer):
 
-    def __init__(self, dim_grid_num, dim, value_ranges=1, cm=3.0, cl=0.8, window=1, l=0.998, beta=0.3):
+    def __init__(self, dim_grid_num, dim, value_ranges=1, cm=3.0, cl=0.8, window=1, l=0.998, beta=0.3, track_memory=False):
         super().__init__()
         self.dim_grid_num = dim_grid_num
         self.grid_num = min(10**12, self.dim_grid_num ** dim) # no point in going too large here
@@ -24,7 +26,7 @@ class DStream(StreamClusterer):
         if not cm < self.grid_num:
             raise ValueError("cm needs to be smaller than grid_num")
 
-        print(self.grid_num)
+        #print(self.grid_num)
 
         if type(value_ranges) is not np.ndarray:
             value_ranges = np.ones(dim) * value_ranges
@@ -32,6 +34,8 @@ class DStream(StreamClusterer):
         self.bounds = np.ones(dim)
         for d in range(dim):
             self.bounds[d] = value_ranges[d] / dim_grid_num
+
+        #print(self.bounds.dtype)
         #print(self.bounds)
         #print(1 // self.bounds)
 
@@ -49,8 +53,15 @@ class DStream(StreamClusterer):
 
         self.cells = {}
         self.removed_cells = {}  # last_removal for grid cell
+        self.track_memory = track_memory
 
     def learn_one(self, x, t: int = None):
+
+        if self.track_memory:
+            tracemalloc.start()
+        # https://stackoverflow.com/questions/67702626/how-to-start-stopwatch-in-python
+        start = time.time()
+
         if self.window is not None:
             self.t = self.d_ctr // self.window
         elif t is not None:
@@ -67,7 +78,7 @@ class DStream(StreamClusterer):
         #print(cell_id_list)
         cell_id = str(cell_id_list).replace("[", "").replace("]", "").replace(".0", "").replace(" ", "").replace("np.float64(","").replace(")", "")
         #print(cell_id)
-        assert "." not in cell_id
+        #assert "." not in cell_id
         new_cell_id = cell_id
         if cell_id in self.cells.keys():
             self.cells[cell_id].insert(1, self.t)
@@ -81,7 +92,8 @@ class DStream(StreamClusterer):
             upper_bound = [self.bounds[d] * (grid_coordinates[d] + 1) for d in range(len(grid_coordinates))]
             cell = DStreamGridCell(cell_id=cell_id, density=1, timestamp=self.t, last_removal=removal,
                                    grid_num=self.grid_num, cm=self.cm, cl=self.cl, beta=self.beta, l=self.l,
-                                   lower_bound=lower_bound, upper_bound=upper_bound)
+                                   lower_bound=lower_bound, upper_bound=upper_bound, bounds=self.bounds,
+                                   dim_grid_num=self.dim_grid_num)
             self.cells[cell_id] = cell
             event_log += f"add {cell_id};"
 
@@ -95,33 +107,46 @@ class DStream(StreamClusterer):
                 del (self.cells[cell_id])
                 self.removed_cells[cell_id] = self.t
                 event_log += f"delete {cell_id};"
-        return new_cell_id, event_log
+
+        stop = time.time()
+        if self.track_memory:
+            mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+        else:
+            mem = (-1, -1)
+
+        return new_cell_id, event_log, mem[1], stop - start
 
     def learn(self, xs: list, timestamps: list = None):
         mc_ids = []
         event_logs = []
+        mems = []
+        times = []
         for i in range(len(xs)):
-            mc_id, event_log = self.learn_one(xs[i], timestamps[i])
+            mc_id, event_log, mem, time = self.learn_one(xs[i], timestamps[i])
             mc_ids.append(mc_id)
             event_logs.append(event_log)
-        return mc_ids, event_logs
+            mems.append(mem)
+            times.append(time)
+        return mc_ids, event_logs, mems, times
 
     def get_summary(self):
-        cells = copy.deepcopy(self.cells)
-        for cell_id, cell in cells.items():
+        #cells = copy.deepcopy(self.cells)
+        for cell_id, cell in self.cells.items():
             cell.decay(self.t)
             cell.check_status(self.t)
-        return cells
+        return self.cells
 
 
 class DStreamGridCell():
 
-    def __init__(self, cell_id, density, timestamp, last_removal, grid_num, cm, cl, beta, l, lower_bound, upper_bound):
+    def __init__(self, cell_id, density, timestamp, last_removal, grid_num, cm, cl, beta, l, lower_bound, upper_bound, bounds, dim_grid_num):
         self.cell_id = cell_id
         self.density = density
         self.last_update = timestamp  # only updated during insert
         self.last_check = timestamp
         self.last_removal = last_removal
+
 
         #hyperparameter
         self.grid_num = grid_num
@@ -131,6 +156,8 @@ class DStreamGridCell():
         self.beta = beta
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
+        self.bounds = bounds
+        self.dim_grid_num = dim_grid_num
 
         self.status = None
         self.check_status(timestamp)
