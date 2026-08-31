@@ -4,6 +4,7 @@ import numpy as np
 import itertools
 import ast
 import copy
+from fastdist import fastdist
 
 from sklearn.metrics import pairwise_distances
 
@@ -59,27 +60,73 @@ def get_data_properties(data_points, labels):
     gt_cls_num = max(1,len(gt_cls))
     return d, gt_cls_num
 
-def distance_calc(pos1, pos2, dist):
+def euclidean_distance_dict(pos1, pos2):
+    pos1 = dict_to_np(pos1)
+    pos2 = dict_to_np(pos2)
+    return distance_calc(pos1, pos2, "euclidean")
+
+def distance_calc(pos1, pos2, dist, use_np = False):
+    # #print(pos1.dtype, pos1.shape, pos2.dtype, pos2.shape)
+    # if dist == "euclidean":
+    #     if len(pos1.shape) == 1 or len(pos2.shape) == 1:
+    #         if pos1.shape[0] * pos2.shape[0] < 250000: # numpy is faster for smaller datasets
+    #             return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
+    #         else:
+    #             if len(pos1.shape) == 1 and len(pos2.shape) == 1:
+    #                 return pairwise_distances(pos1.reshape(1, -1), pos2.reshape(1, -1), dist)[0][0]
+    #             elif len(pos1.shape) == 1:
+    #                 return pairwise_distances(pos1.reshape(1, -1), pos2, dist)[0]
+    #             elif len(pos2.shape) == 1:
+    #                 return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
+    #     else:
+    #         if pos1.shape[0] * pos1.shape[1] * pos2.shape[0] < 250000:  # numpy is faster for smaller datasets
+    #             return np.sqrt(np.sum(np.square(pos1[:, None, :] - pos2[None, :, :]), axis=-1))
+    #         else:
+    #             return pairwise_distances(pos1, pos2, dist)
+
     if dist == "euclidean":
-        if len(pos1.shape) == 1:
-            return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
-        elif len(pos2.shape) == 1:
-            #print(pos1.shape, pos2.shape)
-            #print(pos2)
-            return np.array([np.sqrt(np.sum(np.square(pos - pos2), axis=-1)) for pos in pos1])
-        else:
-            return np.array([[np.sqrt(np.sum(np.square(pos - post), axis=-1)) for post in pos2] for pos in pos1])
-    elif dist == "manhattan":
-        return np.sum(np.abs(pos1 - pos2), axis=-1)
-    else:
         if len(pos1.shape) == 1 and len(pos2.shape) == 1:
-            return pairwise_distances(pos1.reshape(1, -1), pos2.reshape(1, -1), dist)[0][0]
+            return fastdist.euclidean(pos1, pos2)
         elif len(pos1.shape) == 1:
-            return pairwise_distances(pos1.reshape(1, -1), pos2, dist)[0]
+            return fastdist.vector_to_matrix_distance(pos1, pos2, fastdist.euclidean, "euclidean")
         elif len(pos2.shape) == 1:
-            return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
+            return fastdist.vector_to_matrix_distance(pos2, pos1, fastdist.euclidean, "euclidean")
         else:
-            return pairwise_distances(pos1, pos2, dist)
+            return fastdist.matrix_to_matrix_distance(pos1, pos2, fastdist.euclidean, "euclidean")
+
+    # if dist == "euclidean":
+    #     if len(pos1.shape) == 1:
+    #         return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
+    #     elif len(pos2.shape) == 1:
+    #         # print(pos1.shape, pos2.shape)
+    #         # print(pos2)
+    #         return np.array([np.sqrt(np.sum(np.square(pos - pos2), axis=-1)) for pos in pos1])
+    #     else:
+    #         return np.array([[np.sqrt(np.sum(np.square(pos - post), axis=-1)) for post in pos2] for pos in pos1])
+    #
+    # if dist == "euclidean" and use_np:
+    #     if len(pos1.shape) == 1 or len(pos2.shape) == 1:
+    #         return np.sqrt(np.sum(np.square(pos1 - pos2), axis=-1))
+    #     else:
+    #         return np.sqrt(np.sum(np.square(pos1[:, None, :] - pos2[None, :, :]), axis=-1))
+
+    if len(pos1.shape) == 1 and len(pos2.shape) == 1:
+        return pairwise_distances(pos1.reshape(1, -1), pos2.reshape(1, -1), dist)[0][0]
+    elif len(pos1.shape) == 1:
+        return pairwise_distances(pos1.reshape(1, -1), pos2, dist)[0]
+    elif len(pos2.shape) == 1:
+        return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
+    else:
+        return pairwise_distances(pos1, pos2, dist)
+
+        # if len(pos1.shape) == 1 and len(pos2.shape) == 1:
+        #     return pairwise_distances(pos1.reshape(1, -1), pos2.reshape(1, -1), dist)[0][0]
+        # elif len(pos1.shape) == 1:
+        #     return pairwise_distances(pos1.reshape(1, -1), pos2, dist)[0]
+        # elif len(pos2.shape) == 1:
+        #     return pairwise_distances(pos1, pos2.reshape(1, -1), dist).flatten()
+        # else:
+        #     return pairwise_distances(pos1, pos2, dist)
 
 def compute_SAB(SA, SB, nB, meanA, meanB, meanAB):
     SAB = SA + SB + (nB * np.dot((meanB - meanA), (meanB - meanAB)))
