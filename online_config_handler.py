@@ -6,7 +6,9 @@ from ConfigSpace import Configuration, ConfigurationSpace, Float, Integer, Categ
 from utils import get_data_properties
 
 
-sampling_methods = ["random", "kcentroid", "lwc_square", "protras"]
+batch_sampling_methods = ["batch_random", "batch_kcentroid", "batch_lwc_square", "batch_protras"]
+window_sampling_methods = ["window_random", "window_kcentroid", "window_lwc_square", "window_protras"]
+
 
 def get_online_configspace(method, data_points, labels, args):
     config_space = ConfigurationSpace()
@@ -15,10 +17,10 @@ def get_online_configspace(method, data_points, labels, args):
     base_2 = Constant("online", method)
     base_3 = Constant("offline", args.offline)
     base_4 = Constant("batch_size", args.batch)
-    #   base_5 = Constant("batch_max", args.batch_max)
+    base_5 = Constant("eval_size", args.eval_size)
     base_6 = Constant("batch_budget", args.batch_budget)
 
-    config_space.add([base_1, base_2, base_3, base_4, base_6])
+    config_space.add([base_1, base_2, base_3, base_4, base_5, base_6])
 
     window_sizes = [100, 200, 250, 500, 1000]
 
@@ -27,21 +29,21 @@ def get_online_configspace(method, data_points, labels, args):
     if method == "full_batch":
         return config_space
 
-    # if method == "clustream":
-    #
-    #     #"max_mc": 100, "init_num": None, "mbf": 2.0, "m": 10, "delta": 512
-    #
-    #     clustream_1 = Float("mbf", (1.0, 5.0), default=2.0)
-    #     if args.offline is None:
-    #         clustream_2 = Constant("mmc", 100)
-    #     else:
-    #         clustream_2 = Integer("mmc", (1, 100), default=gt_cls_num)
-    #     clustream_3 = Integer("m", (1, 100), default=10)
-    #     clustream_4 = Integer("delta", (100, 2*args.batch), default=512)
-    #     clustream_5 = Constant("init_num", args.batch) # Too slow for non-determinism, swap to deterministic for tests later
-    #
-    #
-    #     config_space.add([clustream_1, clustream_2, clustream_3, clustream_4, clustream_5])
+    if method == "clustream":
+
+        #"max_mc": 100, "init_num": None, "mbf": 2.0, "m": 10, "delta": 512
+
+        clustream_1 = Float("mbf", (1.0, 5.0), default=2.0)
+        if args.offline is None:
+            clustream_2 = Constant("mmc", 100)
+        else:
+            clustream_2 = Integer("mmc", (1, 100), default=gt_cls_num)
+        clustream_3 = Integer("m", (1, 100), default=10)
+        clustream_4 = Integer("delta", (100, 2*args.batch), default=512)
+        clustream_5 = Constant("init_num", args.batch)
+
+
+        config_space.add([clustream_1, clustream_2, clustream_3, clustream_4, clustream_5])
     # elif method == "denstream":
     #     denstream_1 = Constant("init_num", min(args.batch, 1000))
     #     denstream_2 = Integer("mu", (1, 100), default=10)
@@ -111,13 +113,13 @@ def get_online_configspace(method, data_points, labels, args):
     #     config_space.add(streamkmeans_cond_1)
     #     config_space.add(streamkmeans_cond_2)
     #     config_space.add(streamkmeans_cond_3)
-    elif method == "streamkmplus" or method == "streamkmplus+":
+    elif method == "streamkmplus":
         if args.offline is None:
             streamkmplus_1 = Constant("m", 100)
         else:
             streamkmplus_1 = Integer("m", (1, 100), default=gt_cls_num)
         config_space.add(streamkmplus_1)
-    elif method == "dstream" or method == "dstream+" or method == "dstream++":
+    elif method == "dstream":
         #param_dict = {"dim_grid_num": 30, "dim": 2, "value_ranges": 1, "cm": 3.0, "cl": 0.8, "window": 1, "l": 0.998,
         #             "beta": 0.3}
         dstream_1 = Integer("dim_grid_num", (2, 100), default=30)
@@ -129,20 +131,20 @@ def get_online_configspace(method, data_points, labels, args):
         dstream_7 = Float("l", (0.00001,0.5), default=0.002, log=True)
         dstream_8 = Float("beta", (0.001,2), default=0.3)
         config_space.add([dstream_1, dstream_2, dstream_3, dstream_4, dstream_5, dstream_6, dstream_7, dstream_8])
-    # elif method == "emcstream":
-    #     emcstream_1 = Integer("k", (1, 100), default=gt_cls_num)
-    #     emcstream_2 = Constant("horizon", args.batch)
-    #     emcstream_3 = Integer("init_num_factor", (1,3), default=2)
-    #     emcstream_4 = Integer("drift_num_factor", (1,10), default=5)
-    #     emcstream_5 = Constant("drift_num_factor_change", 1)
-    #     emcstream_6 = Integer("drift_inc_delay", (1,10), default=4)
-    #     emcstream_7 = Constant("consistency_threshold", 1.0)
-    #     emcstream_8 = Float("consistency_drift", (0, 0.1), default=0.001)
-    #     emcstream_9 = Integer("consistency_delay", (1, 10), default=4)
-    #     config_space.add([emcstream_1, emcstream_2, emcstream_3, emcstream_4, emcstream_5, emcstream_6, emcstream_7,
-    #                       emcstream_8, emcstream_9])
-    #     emcstream_cond_1 = ForbiddenLessThanRelation(config_space['drift_num_factor'], config_space['init_num_factor'])
-    #     config_space.add(emcstream_cond_1)
+    elif method == "emcstream":
+        emcstream_1 = Integer("k", (1, 100), default=gt_cls_num)
+        emcstream_2 = Constant("horizon", args.batch)
+        emcstream_3 = Integer("init_num_factor", (1,3), default=2)
+        emcstream_4 = Integer("drift_num_factor", (1,10), default=5)
+        emcstream_5 = Constant("drift_num_factor_change", 1)
+        emcstream_6 = Integer("drift_inc_delay", (1,10), default=4)
+        emcstream_7 = Constant("consistency_threshold", 1.0)
+        emcstream_8 = Float("consistency_drift", (0, 0.1), default=0.001)
+        emcstream_9 = Integer("consistency_delay", (1, 10), default=4)
+        config_space.add([emcstream_1, emcstream_2, emcstream_3, emcstream_4, emcstream_5, emcstream_6, emcstream_7,
+                          emcstream_8, emcstream_9])
+        emcstream_cond_1 = ForbiddenLessThanRelation(config_space['drift_num_factor'], config_space['init_num_factor'])
+        config_space.add(emcstream_cond_1)
     # elif method == "gbfuzzystream":
     #     gbfuzzystream_1 = Integer("eps", (1, 10), default=10)
     #     gbfuzzystream_2 = Float("m", (1.001, 5), default=2)
@@ -151,7 +153,7 @@ def get_online_configspace(method, data_points, labels, args):
     #     gbfuzzystream_5 = Categorical("window", window_sizes, default=args.batch)
     #     gbfuzzystream_6 = Constant("min_split_size", 8)
     #     config_space.add([gbfuzzystream_1, gbfuzzystream_2, gbfuzzystream_3, gbfuzzystream_4, gbfuzzystream_5, gbfuzzystream_6])
-    elif method == "stmstream" or method == "stmstream+":
+    elif method == "stmstream":
         stmstream_1 = Float("epsilon", (0, 1), default=0.1)
         if args.offline is None:
             stmstream_2 = Constant("k", 100)
@@ -178,21 +180,31 @@ def get_online_configspace(method, data_points, labels, args):
     #     birch_8 = Categorical("mode", ["betula_median", "betula_mean", "birch_greedy", "birch_max"], default="birch_max")
     #
     #     config_space.add([birch_1, birch_2, birch_3, birch_4, birch_5, birch_6, birch_7, birch_8])
-    elif method == "swclustering" or method == "swclustering+":
+    elif method == "swclustering":
         swclustering_1 = Float("epsilon", (0.001, 0.5), default=0.1)
         swclustering_2 = Float("beta", (1.0, 5.0), default=2.0) # same as mbf
         if args.offline is None:
             swclustering_3 = Constant("mmc", 100)
         else:
             swclustering_3 = Integer("mmc", (1, 100), default=gt_cls_num)
-        swclustering_4 = Categorical("N", [200000, 10000, 5000, 2000, 1000], default=10000)
+        swclustering_4 = Integer("N", (1, 100), default=10)
         config_space.add([swclustering_1, swclustering_2, swclustering_3, swclustering_4])
-    elif method in sampling_methods:
+    elif method in batch_sampling_methods:
         if args.offline is None:
             sampling1 = Constant("sampling_size", 100)
         else:
             sampling1 = Integer("sampling_size", (1, 100), default=gt_cls_num)
         config_space.add([sampling1])
+    elif method in window_sampling_methods:
+        if args.offline is None:
+            sampling1 = Constant("sampling_size", 100)
+        else:
+            sampling1 = Integer("sampling_size", (1, 100), default=gt_cls_num)
+
+        sampling2 = Float("selection_chance", (0, 1), default=0.5)
+        sampling3 = Constant("stride", args.batch) # does not need to be run other than when offline phase is called
+        sampling4 = Categorical("window", window_sizes, default=args.batch)
+        config_space.add([sampling1, sampling2, sampling3, sampling4])
     # River
     elif method == "clustream_river":
         river_clustream_1 = Float("mbf", (1.0, 5.0), default=2.0)
@@ -230,10 +242,10 @@ def get_online_configspace(method, data_points, labels, args):
         streamkmeans_cond_2 = ForbiddenGreaterThanRelation(config_space['chunk_size'], config_space['batch_size'])
         config_space.add(streamkmeans_cond_1)
         config_space.add(streamkmeans_cond_2)
-    elif method == "emcstream_original":
+    elif method == "emcstream_original" or  method == "emcstream_mod":
         emcstream_1 = Integer("k", (1, 100), default=gt_cls_num)
         emcstream_2 = Constant("horizon", args.batch)
-        emcstream_3 = Integer("init_num_factor", (1,3), default=2)
+        emcstream_3 = Integer("init_num_factor", (1,5), default=2)
         emcstream_4 = Integer("drift_num_factor", (1,10), default=5)
         emcstream_5 = Constant("drift_num_factor_change", 1)
         emcstream_6 = Integer("drift_inc_delay", (1,10), default=4)
@@ -242,8 +254,8 @@ def get_online_configspace(method, data_points, labels, args):
         emcstream_9 = Integer("consistency_delay", (1, 10), default=4)
         config_space.add([emcstream_1, emcstream_2, emcstream_3, emcstream_4, emcstream_5, emcstream_6, emcstream_7,
                           emcstream_8, emcstream_9])
-        emcstream_cond_1 = ForbiddenLessThanRelation(config_space['drift_num_factor'], config_space['init_num_factor'])
-        config_space.add(emcstream_cond_1)
+        #emcstream_cond_1 = ForbiddenLessThanRelation(config_space['drift_num_factor'], config_space['init_num_factor'])
+        #config_space.add(emcstream_cond_1)
     elif method == "gbfuzzystream_original":
         gbfuzzystream_1 = Integer("eps", (1, 10), default=10)
         gbfuzzystream_2 = Float("m", (1.001, 5), default=2)
@@ -253,7 +265,7 @@ def get_online_configspace(method, data_points, labels, args):
         config_space.add([gbfuzzystream_1, gbfuzzystream_2, gbfuzzystream_3, gbfuzzystream_4, gbfuzzystream_5])
     elif method == "birch_sklearn":
         birch_1 = Float("threshold", (0, (d**0.5)/2), default=0.000000000001)
-        birch_2 = Integer("branching_factor", (1, 50), default=2)
+        birch_2 = Integer("branching_factor", (2, 50), default=50)
         birch_3 = Constant("max_leaf_entry_num", 100)
         config_space.add([birch_1, birch_2, birch_3])
     else:

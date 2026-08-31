@@ -21,21 +21,30 @@ def get_offline_configspace(method, summary_centers, weights, labels, args):
     base_2 = Constant("online", args.online)
     base_3 = Constant("offline", method)
     base_4 = Constant("batch_size", args.batch)
-    base_5 = Constant("batch_budget", args.batch_budget)
-    base_6 = Constant("batch_id", args.batch_id)
+    base_5 = Constant("eval_size", args.eval_size)
+    base_6 = Constant("offline_batch_budget", args.budget)
+    base_7 = Constant("online_batch_budget", args.online_batch_budget)
 
-    config_space.add([base_1, base_2, base_3, base_4, base_5, base_6])
+    base_8 = Constant("batch_id", args.batch_id)
+
+    config_space.add([base_1, base_2, base_3, base_4, base_5, base_6, base_7, base_8])
 
     if method == "dbscan":
         max_min_samples = min(50, len(summary_centers)) # range based on Anna Beer, Ekaterina Kuznetsova, Claudia Plant: Parameter Selection for DBSCAN: Insights from Persistent Homology. ECAI 2025: 3250-3257
         min_samples, eps, max_eps = estimate_defaults_dbscan(summary_centers, "euclidean", max_min_samples)
-        dbscan_1 = Float("eps", (0, max_eps), default=eps)
+        if max_eps >= 0.000001:
+            dbscan_1 = Float("eps", (0, max_eps), default=eps)
+        else:
+            dbscan_1 = Categorical("eps", [0, 0.000001], default=0.000001)
         dbscan_2 = Integer("min_samples", (1, max_min_samples), default=min_samples)
         config_space.add([dbscan_1, dbscan_2])
     elif method == "fdbscan":
         max_min_samples = min(50, len(summary_centers)) # range based on Anna Beer, Ekaterina Kuznetsova, Claudia Plant: Parameter Selection for DBSCAN: Insights from Persistent Homology. ECAI 2025: 3250-3257
         min_samples, eps, max_eps = estimate_defaults_dbscan(summary_centers, "euclidean", max_min_samples)
-        fdbscan_1 = Float("eps", (0, max_eps), default=eps)
+        if max_eps >= 0.000001:
+            fdbscan_1 = Float("eps", (0, max_eps), default=eps)
+        else:
+            fdbscan_1 = Categorical("eps", [0, 0.000001], default=0.000001)
         fdbscan_2 = Integer("min_samples", (1, 100*max_min_samples), default=100*min_samples)
         config_space.add([fdbscan_1, fdbscan_2])
     elif method == "kmeans":
@@ -59,13 +68,19 @@ def get_offline_configspace(method, summary_centers, weights, labels, args):
         distance_threshold, min_rho, max_distance = estimate_defaults_dpc(summary_centers, weights, default_ratio=0.01, dist_metric="euclidean")
 
         dpc_1 = Constant("metric", "euclidean")
-        dpc_2 = Float("distance_threshold", (0, max_distance), default=min(distance_threshold, max_distance))
+        if max_distance < 0.000001:
+            dpc_2 = Constant("distance_threshold", 0)
+        else:
+            dpc_2 = Float("distance_threshold", (0, max_distance), default=min(distance_threshold, max_distance))
         dpc_3 = Categorical("gaussian", [True, False], default=True)
-        if args.online not in ["denstream", "denstream_river", "dstream", "dstream+", "dstream++"]:
+        if args.online not in ["denstream", "denstream_river", "dstream"]:
             dpc_4 = Float("min_rho", (1, max_min_rho), default=max(1, min(min_rho, max_min_rho)))
         else:
             dpc_4 = Float("min_rho", (0, max_min_rho), default=max(0, min(min_rho, max_min_rho)))
-        dpc_5 = Float("min_delta", (0, max_distance), default=min(distance_threshold, max_distance))
+        if max_distance < 0.000001:
+            dpc_5 = Constant("min_delta", 0)
+        else:
+            dpc_5 = Float("min_delta", (0, max_distance), default=min(distance_threshold, max_distance))
         dpc_6 = Categorical("hard_assign", [True, False], default=False)
         dpc_7 = Categorical("halo", [True, False], default=True)
         dpc_8 = Categorical("halo_avg", [True, False], default=True)
@@ -93,8 +108,7 @@ def get_offline_configspace(method, summary_centers, weights, labels, args):
     #     if args.online in ["clustream", "denstream"]:
     #         adjacency_2 = Float("range", (1, 10), default=1)
     #         config_space.add([adjacency_2])
-
-    else:
+    elif method != "adjacency":
         raise NotImplementedError(method)
     return config_space
 

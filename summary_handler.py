@@ -7,7 +7,7 @@ from datahandler import load_data
 from online_handler import get_online_method
 
 
-def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_pseudoclustering):
+def process_summary(online_alg, summary, batch_datapoints, eval_datapoints, batch_start_id, do_pseudoclustering):
     if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmeans+", "streamkmplus",
                       "streamkmplus+", "birch", "swclustering", "swclustering+",
                       "clustream_river", "denstream_river", "streamkmeans_river", "birch_sklearn"]:
@@ -144,13 +144,13 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
 
         #print(utils.distance_calc(batch_datapoints, positions, dist="euclidean").shape)
         if len(positions) > 0: # check if actually anything was summarized
-            assignment_dists = utils.distance_calc(batch_datapoints, positions, dist="euclidean")
+            assignment_dists = utils.distance_calc(eval_datapoints, positions, dist="euclidean")
             assignment = np.argmin(assignment_dists, axis=1)
         else:
-            assignment = [-1] * len(batch_datapoints)
-    elif online_alg == "dstream" or online_alg == "dstream+" or online_alg == "dstream++":
+            assignment = np.array([-1] * len(eval_datapoints))
+    elif online_alg == "dstream":
         ex_grid_cell = summary[list(summary.keys())[0]]
-        radius = (ex_grid_cell.upper_bound[0] - ex_grid_cell.lower_bound[0]) / 2 + 0.000001 # account for rounding error
+        radius = (ex_grid_cell.bounds[0]) / 2 + 0.000001 # account for rounding error
         #print(radius)
         cm = ex_grid_cell.cm
         cl = ex_grid_cell.cl
@@ -166,7 +166,7 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
         #print(upper_bounds)
         #print(lower_bounds)
         #print(positions)
-        outlier_pos = np.array([np.inf]*d)
+        outlier_pos = np.array([-1000000]*d)
         positions.append(outlier_pos)
         positions = np.array(positions)
         #print(positions)
@@ -192,22 +192,30 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
         # print(utils.distance_calc(batch_datapoints, positions, dist="euclidean").shape)
         # assignment_dists = utils.distance_calc(batch_datapoints, positions, dist="euclidean")
         # assignment = np.argmin(assignment_dists, axis=1)
-        grid_coordinates = batch_datapoints // (2*radius)
-        #print("grid_coordinates", grid_coordinates)
+
+        bound = ex_grid_cell.bounds[0]
+        grid_coordinates = eval_datapoints // bound
+        #print("grid_coordinates", grid_coordinates[1])
         assignment = []
         summary_key_list = list(summary.keys())
+        #print(summary_key_list)
         for grid_coordinate in grid_coordinates:
             cell_id_list = grid_coordinate.tolist()
             #print(cell_id_list)
+
+            for i in range(len(cell_id_list)):
+                if cell_id_list[i] == ex_grid_cell.dim_grid_num:  # rounding for 1
+                    cell_id_list[i] = ex_grid_cell.dim_grid_num - 1
             cell_id = str(cell_id_list).replace("[", "").replace("]", "").replace(".0", "").replace(" ", "")
             if cell_id in summary_key_list:
                 assignment.append(summary_key_list.index(cell_id))
             else:
+                #print(cell_id)
                 assignment.append(-1)
         assignment = np.array(assignment)
-       # print(assignment)
-    elif online_alg == "emcstream" or online_alg == "emcstream_original":
-        assignment = np.arange(len(batch_datapoints))  # self assignment
+    elif online_alg == "emcstream" or online_alg == "emcstream_original" or online_alg == "emcstream_mod":
+        assignment_dists = utils.distance_calc(eval_datapoints, batch_datapoints, dist="euclidean")
+        assignment = np.argmin(assignment_dists, axis=1)
         id_map = assignment
         radii = np.zeros(len(batch_datapoints))
         weights = np.ones(len(batch_datapoints))
@@ -240,41 +248,47 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
             sample_ids = [cell.sample_ids for cell in summary.values()]
         assignment = []
         if len(positions) > 0:
-            for j in range(len(batch_datapoints)):
-                j_id = j + batch_start_id
+            for j in range(len(eval_datapoints)):
+                j_id = j + batch_start_id - len(eval_datapoints) + len(batch_datapoints)
                 found = False
-                for h in range(len(sample_ids)):
-                    if j_id in sample_ids[h]:
-                        assignment.append(h)
-                        found = True
-                        break
+                if j_id >= batch_start_id: # don't even need to check for prior batches
+                    for h in range(len(sample_ids)):
+                        if j_id in sample_ids[h]:
+                            assignment.append(h)
+                            found = True
+                            break
                 if not found and len(positions) > 0:  # missing
                     #print(f"{j_id} not found in summary")
-                    assignment.append(np.argmin(utils.distance_calc(batch_datapoints[j], positions, dist="euclidean")))
+                    assignment.append(np.argmin(utils.distance_calc(eval_datapoints[j], positions, dist="euclidean")))
                 assert len(assignment) == j + 1
         else:
-            assignment = [-1] * len(batch_datapoints)
+            assignment = [-1] * len(eval_datapoints)
         assignment = np.array(assignment)
         #print(len(assignment))
-    elif online_alg in ["random", "kcentroid", "lwc_square", "protras", "full_batch"]:
+    elif online_alg in ["batch_random", "batch_kcentroid", "batch_lwc_square", "batch_protras", "full_batch",
+                        "window_random", "window_kcentroid", "window_lwc_square", "window_protras"
+                        ]:
         positions = summary["centers"]
         radii = np.zeros(len(positions))
         weights = summary["weights"]
         id_map = np.arange(len(weights))
         status = np.array(["dense"] * len(weights))
-        assignment_dists = utils.distance_calc(batch_datapoints, positions, dist="euclidean")
+        assignment_dists = utils.distance_calc(eval_datapoints, positions, dist="euclidean")
         assignment = np.argmin(assignment_dists, axis=1)
     else:
         raise NotImplementedError(f"{online_alg} is not implemented.")
     min_store = {"id_map": id_map, "center": positions, "radii": radii, "weights": weights, "status": status}
     if do_pseudoclustering:
-        if online_alg in ["clustream", "denstream", "hddstream", "dstream", "dstream+", "dstream++", "gbfuzzystream",
+        if online_alg in ["clustream", "denstream", "hddstream", "dstream", "gbfuzzystream",
                           "stmstream", "stmstream+", "birch", "swclustering", "swclustering+",
                           "clustream_river", "denstream_river", "gbfuzzystream_original", "birch_sklearn"]:  # connected components
 
             mc_dists = utils.distance_calc(positions, positions, dist="euclidean")
-            two_radii = np.array([radii + radii[i] for i in range(len(positions))])
-            connected = np.where(mc_dists <= two_radii, True, False)
+            #two_radii = np.array([radii + radii[i] for i in range(len(positions))])
+            mc_dists = np.subtract(mc_dists, radii)
+            mc_dists = mc_dists.T
+            mc_dists = np.subtract(mc_dists, radii)
+            connected = np.where(mc_dists <= 0, True, False)
             partitions = np.arange(len(positions)+1)  # get connected
             for i in range(len(partitions)-1):
                 if status[i] != "outlie" and status[i] != "sporad" and status[i] != "sporadic" and status[i] != "deleted" and status[i] != "delete":
@@ -294,10 +308,10 @@ def process_summary(online_alg, summary, batch_datapoints, batch_start_id, do_ps
                     partitions[i] = -1
             partitions[-1] = -1
             return assignment, min_store, partitions[assignment]
-        elif online_alg == "emcstream" or online_alg == "emcstream_original":
-            pseudoclustering = summary["labels"]
-            return assignment, min_store, np.array(pseudoclustering)
-        else:  # no pseudo-clustering
+        elif online_alg == "emcstream" or online_alg == "emcstream_original" or online_alg == "emcstream_mod":
+            pseudoclustering = np.array(summary["labels"])[assignment]
+            return assignment, min_store, pseudoclustering
+        else: # no pseudo-clustering
             pseudoclustering = assignment
             return assignment, min_store, pseudoclustering
     else:
@@ -309,15 +323,11 @@ import matplotlib.patches as ptc
 from clustpy.metrics.clustering_metrics import purity
 
 if __name__ == "__main__":
-    stream, labels = load_data("stream_densired")
+    stream, labels = load_data("har")
     #stream = stream[:8500]
     #labels = labels[:8500]
     online_alg = "dstream"
-    config_dict = {'heuristic': False, 'epsilon': 0.1, 'B': 1, 'L': 3, 'absorption': 'euclidean', 'batch_budget': 1800, 'batch_size': 1000, 'closeness': 'D3', 'ds': 'densired2', 'max_leaf_entry_num': 100, 'offline': None, 'online': 'birch', 'outlier_batch': 100, 'outlier_ratio': 0.2455760137573}
-    config_dict = {'window': 1000, "N": 2000, "epsilon": 0.02, "horizon": 200, "verbose": False, "threshold": 0.05, "branching_factor": 5 }
-    config_dict = {'batch_budget': 1800, 'batch_size': 1000, 'ds': 'stream_densired', 'epsilon': 0.4203896618903, 'init_num': 1000, 'k': 100, 'offline': None, 'online': 'stmstream+', 'stride': 500, 'u_radius': 0.0603858461158, 'window': 1000}
-    config_dict = {'batch_budget': 1800, 'batch_size': 1000, 'ds': 'har', 'epsilon': 0.9084672533065, 'init_num': 1000, 'k': 100, 'offline': None, 'online': 'stmstream+', 'stride': 100, 'u_radius': 0.0371620941924, 'window': 1000}
-    config_dict = {'dim_grid_num': 3}
+    config_dict = {'batch_budget': '300_logdim', 'batch_size': 1000, 'beta': 0.3, 'cl': 0.8, 'cm': 3.0, 'dim': 561, 'dim_grid_num': 30, 'ds': 'har', 'eval_size': 1, 'l': 0.002, 'offline': None, 'online': 'dstream', 'value_ranges': 1, 'window': 1}
 
     stream_alg = get_online_method(online_alg, config_dict, 0)
     batch_size = 1000
@@ -325,7 +335,7 @@ if __name__ == "__main__":
     batch_ids.append(len(stream))
     print(batch_ids)
     timestamps = np.arange(len(stream))
-    if online_alg == "emcstream" or online_alg == "emcstream_original" or online_alg == "gbfuzzystream_original" or online_alg == "birch_sklearn":  # needs to run through fully
+    if online_alg == "emcstream" or online_alg == "emcstream_original" or online_alg == "emcstream_mod" or online_alg == "gbfuzzystream_original" or online_alg == "birch_sklearn":  # needs to run through fully
         stream_alg.learn(stream.tolist(), timestamps.tolist())
         full_summary = stream_alg.get_summary()
     summary = None
@@ -336,8 +346,9 @@ if __name__ == "__main__":
         label_batch = labels[batch_ids[i]:batch_ids[i + 1]]
         timestamp_batch = timestamps[batch_ids[i]:batch_ids[i + 1]]
         #print(timestamp_batch)
-        if online_alg != "emcstream" and online_alg != "emcstream_original" and online_alg != "gbfuzzystream_original" and online_alg != "birch_sklearn":
-            _, event_log = stream_alg.learn(stream_batch.tolist(), timestamp_batch.tolist())
+        if (online_alg != "emcstream" and online_alg != "emcstream_original" and online_alg != "emcstream_mod"
+                and online_alg != "gbfuzzystream_original" and online_alg != "birch_sklearn"):
+            _, event_log, _, _ = stream_alg.learn(stream_batch.tolist(), timestamp_batch.tolist())
             #print(event_log)
             summary = stream_alg.get_summary()
             if online_alg == "clustream":
@@ -381,11 +392,10 @@ if __name__ == "__main__":
         summary2 = np.load(f"./storage_test/{online_alg}_store_{i}.npy", allow_pickle=True)
         summary2 = summary2.item()
         #print(summary2[list(summary2.keys())[-1]])
-        assignment, min_store, pseudoclustering = process_summary(online_alg, summary2, stream_batch, batch_ids[i],
+        assignment, min_store, pseudoclustering = process_summary(online_alg, summary2, stream_batch, stream_batch, batch_ids[i],
                                                                   True)
         _, pseudoclustering_unq = np.unique(pseudoclustering, return_inverse=True)
         pseudoclustering = np.where(pseudoclustering == -1, -1, pseudoclustering_unq)
-        plt.figure(figsize=(30, 30))
         #print(min_store)
         ids = min_store["id_map"]
         print(len(ids))
@@ -395,29 +405,32 @@ if __name__ == "__main__":
         status = min_store["status"]
         #print(status)
 
-        plt.scatter(x=stream_batch[:, 0], y=stream_batch[:, 1], cmap=plt.get_cmap("jet"), c=pseudoclustering, s=10)
-        for j in range(stream_batch.shape[0]):
-            plt.text(stream_batch[j][0], stream_batch[j][1], s=str(assignment[j]) + "_" + str(pseudoclustering[j]), c="grey")
+        if False:
+            plt.figure(figsize=(30, 30))
 
-        for l in range(len(ids)):
-            # print(mc.mean)
-            mc_patch = ptc.Circle((float(centers[l][0]), float(centers[l][1])), radii[l], alpha=0.4, color="lightgrey")
-            plt.gca().add_patch(mc_patch)
-            if status[l] == "dense":
-                plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=weights[l] * 10, c="darkgrey", marker="X", linewidths=0)
-            elif status[l] == "normal":
-                plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=weights[l] * 10, c="darkgrey", marker="s")
-            elif status[l] == "outlie":
-                plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=max(1,weights[l]) * 15, c="darkgrey", marker="+")
-            else:
-                plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=max(1,weights[l]) * 15, c="darkgrey", marker="*", linewidths=0)
-            if online_alg != "dstream":
-                plt.text(centers[l][0], centers[l][1], s=ids[l])
+            plt.scatter(x=stream_batch[:, 0], y=stream_batch[:, 1], cmap=plt.get_cmap("jet"), c=pseudoclustering, s=10)
+            for j in range(stream_batch.shape[0]):
+                plt.text(stream_batch[j][0], stream_batch[j][1], s=str(assignment[j]) + "_" + str(pseudoclustering[j]), c="grey")
 
-        assignpurity = purity(labels_true=label_batch, labels_pred=assignment)
-        pseudopurity = purity(labels_true=label_batch, labels_pred=pseudoclustering)
-        plt.ylim((0, 1))
-        plt.xlim((0, 1))
-        plt.title(f"assign purity: {assignpurity}; pseudo purity: {pseudopurity}")
-        plt.savefig(f"./test_figures_2/{online_alg}_store_{i}.png")
-        plt.close()
+            for l in range(len(ids)):
+                # print(mc.mean)
+                mc_patch = ptc.Circle((float(centers[l][0]), float(centers[l][1])), radii[l], alpha=0.4, color="lightgrey")
+                plt.gca().add_patch(mc_patch)
+                if status[l] == "dense":
+                    plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=weights[l] * 10, c="darkgrey", marker="X", linewidths=0)
+                elif status[l] == "normal":
+                    plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=weights[l] * 10, c="darkgrey", marker="s")
+                elif status[l] == "outlie":
+                    plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=max(1,weights[l]) * 15, c="darkgrey", marker="+")
+                else:
+                    plt.scatter(x=centers[l][0], y=centers[l][1], alpha=1, s=max(1,weights[l]) * 15, c="darkgrey", marker="*", linewidths=0)
+                if online_alg != "dstream":
+                    plt.text(centers[l][0], centers[l][1], s=ids[l])
+
+            assignpurity = purity(labels_true=label_batch, labels_pred=assignment)
+            pseudopurity = purity(labels_true=label_batch, labels_pred=pseudoclustering)
+            plt.ylim((0, 1))
+            plt.xlim((0, 1))
+            plt.title(f"assign purity: {assignpurity}; pseudo purity: {pseudopurity}")
+            plt.savefig(f"./test_figures_2/{online_alg}_store_{i}.png")
+            plt.close()
