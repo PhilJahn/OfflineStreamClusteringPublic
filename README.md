@@ -200,7 +200,16 @@ The final results for all of our experiments are provided in ``result_evals/``.
 
 The rankings are then extracted with ```result_extractor.py```. These are provided in ``result_extracts/``, which provides score overviews and rankings for all relevant combinations. These are then utilized by the figure and table extractors.
 
-We provide our results in 
+
+## Reproducibility
+
+We provide our results in the following Zenodo repositories:
+https://zenodo.org/records/22235275 (DOI:https://doi.org/10.5281/zenodo.22235275)
+https://zenodo.org/records/22238050 (DOI:https://doi.org/10.5281/zenodo.22238050)
+
+The content is stored in .zip files and needs to be extracted into folders of the same name. The offline results had to be split into separate .zip-files. The file names need to be split along the ```-``` into subfolders.
+
+The scripts we sued to execute our experiments can be found in ``Scripts/``.
 
 ## Figures / Tables
 
