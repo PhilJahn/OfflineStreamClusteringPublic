@@ -1,0 +1,541 @@
+online_method,dataset_name,ARI+AMI
+Random (Batch),kddcup99,1.6934733543196132
+Random (Batch),covertype,0.7454953188608335
+Random (Batch),sensorstream,1.0726141615781857
+Random (Batch),pokerhand,0.02437081137287933
+Random (Batch),heartbeats,0.8374744832402805
+Random (Batch),rialto,0.5283629013695776
+Random (Batch),phiusiil,1.6429060278282135
+Random (Batch),starlightcurves,1.3168259036400545
+Random (Batch),har,1.307415563308161
+Random (Batch),pendigits,1.3833139841484932
+Random (Batch),adult,0.3853290161166698
+Random (Batch),iabrupt,0.3932358501314581
+Random (Batch),iincremental,0.32945955013065786
+Random (Batch),ireocurring,0.5456124042436612
+Random (Batch),igradual,0.5401192343769916
+Random (Batch),iabruptreocurring,0.6214583916556562
+Random (Batch),posture,0.3333704273417124
+Random (Batch),smartmeter,0.6025895085918878
+Random (Batch),uwave,0.554377403264082
+Random (Batch),asfault,0.5853029502389344
+Random (Batch),powersupply,0.37972265917141335
+Random (Batch),outdoor,1.1253805224055866
+Random (Batch),gassensor,1.1236685255543832
+Random (Batch),htru2,1.2012894814322737
+Random (Batch),cancer,0.21096792769506445
+Random (Batch),sepsissurvival,0.10480857658197817
+Random (Batch),electricity,0.19400547039920735
+Random (Batch),mirs,0.3201107309413078
+Random (Batch),yoga,0.10340766754453878
+Random (Batch),noaa,0.23332587734182497
+LWC (Batch),kddcup99,1.816352770804623
+LWC (Batch),covertype,0.7502653485736592
+LWC (Batch),sensorstream,1.0436728295325606
+LWC (Batch),pokerhand,0.02477088527720306
+LWC (Batch),heartbeats,1.0154632930126628
+LWC (Batch),rialto,0.5304202118240926
+LWC (Batch),phiusiil,1.6483643431984571
+LWC (Batch),starlightcurves,1.3395194463515872
+LWC (Batch),har,1.282683341701658
+LWC (Batch),pendigits,1.3999912706276092
+LWC (Batch),adult,0.3776526022560578
+LWC (Batch),iabrupt,0.41519382511319747
+LWC (Batch),iincremental,0.32807679189021277
+LWC (Batch),ireocurring,0.5443318491279134
+LWC (Batch),igradual,0.5254265225157155
+LWC (Batch),iabruptreocurring,0.6238200075712714
+LWC (Batch),posture,0.3453624267324096
+LWC (Batch),smartmeter,0.5979484188956665
+LWC (Batch),uwave,0.5657698848244095
+LWC (Batch),asfault,0.5843743923326683
+LWC (Batch),powersupply,0.38166251966337694
+LWC (Batch),outdoor,1.136241708736762
+LWC (Batch),gassensor,1.0916548736246718
+LWC (Batch),htru2,1.2847833999524831
+LWC (Batch),cancer,0.21391178346518003
+LWC (Batch),sepsissurvival,0.10262949529097964
+LWC (Batch),electricity,0.2026573725195573
+LWC (Batch),mirs,0.2778669723515488
+LWC (Batch),yoga,0.11238916034327895
+LWC (Batch),noaa,0.2276536941369951
+k-Centroid (Batch),kddcup99,1.8374008273009708
+k-Centroid (Batch),covertype,0.758755906958642
+k-Centroid (Batch),sensorstream,1.1444970759340674
+k-Centroid (Batch),pokerhand,0.025585183648448195
+k-Centroid (Batch),heartbeats,1.0729604020122279
+k-Centroid (Batch),rialto,0.5299282000850634
+k-Centroid (Batch),phiusiil,1.7327801015433748
+k-Centroid (Batch),starlightcurves,1.3440376914669545
+k-Centroid (Batch),har,1.3882778556757596
+k-Centroid (Batch),pendigits,1.5480144322908282
+k-Centroid (Batch),adult,0.3984515568197511
+k-Centroid (Batch),iabrupt,0.4210651589952412
+k-Centroid (Batch),iincremental,0.33273716812039367
+k-Centroid (Batch),ireocurring,0.5659552030401069
+k-Centroid (Batch),igradual,0.5653234424705647
+k-Centroid (Batch),iabruptreocurring,0.6266480362785438
+k-Centroid (Batch),posture,0.35242466425675456
+k-Centroid (Batch),smartmeter,0.6576623939857735
+k-Centroid (Batch),uwave,0.6060267136864554
+k-Centroid (Batch),asfault,0.6179721073513849
+k-Centroid (Batch),powersupply,0.3796291608240512
+k-Centroid (Batch),outdoor,1.1769588567785685
+k-Centroid (Batch),gassensor,1.1749764741141684
+k-Centroid (Batch),htru2,1.3263430651656074
+k-Centroid (Batch),cancer,0.23695342002340092
+k-Centroid (Batch),sepsissurvival,0.10367178422819667
+k-Centroid (Batch),electricity,0.20449302970422067
+k-Centroid (Batch),mirs,0.2870058523511483
+k-Centroid (Batch),yoga,0.12887209770389862
+k-Centroid (Batch),noaa,0.22904066980638427
+ProTraS (Batch),kddcup99,1.8802681532338132
+ProTraS (Batch),covertype,0.7414271037692268
+ProTraS (Batch),sensorstream,1.1049202991306801
+ProTraS (Batch),pokerhand,0.023943301653790217
+ProTraS (Batch),heartbeats,1.0886286744949116
+ProTraS (Batch),rialto,0.5360919224660396
+ProTraS (Batch),phiusiil,1.4951324748665602
+ProTraS (Batch),starlightcurves,1.3341003694407703
+ProTraS (Batch),har,1.2181845141050909
+ProTraS (Batch),pendigits,1.3303776228767217
+ProTraS (Batch),adult,0.2893218232762198
+ProTraS (Batch),iabrupt,0.39200639642188273
+ProTraS (Batch),iincremental,0.32876359200465677
+ProTraS (Batch),ireocurring,0.5250961412256623
+ProTraS (Batch),igradual,0.4984242701002515
+ProTraS (Batch),iabruptreocurring,0.5901705891264568
+ProTraS (Batch),posture,0.3261909072018998
+ProTraS (Batch),smartmeter,0.5541898057759029
+ProTraS (Batch),uwave,0.5505682965540359
+ProTraS (Batch),asfault,0.546470007423072
+ProTraS (Batch),powersupply,0.37926125930798893
+ProTraS (Batch),outdoor,1.1522826900501317
+ProTraS (Batch),gassensor,1.1628804222445002
+ProTraS (Batch),htru2,1.2934996794315565
+ProTraS (Batch),cancer,0.22198676521613114
+ProTraS (Batch),sepsissurvival,0.09579919820411331
+ProTraS (Batch),electricity,0.18992741667383184
+ProTraS (Batch),mirs,0.27804412781348975
+ProTraS (Batch),yoga,0.11102233297067521
+ProTraS (Batch),noaa,0.21696441846875092
+Random (Window),kddcup99,1.7175194687957336
+Random (Window),covertype,0.7495841053439949
+Random (Window),sensorstream,1.0453054386979197
+Random (Window),pokerhand,0.024555120421262844
+Random (Window),heartbeats,0.8331022247556186
+Random (Window),rialto,0.5942391093669941
+Random (Window),phiusiil,1.6474068776404638
+Random (Window),starlightcurves,1.4110322177858534
+Random (Window),har,1.2942495973935175
+Random (Window),pendigits,1.4087617453453878
+Random (Window),adult,0.3656577635643441
+Random (Window),iabrupt,0.4051277743946604
+Random (Window),iincremental,0.3308135370002301
+Random (Window),ireocurring,0.5555718416778177
+Random (Window),igradual,0.5936218234627357
+Random (Window),iabruptreocurring,0.6415861152444129
+Random (Window),posture,0.3356056729223085
+Random (Window),smartmeter,0.6165328584873604
+Random (Window),uwave,0.5761154485265312
+Random (Window),asfault,0.6401974552770984
+Random (Window),powersupply,0.37972632478929236
+Random (Window),outdoor,1.1840085618443772
+Random (Window),gassensor,1.2189100204667942
+Random (Window),htru2,1.2548876750539122
+Random (Window),cancer,0.21406012020324305
+Random (Window),sepsissurvival,0.1008787044352597
+Random (Window),electricity,0.18902035597201916
+Random (Window),mirs,0.30437698816690606
+Random (Window),yoga,0.13751848151539825
+Random (Window),noaa,0.23855644917670515
+LWC (Window),kddcup99,1.8721905148540416
+LWC (Window),covertype,0.7497124945537159
+LWC (Window),sensorstream,1.0185182730726026
+LWC (Window),pokerhand,0.024938698892784883
+LWC (Window),heartbeats,0.9696251801313969
+LWC (Window),rialto,0.5888631747144046
+LWC (Window),phiusiil,1.651754297327494
+LWC (Window),starlightcurves,1.3927605735182487
+LWC (Window),har,1.2378144453230258
+LWC (Window),pendigits,1.3985857416654748
+LWC (Window),adult,0.3730359940360828
+LWC (Window),iabrupt,0.41591961393360166
+LWC (Window),iincremental,0.33592388669328366
+LWC (Window),ireocurring,0.5698008903880409
+LWC (Window),igradual,0.5599918693440009
+LWC (Window),iabruptreocurring,0.6416607438945792
+LWC (Window),posture,0.34860506485539644
+LWC (Window),smartmeter,0.6075620035440004
+LWC (Window),uwave,0.5649327169523206
+LWC (Window),asfault,0.6365756145919226
+LWC (Window),powersupply,0.3821137055425199
+LWC (Window),outdoor,1.200530848531916
+LWC (Window),gassensor,1.1570484217566248
+LWC (Window),htru2,1.340578048722389
+LWC (Window),cancer,0.22648507260691386
+LWC (Window),sepsissurvival,0.10522619875260042
+LWC (Window),electricity,0.19131087116890755
+LWC (Window),mirs,0.28978570875964427
+LWC (Window),yoga,0.12223823697148695
+LWC (Window),noaa,0.21924537779751274
+k-Centroid (Window),kddcup99,1.8986470019916013
+k-Centroid (Window),covertype,0.7553249614683233
+k-Centroid (Window),sensorstream,1.1299407316660688
+k-Centroid (Window),pokerhand,0.025309040407994976
+k-Centroid (Window),heartbeats,1.064531372943926
+k-Centroid (Window),rialto,0.5884690787031104
+k-Centroid (Window),phiusiil,1.7389078790748425
+k-Centroid (Window),starlightcurves,1.3946794120494297
+k-Centroid (Window),har,1.4400396347409892
+k-Centroid (Window),pendigits,1.5577683318256206
+k-Centroid (Window),adult,0.40273270150128004
+k-Centroid (Window),iabrupt,0.424703661497162
+k-Centroid (Window),iincremental,0.3307246747360928
+k-Centroid (Window),ireocurring,0.5653357215498207
+k-Centroid (Window),igradual,0.5896603337806721
+k-Centroid (Window),iabruptreocurring,0.6432869935172498
+k-Centroid (Window),posture,0.35220801693406334
+k-Centroid (Window),smartmeter,0.6666972252953574
+k-Centroid (Window),uwave,0.6000102186844978
+k-Centroid (Window),asfault,0.7322571256347599
+k-Centroid (Window),powersupply,0.3822123773872659
+k-Centroid (Window),outdoor,1.229383147864204
+k-Centroid (Window),gassensor,1.28371687565371
+k-Centroid (Window),htru2,1.3115476785090405
+k-Centroid (Window),cancer,0.25080471429890516
+k-Centroid (Window),sepsissurvival,0.10414540995651844
+k-Centroid (Window),electricity,0.20322768144122372
+k-Centroid (Window),mirs,0.299102972802485
+k-Centroid (Window),yoga,0.15657264109459512
+k-Centroid (Window),noaa,0.22673273509194125
+ProTraS (Window),kddcup99,1.9138099251071021
+ProTraS (Window),covertype,0.7395886312852473
+ProTraS (Window),sensorstream,1.0712878684836897
+ProTraS (Window),pokerhand,0.024304451679363348
+ProTraS (Window),heartbeats,1.1083903757796605
+ProTraS (Window),rialto,0.5879992443289739
+ProTraS (Window),phiusiil,1.5544476857978904
+ProTraS (Window),starlightcurves,1.4206705647120061
+ProTraS (Window),har,1.242692157894052
+ProTraS (Window),pendigits,1.3111542223107522
+ProTraS (Window),adult,0.2868807690281605
+ProTraS (Window),iabrupt,0.40817463834060264
+ProTraS (Window),iincremental,0.3373485162176124
+ProTraS (Window),ireocurring,0.5417301484371722
+ProTraS (Window),igradual,0.5233871511969979
+ProTraS (Window),iabruptreocurring,0.6021136438061423
+ProTraS (Window),posture,0.32333786468916004
+ProTraS (Window),smartmeter,0.5925143180867611
+ProTraS (Window),uwave,0.5585562476052499
+ProTraS (Window),asfault,0.5775988900210587
+ProTraS (Window),powersupply,0.37914530835200067
+ProTraS (Window),outdoor,1.199566163401375
+ProTraS (Window),gassensor,1.2352909026084864
+ProTraS (Window),htru2,1.2413778431068838
+ProTraS (Window),cancer,0.2367921075173891
+ProTraS (Window),sepsissurvival,0.10294003626856552
+ProTraS (Window),electricity,0.1887786749503073
+ProTraS (Window),mirs,0.267211609991453
+ProTraS (Window),yoga,0.12114174535061872
+ProTraS (Window),noaa,0.21373579770803075
+StreamKMeans,kddcup99,1.903989030852174
+StreamKMeans,covertype,0.3832601705409302
+StreamKMeans,sensorstream,0.2657012857305645
+StreamKMeans,pokerhand,0.016533840014457013
+StreamKMeans,heartbeats,1.0141337565757733
+StreamKMeans,rialto,0.3221026535695266
+StreamKMeans,phiusiil,1.598209882424583
+StreamKMeans,starlightcurves,1.4278308544761125
+StreamKMeans,har,0.7487292822334064
+StreamKMeans,pendigits,1.2972273354379764
+StreamKMeans,adult,0.3268579859400045
+StreamKMeans,iabrupt,0.3991348191727382
+StreamKMeans,iincremental,0.3017308964755572
+StreamKMeans,ireocurring,0.5431574492905185
+StreamKMeans,igradual,0.5632826112995681
+StreamKMeans,iabruptreocurring,0.6103199575919154
+StreamKMeans,posture,0.3349124335561324
+StreamKMeans,smartmeter,0.6088880052932035
+StreamKMeans,uwave,0.5392848349806536
+StreamKMeans,asfault,0.6717385477186149
+StreamKMeans,powersupply,0.36490839024686506
+StreamKMeans,outdoor,0.7448192644219382
+StreamKMeans,gassensor,0.23893209917674052
+StreamKMeans,htru2,1.2031106783896832
+StreamKMeans,cancer,0.0
+StreamKMeans,sepsissurvival,0.0446197373600421
+StreamKMeans,electricity,0.12724631798698516
+StreamKMeans,mirs,0.0003044822924118673
+StreamKMeans,yoga,0.03561766020135426
+StreamKMeans,noaa,0.12094195575117661
+StreamKM++,kddcup99,1.9299318884422472
+StreamKM++,covertype,0.6890622838257681
+StreamKM++,sensorstream,0.6121799493135922
+StreamKM++,pokerhand,0.02128898042844596
+StreamKM++,heartbeats,1.0733599505108273
+StreamKM++,rialto,0.4972841563183914
+StreamKM++,phiusiil,1.6942987068996056
+StreamKM++,starlightcurves,1.3932843402441253
+StreamKM++,har,1.265896955969536
+StreamKM++,pendigits,1.4349582679109174
+StreamKM++,adult,0.3443481391702643
+StreamKM++,iabrupt,0.4013471035142482
+StreamKM++,iincremental,0.30015637313112853
+StreamKM++,ireocurring,0.49704795858911344
+StreamKM++,igradual,0.5449138880587145
+StreamKM++,iabruptreocurring,0.5873269969075694
+StreamKM++,posture,0.33519645040754353
+StreamKM++,smartmeter,0.5543885369970516
+StreamKM++,uwave,0.5668220624285916
+StreamKM++,asfault,0.5987271165883428
+StreamKM++,powersupply,0.37546567068527326
+StreamKM++,outdoor,1.1600001522100745
+StreamKM++,gassensor,1.0711946385402047
+StreamKM++,htru2,1.3500251105472785
+StreamKM++,cancer,0.21660378309897
+StreamKM++,sepsissurvival,0.1016771576548865
+StreamKM++,electricity,0.16813735428256615
+StreamKM++,mirs,0.2579245487504025
+StreamKM++,yoga,0.11686510305301034
+StreamKM++,noaa,0.19219309294857423
+BIRCH,kddcup99,1.9066769141947213
+BIRCH,covertype,0.6144648677460751
+BIRCH,sensorstream,0.35681881188411535
+BIRCH,pokerhand,0.021298126869450984
+BIRCH,heartbeats,1.1737224007682165
+BIRCH,rialto,0.4340460197085163
+BIRCH,phiusiil,1.549833386981592
+BIRCH,starlightcurves,1.419275492906702
+BIRCH,har,1.303671272301395
+BIRCH,pendigits,1.472423299513645
+BIRCH,adult,0.3612536987867687
+BIRCH,iabrupt,0.38298657144362735
+BIRCH,iincremental,0.28976262214953485
+BIRCH,ireocurring,0.5385679773253624
+BIRCH,igradual,0.5306647103514175
+BIRCH,iabruptreocurring,0.5022727337386035
+BIRCH,posture,0.34625522178202295
+BIRCH,smartmeter,0.0
+BIRCH,uwave,0.5992516366058394
+BIRCH,asfault,0.7230811738323171
+BIRCH,powersupply,0.3772619610845753
+BIRCH,outdoor,1.117966577359251
+BIRCH,gassensor,0.7333895845509886
+BIRCH,htru2,1.3026299483845851
+BIRCH,cancer,0.246528529721304
+BIRCH,sepsissurvival,0.10325095144231833
+BIRCH,electricity,0.2013126358264572
+BIRCH,mirs,0.30770234616178427
+BIRCH,yoga,0.0860337283481798
+BIRCH,noaa,0.21453546463328532
+CluStream,kddcup99,1.919653474012355
+CluStream,covertype,0.749046811267198
+CluStream,sensorstream,1.2052352844999963
+CluStream,pokerhand,0.02111782083292546
+CluStream,heartbeats,1.0856514471635301
+CluStream,rialto,0.5188747272600718
+CluStream,phiusiil,1.6111618399198964
+CluStream,starlightcurves,0.0
+CluStream,har,1.213847391302679
+CluStream,pendigits,1.4080024021882982
+CluStream,adult,0.35568304512123117
+CluStream,iabrupt,0.38159252661653853
+CluStream,iincremental,0.3260586830145298
+CluStream,ireocurring,0.5372298561086786
+CluStream,igradual,0.5013654894986743
+CluStream,iabruptreocurring,0.6049255524051755
+CluStream,posture,0.33199546164630633
+CluStream,smartmeter,0.5988918072968916
+CluStream,uwave,0.5769453799908568
+CluStream,asfault,0.6347909736440582
+CluStream,powersupply,0.3793979243500014
+CluStream,outdoor,1.1926544196731972
+CluStream,gassensor,1.141459581048615
+CluStream,htru2,1.29703719768559
+CluStream,cancer,0.0
+CluStream,sepsissurvival,0.09962665813821592
+CluStream,electricity,0.18570314701146118
+CluStream,mirs,0.0
+CluStream,yoga,0.12145522772927131
+CluStream,noaa,0.25078221195334094
+DenStream,kddcup99,1.8749598475513758
+DenStream,covertype,0.46871801359872944
+DenStream,sensorstream,0.29681304565408717
+DenStream,pokerhand,0.025837430527360317
+DenStream,heartbeats,0.9949032292822424
+DenStream,rialto,0.3405490543758811
+DenStream,phiusiil,1.809534285092581
+DenStream,starlightcurves,1.3816307754189316
+DenStream,har,1.363366425598409
+DenStream,pendigits,1.5317571031996178
+DenStream,adult,0.3868449367318372
+DenStream,iabrupt,0.34288116371440713
+DenStream,iincremental,0.2893054717567911
+DenStream,ireocurring,0.4700332952777637
+DenStream,igradual,0.5189967173685022
+DenStream,iabruptreocurring,0.5342303776275077
+DenStream,posture,0.3461237115778941
+DenStream,smartmeter,0.619924064482444
+DenStream,uwave,0.5951953097411959
+DenStream,asfault,0.666043418003351
+DenStream,powersupply,0.3751359109351813
+DenStream,outdoor,1.1970070522212797
+DenStream,gassensor,0.9711243759701544
+DenStream,htru2,1.2847891237951305
+DenStream,cancer,0.2605869148188258
+DenStream,sepsissurvival,0.05129350988492165
+DenStream,electricity,0.1831143631082166
+DenStream,mirs,0.30826596095755887
+DenStream,yoga,0.09473384283059993
+DenStream,noaa,0.2002040629430708
+SWClustering,kddcup99,1.9424545334173478
+SWClustering,covertype,0.7487889876373639
+SWClustering,sensorstream,1.1185393291713488
+SWClustering,pokerhand,0.024247353212921707
+SWClustering,heartbeats,1.2915235461700716
+SWClustering,rialto,0.5286645607089822
+SWClustering,phiusiil,1.5686879584294624
+SWClustering,starlightcurves,1.4212269168346343
+SWClustering,har,1.0625787818895462
+SWClustering,pendigits,1.5071330581053295
+SWClustering,adult,0.0
+SWClustering,iabrupt,0.4083029546806536
+SWClustering,iincremental,0.31900772047188797
+SWClustering,ireocurring,0.5393066252447258
+SWClustering,igradual,0.5243093420301532
+SWClustering,iabruptreocurring,0.5784373123395892
+SWClustering,posture,0.34916775803293754
+SWClustering,smartmeter,0.31379280748302074
+SWClustering,uwave,0.5883852638114699
+SWClustering,asfault,0.6831266360451262
+SWClustering,powersupply,0.3798908243989505
+SWClustering,outdoor,1.1890484810857291
+SWClustering,gassensor,1.1755044801774104
+SWClustering,htru2,1.327543790638802
+SWClustering,cancer,0.18797977355476125
+SWClustering,sepsissurvival,0.09188441681814408
+SWClustering,electricity,0.19913070689074952
+SWClustering,mirs,0.27373944685468254
+SWClustering,yoga,0.08940033840152961
+SWClustering,noaa,0.2058293163705711
+D-Stream,kddcup99,1.9372713972537494
+D-Stream,covertype,0.6362970095205034
+D-Stream,sensorstream,0.7962156581384388
+D-Stream,pokerhand,0.027630792754855804
+D-Stream,heartbeats,0.23240200382172183
+D-Stream,rialto,0.3904153228044327
+D-Stream,phiusiil,0.0
+D-Stream,starlightcurves,1.3963269250178254
+D-Stream,har,1.1469679060793168
+D-Stream,pendigits,1.427415967291553
+D-Stream,adult,0.3639717509163187
+D-Stream,iabrupt,0.3100062601602096
+D-Stream,iincremental,0.2108041454358851
+D-Stream,ireocurring,0.2745579172377739
+D-Stream,igradual,0.3677679456171561
+D-Stream,iabruptreocurring,0.31318262340332725
+D-Stream,posture,0.1456966444836485
+D-Stream,smartmeter,0.4049561909255508
+D-Stream,uwave,0.5608467450982109
+D-Stream,asfault,0.4579653750726189
+D-Stream,powersupply,0.3718622930903166
+D-Stream,outdoor,1.1341387606603084
+D-Stream,gassensor,1.0632500272550203
+D-Stream,htru2,0.9220233233898876
+D-Stream,cancer,0.0
+D-Stream,sepsissurvival,0.08941196105496663
+D-Stream,electricity,0.12615006568663456
+D-Stream,mirs,0.21713488442641715
+D-Stream,yoga,0.15301548567362322
+D-Stream,noaa,0.0710064652687954
+EmCStream,kddcup99,1.855997101638991
+EmCStream,covertype,0.5307754790251793
+EmCStream,sensorstream,0.8158066238702175
+EmCStream,pokerhand,0.02088374059047826
+EmCStream,heartbeats,0.8567175966389757
+EmCStream,rialto,0.519370601589632
+EmCStream,phiusiil,1.165032252689009
+EmCStream,starlightcurves,1.3243723959434432
+EmCStream,har,1.371431115020136
+EmCStream,pendigits,1.678050417225148
+EmCStream,adult,0.4722439286605691
+EmCStream,iabrupt,0.41202069006905506
+EmCStream,iincremental,0.35530837118048053
+EmCStream,ireocurring,0.6559542400514147
+EmCStream,igradual,0.6567792664230165
+EmCStream,iabruptreocurring,0.6118039392397128
+EmCStream,posture,0.335459300849678
+EmCStream,smartmeter,0.6677986810878498
+EmCStream,uwave,0.590303142034339
+EmCStream,asfault,0.5693628823938659
+EmCStream,powersupply,0.37495796340267273
+EmCStream,outdoor,1.1964962498537193
+EmCStream,gassensor,1.0331045594895938
+EmCStream,htru2,1.2798664803851598
+EmCStream,cancer,0.1915640118207642
+EmCStream,sepsissurvival,0.10904708017911457
+EmCStream,electricity,0.16307764511347322
+EmCStream,mirs,0.33255123101926465
+EmCStream,yoga,0.14665577040075006
+EmCStream,noaa,0.2212114975367463
+GB-FuzzyStream,kddcup99,1.5890775600923464
+GB-FuzzyStream,covertype,0.7311603457372582
+GB-FuzzyStream,sensorstream,0.0
+GB-FuzzyStream,pokerhand,0.01932169374881898
+GB-FuzzyStream,heartbeats,1.0668605384913121
+GB-FuzzyStream,rialto,0.0
+GB-FuzzyStream,phiusiil,0.0
+GB-FuzzyStream,starlightcurves,1.3946849566717696
+GB-FuzzyStream,har,1.4012079400582527
+GB-FuzzyStream,pendigits,1.535805838293635
+GB-FuzzyStream,adult,0.3238446407679074
+GB-FuzzyStream,iabrupt,0.23825924754374883
+GB-FuzzyStream,iincremental,0.20624836130791202
+GB-FuzzyStream,ireocurring,0.3707627997959433
+GB-FuzzyStream,igradual,0.3878415613704269
+GB-FuzzyStream,iabruptreocurring,0.45988171196462213
+GB-FuzzyStream,posture,0.11667987874784891
+GB-FuzzyStream,smartmeter,0.0
+GB-FuzzyStream,uwave,0.5680090881703665
+GB-FuzzyStream,asfault,0.5311644452346476
+GB-FuzzyStream,powersupply,0.0
+GB-FuzzyStream,outdoor,1.2080126704428817
+GB-FuzzyStream,gassensor,1.2751260310616783
+GB-FuzzyStream,htru2,1.0720724220364253
+GB-FuzzyStream,cancer,0.29191903517567286
+GB-FuzzyStream,sepsissurvival,0.0
+GB-FuzzyStream,electricity,0.14089210390692775
+GB-FuzzyStream,mirs,0.0
+GB-FuzzyStream,yoga,0.15161040844214946
+GB-FuzzyStream,noaa,0.133333314120047
+STM-Stream,kddcup99,1.776442118480418
+STM-Stream,covertype,0.6924422249802791
+STM-Stream,sensorstream,1.0514280778139216
+STM-Stream,pokerhand,0.0017528081117614835
+STM-Stream,heartbeats,0.25719704252584896
+STM-Stream,rialto,0.5298835213076214
+STM-Stream,phiusiil,0.4012023094624211
+STM-Stream,starlightcurves,0.34706363351037384
+STM-Stream,har,0.40879804108816664
+STM-Stream,pendigits,0.9751365547317898
+STM-Stream,adult,0.19005819912269106
+STM-Stream,iabrupt,0.23865851827346019
+STM-Stream,iincremental,0.18739246618030858
+STM-Stream,ireocurring,0.3461110572171311
+STM-Stream,igradual,0.30427416902346893
+STM-Stream,iabruptreocurring,0.4299154792192035
+STM-Stream,posture,0.3039946542768306
+STM-Stream,smartmeter,0.29653585985282427
+STM-Stream,uwave,0.3219116733343681
+STM-Stream,asfault,0.3007360530314054
+STM-Stream,powersupply,0.3371762145227455
+STM-Stream,outdoor,1.134668024852533
+STM-Stream,gassensor,1.1940101688698608
+STM-Stream,htru2,0.8119814273536627
+STM-Stream,cancer,0.18933468589495206
+STM-Stream,sepsissurvival,0.08821357304942223
+STM-Stream,electricity,0.18964890822196523
+STM-Stream,mirs,0.2345311456672996
+STM-Stream,yoga,0.07185972423137077
+STM-Stream,noaa,0.18925649565539948
