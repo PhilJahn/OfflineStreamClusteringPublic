@@ -1,0 +1,2 @@
+full_mem,full_summary_mem,full_min_store_mem,full_time,full_num
+52007293,4001520,4005680,37.57448387145996,100

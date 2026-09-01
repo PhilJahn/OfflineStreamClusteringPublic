@@ -1,0 +1,2 @@
+full_mem,full_summary_mem,full_min_store_mem,full_time,full_num
+291590342,138867,53392,46561.25380182266,1000
