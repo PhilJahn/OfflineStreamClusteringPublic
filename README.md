@@ -200,6 +200,8 @@ The final results for all of our experiments are provided in ``result_evals/``.
 
 The rankings are then extracted with ```result_extractor.py```. These are provided in ``result_extracts/``, which provides score overviews and rankings for all relevant combinations. These are then utilized by the figure and table extractors.
 
+We provide our results in 
+
 ## Figures / Tables
 
 - Figure 1: Created with draw.io, content created with ``fig1_content.ipynb`` (see ``figure1_content/``)
