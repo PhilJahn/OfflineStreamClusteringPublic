@@ -209,7 +209,7 @@ https://zenodo.org/records/22238050 (DOI:https://doi.org/10.5281/zenodo.22238050
 
 The content is stored in .zip files and needs to be extracted into folders of the same name. The offline results had to be split into separate .zip-files. The file names need to be split along the ```-``` into subfolders.
 
-The scripts we sued to execute our experiments can be found in ``Scripts/``.
+The scripts we used to execute our experiments can be found in ``Scripts/``.
 
 ## Figures / Tables
 
