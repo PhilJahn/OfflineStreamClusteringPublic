@@ -242,4 +242,4 @@ GB-FuzzyStream: [GBFuzzyStream repository](https://github.com/xjnine/GBFuzzyStre
 
 BIRCH: [scikit-learn](https://github.com/scikit-learn/scikit-learn)
 
-SMAC3: []() (our modifications only restrict the to-file logging of SMAC3 to minimize FileIO during optimization)
+SMAC3: [SMAC3 repository](https://github.com/automl/smac3) (our modifications only restrict the to-file logging of SMAC3 to minimize FileIO during optimization)
