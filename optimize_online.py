@@ -262,13 +262,13 @@ if __name__ == '__main__':
     parser.add_argument('--ds', default="stream_densired", type=str,
                         help='Dataset')
     parser.add_argument('--online', default="full_batch", type=str, help='Online Summarization Method')
-    parser.add_argument('--batch_budget', default="1_logdim"
+    parser.add_argument('--batch_budget', default="300_logdim"
                         , type=str, help='SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--eval_size', default=1, type=int, help='Number of preceding batches to include in evaluation')
     parser.add_argument('--smac_seed', default=0, type=int, help='Seed for SMAC Optimization')
     parser.add_argument('--summary_limit', default=15000, type=int, help='Limit on Summary structures')
-    parser.add_argument('--memory_limit', default=None, type=int, help='Memory Limit in MB')
+    parser.add_argument('--memory_limit', default=8000, type=int, help='Memory Limit in MB')
     parser.add_argument('--trial_limit', default=1000, type=int, help='Maximum number of trials')
 
     args = parser.parse_args()

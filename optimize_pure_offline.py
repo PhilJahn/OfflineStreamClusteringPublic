@@ -154,7 +154,7 @@ if __name__ == '__main__':
     parser.add_argument('--ds', default="stream_densired", type=str,
                         help='Dataset')
     parser.add_argument('--offline', default="kmeans", type=str, help='Offline Clustering Method')
-    parser.add_argument('--batch_budget', default="1_logdim"
+    parser.add_argument('--batch_budget', default="900_logdim"
                         , type=str, help='SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--eval_size', default=1, type=int, help='Number of preceding batches to include in evaluation')

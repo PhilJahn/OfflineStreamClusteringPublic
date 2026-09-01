@@ -235,16 +235,16 @@ if __name__ == '__main__':
     parser.add_argument('--ds', default="stream_densired", type=str, help='Dataset')
     parser.add_argument('--online', default="dstream", type=str, help='Online Summarization Method')
     parser.add_argument('--offline', default="adjacency", type=str, help='Offline Clustering Method')
-    parser.add_argument('--online_batch_budget', default="1_logdim"
+    parser.add_argument('--online_batch_budget', default="300_logdim"
                         , type=str, help='Online SMAC AutoML Budget (in seconds per batch)')
-    parser.add_argument('--offline_batch_budget', default="1_logdim"
+    parser.add_argument('--offline_batch_budget', default="600_logdim"
                         , type=str, help='Offline SMAC AutoML Budget (in seconds per batch)')
 
     parser.add_argument('--eval_size', default=1, type=int, help='Number of preceding batches to include in evaluation')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--batch_id', default=0, type=int, help='Current batch for Offline Optimization (-1 for all)')
     parser.add_argument('--smac_seed', default=42, type=int, help='Seed for SMAC Optimization')
-    parser.add_argument('--memory_limit', default=None, type=int, help='Memory Limit in MB')
+    parser.add_argument('--memory_limit', default=8000, type=int, help='Memory Limit in MB')
     parser.add_argument('--trial_limit', default=1000, type=int, help='Maximum number of trials')
 
 
