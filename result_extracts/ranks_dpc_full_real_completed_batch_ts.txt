@@ -1,0 +1,343 @@
+online_method,dataset_name,rank_TS
+Full Batch,covertype,11.0
+Full Batch,pokerhand,17.0
+Full Batch,har,13.0
+Full Batch,pendigits,15.0
+Full Batch,adult,13.0
+Full Batch,iabrupt,13.0
+Full Batch,iincremental,15.0
+Full Batch,ireocurring,16.0
+Full Batch,igradual,17.0
+Full Batch,iabruptreocurring,15.0
+Full Batch,posture,15.0
+Full Batch,uwave,13.0
+Full Batch,asfault,17.0
+Full Batch,outdoor,17.0
+Full Batch,gassensor,18.0
+Full Batch,htru2,15.0
+Full Batch,yoga,7.0
+Full Batch,noaa,17.0
+Full Batch,electricity,13.0
+Random (Batch),covertype,16.0
+Random (Batch),pokerhand,4.0
+Random (Batch),har,8.0
+Random (Batch),pendigits,6.0
+Random (Batch),adult,12.0
+Random (Batch),iabrupt,9.0
+Random (Batch),iincremental,11.0
+Random (Batch),ireocurring,13.0
+Random (Batch),igradual,12.0
+Random (Batch),iabruptreocurring,9.0
+Random (Batch),posture,6.0
+Random (Batch),uwave,11.0
+Random (Batch),asfault,2.0
+Random (Batch),outdoor,18.0
+Random (Batch),gassensor,11.0
+Random (Batch),htru2,7.0
+Random (Batch),yoga,8.0
+Random (Batch),noaa,5.0
+Random (Batch),electricity,12.0
+LWC (Batch),covertype,12.0
+LWC (Batch),pokerhand,7.0
+LWC (Batch),har,12.0
+LWC (Batch),pendigits,10.0
+LWC (Batch),adult,10.0
+LWC (Batch),iabrupt,11.0
+LWC (Batch),iincremental,7.0
+LWC (Batch),ireocurring,10.0
+LWC (Batch),igradual,8.0
+LWC (Batch),iabruptreocurring,5.0
+LWC (Batch),posture,12.0
+LWC (Batch),uwave,9.0
+LWC (Batch),asfault,12.0
+LWC (Batch),outdoor,11.0
+LWC (Batch),gassensor,14.0
+LWC (Batch),htru2,10.0
+LWC (Batch),yoga,5.0
+LWC (Batch),noaa,8.0
+LWC (Batch),electricity,6.0
+k-Centroid (Batch),covertype,8.0
+k-Centroid (Batch),pokerhand,8.0
+k-Centroid (Batch),har,11.0
+k-Centroid (Batch),pendigits,3.0
+k-Centroid (Batch),adult,3.0
+k-Centroid (Batch),iabrupt,2.0
+k-Centroid (Batch),iincremental,3.0
+k-Centroid (Batch),ireocurring,2.0
+k-Centroid (Batch),igradual,5.0
+k-Centroid (Batch),iabruptreocurring,3.0
+k-Centroid (Batch),posture,4.0
+k-Centroid (Batch),uwave,1.0
+k-Centroid (Batch),asfault,13.0
+k-Centroid (Batch),outdoor,6.0
+k-Centroid (Batch),gassensor,10.0
+k-Centroid (Batch),htru2,8.0
+k-Centroid (Batch),yoga,13.0
+k-Centroid (Batch),noaa,10.0
+k-Centroid (Batch),electricity,7.0
+ProTraS (Batch),covertype,5.0
+ProTraS (Batch),pokerhand,11.0
+ProTraS (Batch),har,10.0
+ProTraS (Batch),pendigits,14.0
+ProTraS (Batch),adult,14.0
+ProTraS (Batch),iabrupt,14.0
+ProTraS (Batch),iincremental,14.0
+ProTraS (Batch),ireocurring,14.0
+ProTraS (Batch),igradual,14.0
+ProTraS (Batch),iabruptreocurring,14.0
+ProTraS (Batch),posture,11.0
+ProTraS (Batch),uwave,16.0
+ProTraS (Batch),asfault,11.0
+ProTraS (Batch),outdoor,14.0
+ProTraS (Batch),gassensor,16.0
+ProTraS (Batch),htru2,9.0
+ProTraS (Batch),yoga,9.0
+ProTraS (Batch),noaa,14.0
+ProTraS (Batch),electricity,14.0
+Random (Window),covertype,15.0
+Random (Window),pokerhand,6.0
+Random (Window),har,16.0
+Random (Window),pendigits,7.0
+Random (Window),adult,8.0
+Random (Window),iabrupt,10.0
+Random (Window),iincremental,10.0
+Random (Window),ireocurring,11.0
+Random (Window),igradual,9.0
+Random (Window),iabruptreocurring,6.0
+Random (Window),posture,7.0
+Random (Window),uwave,14.0
+Random (Window),asfault,14.0
+Random (Window),outdoor,12.0
+Random (Window),gassensor,13.0
+Random (Window),htru2,4.0
+Random (Window),yoga,17.0
+Random (Window),noaa,9.0
+Random (Window),electricity,10.0
+LWC (Window),covertype,13.0
+LWC (Window),pokerhand,3.0
+LWC (Window),har,17.0
+LWC (Window),pendigits,16.0
+LWC (Window),adult,5.0
+LWC (Window),iabrupt,7.0
+LWC (Window),iincremental,12.0
+LWC (Window),ireocurring,6.0
+LWC (Window),igradual,7.0
+LWC (Window),iabruptreocurring,8.0
+LWC (Window),posture,13.0
+LWC (Window),uwave,10.0
+LWC (Window),asfault,10.0
+LWC (Window),outdoor,15.0
+LWC (Window),gassensor,5.0
+LWC (Window),htru2,6.0
+LWC (Window),yoga,12.0
+LWC (Window),noaa,15.0
+LWC (Window),electricity,9.0
+k-Centroid (Window),covertype,7.0
+k-Centroid (Window),pokerhand,9.0
+k-Centroid (Window),har,5.0
+k-Centroid (Window),pendigits,5.0
+k-Centroid (Window),adult,4.0
+k-Centroid (Window),iabrupt,4.0
+k-Centroid (Window),iincremental,2.0
+k-Centroid (Window),ireocurring,4.0
+k-Centroid (Window),igradual,4.0
+k-Centroid (Window),iabruptreocurring,4.0
+k-Centroid (Window),posture,3.0
+k-Centroid (Window),uwave,5.0
+k-Centroid (Window),asfault,9.0
+k-Centroid (Window),outdoor,2.0
+k-Centroid (Window),gassensor,7.0
+k-Centroid (Window),htru2,16.0
+k-Centroid (Window),yoga,16.0
+k-Centroid (Window),noaa,7.0
+k-Centroid (Window),electricity,4.0
+ProTraS (Window),covertype,10.0
+ProTraS (Window),pokerhand,12.0
+ProTraS (Window),har,15.0
+ProTraS (Window),pendigits,17.0
+ProTraS (Window),adult,15.0
+ProTraS (Window),iabrupt,15.0
+ProTraS (Window),iincremental,13.0
+ProTraS (Window),ireocurring,15.0
+ProTraS (Window),igradual,10.0
+ProTraS (Window),iabruptreocurring,12.0
+ProTraS (Window),posture,10.0
+ProTraS (Window),uwave,7.0
+ProTraS (Window),asfault,15.0
+ProTraS (Window),outdoor,13.0
+ProTraS (Window),gassensor,9.0
+ProTraS (Window),htru2,11.0
+ProTraS (Window),yoga,11.0
+ProTraS (Window),noaa,6.0
+ProTraS (Window),electricity,16.0
+StreamKMeans,covertype,17.0
+StreamKMeans,pokerhand,1.0
+StreamKMeans,har,1.0
+StreamKMeans,pendigits,1.0
+StreamKMeans,adult,7.0
+StreamKMeans,iabrupt,3.0
+StreamKMeans,iincremental,9.0
+StreamKMeans,ireocurring,5.0
+StreamKMeans,igradual,11.0
+StreamKMeans,iabruptreocurring,7.0
+StreamKMeans,posture,8.0
+StreamKMeans,uwave,4.0
+StreamKMeans,asfault,1.0
+StreamKMeans,outdoor,4.0
+StreamKMeans,gassensor,1.0
+StreamKMeans,htru2,12.0
+StreamKMeans,yoga,3.0
+StreamKMeans,noaa,1.0
+StreamKMeans,electricity,1.0
+StreamKM++,covertype,14.0
+StreamKM++,pokerhand,13.0
+StreamKM++,har,9.0
+StreamKM++,pendigits,9.0
+StreamKM++,adult,6.0
+StreamKM++,iabrupt,12.0
+StreamKM++,iincremental,5.0
+StreamKM++,ireocurring,9.0
+StreamKM++,igradual,6.0
+StreamKM++,iabruptreocurring,11.0
+StreamKM++,posture,9.0
+StreamKM++,uwave,12.0
+StreamKM++,asfault,5.0
+StreamKM++,outdoor,10.0
+StreamKM++,gassensor,12.0
+StreamKM++,htru2,2.0
+StreamKM++,yoga,18.0
+StreamKM++,noaa,11.0
+StreamKM++,electricity,15.0
+BIRCH,covertype,1.0
+BIRCH,pokerhand,5.0
+BIRCH,har,3.0
+BIRCH,pendigits,4.0
+BIRCH,adult,9.0
+BIRCH,iabrupt,5.0
+BIRCH,iincremental,4.0
+BIRCH,ireocurring,8.0
+BIRCH,igradual,2.0
+BIRCH,iabruptreocurring,16.0
+BIRCH,posture,5.0
+BIRCH,uwave,2.0
+BIRCH,asfault,4.0
+BIRCH,outdoor,9.0
+BIRCH,gassensor,2.0
+BIRCH,htru2,3.0
+BIRCH,yoga,1.0
+BIRCH,noaa,13.0
+BIRCH,electricity,2.0
+CluStream,covertype,4.0
+CluStream,pokerhand,2.0
+CluStream,har,2.0
+CluStream,pendigits,13.0
+CluStream,adult,11.0
+CluStream,iabrupt,8.0
+CluStream,iincremental,8.0
+CluStream,ireocurring,12.0
+CluStream,igradual,13.0
+CluStream,iabruptreocurring,13.0
+CluStream,posture,2.0
+CluStream,uwave,8.0
+CluStream,asfault,6.0
+CluStream,outdoor,5.0
+CluStream,gassensor,6.0
+CluStream,htru2,13.0
+CluStream,yoga,15.0
+CluStream,noaa,2.0
+CluStream,electricity,8.0
+DenStream,covertype,6.0
+DenStream,pokerhand,14.0
+DenStream,har,6.0
+DenStream,pendigits,2.0
+DenStream,adult,2.0
+DenStream,iabrupt,1.0
+DenStream,iincremental,1.0
+DenStream,ireocurring,1.0
+DenStream,igradual,1.0
+DenStream,iabruptreocurring,2.0
+DenStream,posture,16.0
+DenStream,uwave,3.0
+DenStream,asfault,3.0
+DenStream,outdoor,7.0
+DenStream,gassensor,15.0
+DenStream,htru2,1.0
+DenStream,yoga,4.0
+DenStream,noaa,3.0
+DenStream,electricity,3.0
+SWClustering,covertype,3.0
+SWClustering,pokerhand,10.0
+SWClustering,har,7.0
+SWClustering,pendigits,8.0
+SWClustering,adult,18.0
+SWClustering,iabrupt,6.0
+SWClustering,iincremental,6.0
+SWClustering,ireocurring,7.0
+SWClustering,igradual,3.0
+SWClustering,iabruptreocurring,1.0
+SWClustering,posture,1.0
+SWClustering,uwave,6.0
+SWClustering,asfault,7.0
+SWClustering,outdoor,8.0
+SWClustering,gassensor,3.0
+SWClustering,htru2,5.0
+SWClustering,yoga,2.0
+SWClustering,noaa,12.0
+SWClustering,electricity,5.0
+D-Stream,covertype,2.0
+D-Stream,pokerhand,18.0
+D-Stream,har,14.0
+D-Stream,pendigits,12.0
+D-Stream,adult,17.0
+D-Stream,iabrupt,16.0
+D-Stream,iincremental,18.0
+D-Stream,ireocurring,3.0
+D-Stream,igradual,18.0
+D-Stream,iabruptreocurring,10.0
+D-Stream,posture,14.0
+D-Stream,uwave,18.0
+D-Stream,asfault,8.0
+D-Stream,outdoor,1.0
+D-Stream,gassensor,17.0
+D-Stream,htru2,18.0
+D-Stream,yoga,10.0
+D-Stream,noaa,4.0
+D-Stream,electricity,17.0
+GB-FuzzyStream,covertype,9.0
+GB-FuzzyStream,pokerhand,16.0
+GB-FuzzyStream,har,4.0
+GB-FuzzyStream,pendigits,11.0
+GB-FuzzyStream,adult,1.0
+GB-FuzzyStream,iabrupt,17.0
+GB-FuzzyStream,iincremental,17.0
+GB-FuzzyStream,ireocurring,18.0
+GB-FuzzyStream,igradual,16.0
+GB-FuzzyStream,iabruptreocurring,18.0
+GB-FuzzyStream,posture,18.0
+GB-FuzzyStream,uwave,17.0
+GB-FuzzyStream,asfault,16.0
+GB-FuzzyStream,outdoor,3.0
+GB-FuzzyStream,gassensor,4.0
+GB-FuzzyStream,htru2,14.0
+GB-FuzzyStream,yoga,14.0
+GB-FuzzyStream,noaa,16.0
+GB-FuzzyStream,electricity,11.0
+STM-Stream,covertype,18.0
+STM-Stream,pokerhand,15.0
+STM-Stream,har,18.0
+STM-Stream,pendigits,18.0
+STM-Stream,adult,16.0
+STM-Stream,iabrupt,18.0
+STM-Stream,iincremental,16.0
+STM-Stream,ireocurring,17.0
+STM-Stream,igradual,15.0
+STM-Stream,iabruptreocurring,17.0
+STM-Stream,posture,17.0
+STM-Stream,uwave,15.0
+STM-Stream,asfault,18.0
+STM-Stream,outdoor,16.0
+STM-Stream,gassensor,8.0
+STM-Stream,htru2,17.0
+STM-Stream,yoga,6.0
+STM-Stream,noaa,18.0
+STM-Stream,electricity,18.0

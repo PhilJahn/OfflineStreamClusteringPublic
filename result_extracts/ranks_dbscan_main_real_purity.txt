@@ -1,0 +1,511 @@
+online_method,dataset_name,rank_Purity
+Random (Batch),kddcup99,16.0
+Random (Batch),covertype,12.0
+Random (Batch),sensorstream,9.0
+Random (Batch),pokerhand,14.0
+Random (Batch),heartbeats,11.0
+Random (Batch),rialto,10.0
+Random (Batch),phiusiil,6.0
+Random (Batch),starlightcurves,15.0
+Random (Batch),har,7.0
+Random (Batch),pendigits,9.0
+Random (Batch),adult,5.0
+Random (Batch),iabrupt,12.0
+Random (Batch),iincremental,7.0
+Random (Batch),ireocurring,10.0
+Random (Batch),igradual,9.0
+Random (Batch),iabruptreocurring,8.0
+Random (Batch),posture,14.0
+Random (Batch),smartmeter,7.0
+Random (Batch),uwave,10.0
+Random (Batch),asfault,10.0
+Random (Batch),powersupply,10.0
+Random (Batch),outdoor,14.0
+Random (Batch),gassensor,14.0
+Random (Batch),htru2,8.0
+Random (Batch),cancer,10.0
+Random (Batch),sepsissurvival,15.0
+Random (Batch),electricity,12.0
+Random (Batch),mirs,5.0
+Random (Batch),yoga,9.0
+Random (Batch),noaa,7.0
+LWC (Batch),kddcup99,13.0
+LWC (Batch),covertype,9.0
+LWC (Batch),sensorstream,11.0
+LWC (Batch),pokerhand,12.0
+LWC (Batch),heartbeats,9.0
+LWC (Batch),rialto,12.0
+LWC (Batch),phiusiil,8.0
+LWC (Batch),starlightcurves,14.0
+LWC (Batch),har,1.0
+LWC (Batch),pendigits,12.0
+LWC (Batch),adult,2.0
+LWC (Batch),iabrupt,11.0
+LWC (Batch),iincremental,11.0
+LWC (Batch),ireocurring,12.0
+LWC (Batch),igradual,10.0
+LWC (Batch),iabruptreocurring,11.0
+LWC (Batch),posture,16.0
+LWC (Batch),smartmeter,11.0
+LWC (Batch),uwave,13.0
+LWC (Batch),asfault,14.0
+LWC (Batch),powersupply,9.0
+LWC (Batch),outdoor,13.0
+LWC (Batch),gassensor,11.0
+LWC (Batch),htru2,5.0
+LWC (Batch),cancer,9.0
+LWC (Batch),sepsissurvival,15.0
+LWC (Batch),electricity,14.0
+LWC (Batch),mirs,8.0
+LWC (Batch),yoga,3.0
+LWC (Batch),noaa,11.0
+k-Centroid (Batch),kddcup99,12.0
+k-Centroid (Batch),covertype,4.0
+k-Centroid (Batch),sensorstream,3.0
+k-Centroid (Batch),pokerhand,11.0
+k-Centroid (Batch),heartbeats,6.0
+k-Centroid (Batch),rialto,9.0
+k-Centroid (Batch),phiusiil,9.0
+k-Centroid (Batch),starlightcurves,12.0
+k-Centroid (Batch),har,4.0
+k-Centroid (Batch),pendigits,4.0
+k-Centroid (Batch),adult,8.0
+k-Centroid (Batch),iabrupt,8.0
+k-Centroid (Batch),iincremental,2.0
+k-Centroid (Batch),ireocurring,4.0
+k-Centroid (Batch),igradual,5.0
+k-Centroid (Batch),iabruptreocurring,7.0
+k-Centroid (Batch),posture,6.0
+k-Centroid (Batch),smartmeter,9.0
+k-Centroid (Batch),uwave,12.0
+k-Centroid (Batch),asfault,4.0
+k-Centroid (Batch),powersupply,6.0
+k-Centroid (Batch),outdoor,6.0
+k-Centroid (Batch),gassensor,12.0
+k-Centroid (Batch),htru2,12.0
+k-Centroid (Batch),cancer,3.0
+k-Centroid (Batch),sepsissurvival,8.0
+k-Centroid (Batch),electricity,11.0
+k-Centroid (Batch),mirs,10.0
+k-Centroid (Batch),yoga,4.0
+k-Centroid (Batch),noaa,5.0
+ProTraS (Batch),kddcup99,14.0
+ProTraS (Batch),covertype,7.0
+ProTraS (Batch),sensorstream,2.0
+ProTraS (Batch),pokerhand,8.0
+ProTraS (Batch),heartbeats,5.0
+ProTraS (Batch),rialto,5.0
+ProTraS (Batch),phiusiil,14.0
+ProTraS (Batch),starlightcurves,11.0
+ProTraS (Batch),har,13.0
+ProTraS (Batch),pendigits,13.0
+ProTraS (Batch),adult,6.0
+ProTraS (Batch),iabrupt,4.0
+ProTraS (Batch),iincremental,5.0
+ProTraS (Batch),ireocurring,7.0
+ProTraS (Batch),igradual,2.0
+ProTraS (Batch),iabruptreocurring,6.0
+ProTraS (Batch),posture,9.0
+ProTraS (Batch),smartmeter,12.0
+ProTraS (Batch),uwave,11.0
+ProTraS (Batch),asfault,12.0
+ProTraS (Batch),powersupply,7.0
+ProTraS (Batch),outdoor,4.0
+ProTraS (Batch),gassensor,15.0
+ProTraS (Batch),htru2,11.0
+ProTraS (Batch),cancer,4.0
+ProTraS (Batch),sepsissurvival,10.5
+ProTraS (Batch),electricity,15.0
+ProTraS (Batch),mirs,7.0
+ProTraS (Batch),yoga,6.0
+ProTraS (Batch),noaa,8.0
+Random (Window),kddcup99,6.0
+Random (Window),covertype,11.0
+Random (Window),sensorstream,8.0
+Random (Window),pokerhand,10.0
+Random (Window),heartbeats,13.0
+Random (Window),rialto,3.0
+Random (Window),phiusiil,7.0
+Random (Window),starlightcurves,9.0
+Random (Window),har,3.0
+Random (Window),pendigits,11.0
+Random (Window),adult,3.0
+Random (Window),iabrupt,7.0
+Random (Window),iincremental,10.0
+Random (Window),ireocurring,11.0
+Random (Window),igradual,8.0
+Random (Window),iabruptreocurring,9.0
+Random (Window),posture,12.0
+Random (Window),smartmeter,5.0
+Random (Window),uwave,4.0
+Random (Window),asfault,8.0
+Random (Window),powersupply,8.0
+Random (Window),outdoor,5.0
+Random (Window),gassensor,2.0
+Random (Window),htru2,6.0
+Random (Window),cancer,7.0
+Random (Window),sepsissurvival,10.5
+Random (Window),electricity,8.0
+Random (Window),mirs,9.0
+Random (Window),yoga,7.0
+Random (Window),noaa,10.0
+LWC (Window),kddcup99,1.0
+LWC (Window),covertype,8.0
+LWC (Window),sensorstream,10.0
+LWC (Window),pokerhand,13.0
+LWC (Window),heartbeats,12.0
+LWC (Window),rialto,4.0
+LWC (Window),phiusiil,5.0
+LWC (Window),starlightcurves,6.0
+LWC (Window),har,2.0
+LWC (Window),pendigits,7.0
+LWC (Window),adult,4.0
+LWC (Window),iabrupt,9.0
+LWC (Window),iincremental,8.0
+LWC (Window),ireocurring,8.0
+LWC (Window),igradual,4.0
+LWC (Window),iabruptreocurring,10.0
+LWC (Window),posture,15.0
+LWC (Window),smartmeter,4.0
+LWC (Window),uwave,6.0
+LWC (Window),asfault,3.0
+LWC (Window),powersupply,11.0
+LWC (Window),outdoor,9.0
+LWC (Window),gassensor,1.0
+LWC (Window),htru2,9.0
+LWC (Window),cancer,6.0
+LWC (Window),sepsissurvival,10.5
+LWC (Window),electricity,5.0
+LWC (Window),mirs,11.0
+LWC (Window),yoga,1.0
+LWC (Window),noaa,14.0
+k-Centroid (Window),kddcup99,2.0
+k-Centroid (Window),covertype,5.0
+k-Centroid (Window),sensorstream,5.0
+k-Centroid (Window),pokerhand,9.0
+k-Centroid (Window),heartbeats,3.0
+k-Centroid (Window),rialto,2.0
+k-Centroid (Window),phiusiil,10.0
+k-Centroid (Window),starlightcurves,2.0
+k-Centroid (Window),har,5.0
+k-Centroid (Window),pendigits,3.0
+k-Centroid (Window),adult,10.0
+k-Centroid (Window),iabrupt,2.0
+k-Centroid (Window),iincremental,1.0
+k-Centroid (Window),ireocurring,2.0
+k-Centroid (Window),igradual,3.0
+k-Centroid (Window),iabruptreocurring,4.0
+k-Centroid (Window),posture,4.0
+k-Centroid (Window),smartmeter,2.0
+k-Centroid (Window),uwave,3.0
+k-Centroid (Window),asfault,2.0
+k-Centroid (Window),powersupply,12.0
+k-Centroid (Window),outdoor,2.0
+k-Centroid (Window),gassensor,7.0
+k-Centroid (Window),htru2,13.0
+k-Centroid (Window),cancer,5.0
+k-Centroid (Window),sepsissurvival,15.0
+k-Centroid (Window),electricity,9.0
+k-Centroid (Window),mirs,6.0
+k-Centroid (Window),yoga,2.0
+k-Centroid (Window),noaa,9.0
+ProTraS (Window),kddcup99,5.0
+ProTraS (Window),covertype,6.0
+ProTraS (Window),sensorstream,1.0
+ProTraS (Window),pokerhand,7.0
+ProTraS (Window),heartbeats,2.0
+ProTraS (Window),rialto,1.0
+ProTraS (Window),phiusiil,11.0
+ProTraS (Window),starlightcurves,4.0
+ProTraS (Window),har,12.0
+ProTraS (Window),pendigits,14.0
+ProTraS (Window),adult,7.0
+ProTraS (Window),iabrupt,3.0
+ProTraS (Window),iincremental,3.0
+ProTraS (Window),ireocurring,6.0
+ProTraS (Window),igradual,1.0
+ProTraS (Window),iabruptreocurring,5.0
+ProTraS (Window),posture,8.0
+ProTraS (Window),smartmeter,6.0
+ProTraS (Window),uwave,2.0
+ProTraS (Window),asfault,6.0
+ProTraS (Window),powersupply,13.0
+ProTraS (Window),outdoor,3.0
+ProTraS (Window),gassensor,3.0
+ProTraS (Window),htru2,15.0
+ProTraS (Window),cancer,2.0
+ProTraS (Window),sepsissurvival,15.0
+ProTraS (Window),electricity,10.0
+ProTraS (Window),mirs,4.0
+ProTraS (Window),yoga,5.0
+ProTraS (Window),noaa,6.0
+StreamKMeans,kddcup99,9.0
+StreamKMeans,covertype,17.0
+StreamKMeans,sensorstream,16.0
+StreamKMeans,pokerhand,16.0
+StreamKMeans,heartbeats,15.0
+StreamKMeans,rialto,16.0
+StreamKMeans,phiusiil,4.0
+StreamKMeans,starlightcurves,13.0
+StreamKMeans,har,17.0
+StreamKMeans,pendigits,16.0
+StreamKMeans,adult,11.0
+StreamKMeans,iabrupt,16.0
+StreamKMeans,iincremental,14.0
+StreamKMeans,ireocurring,16.0
+StreamKMeans,igradual,14.0
+StreamKMeans,iabruptreocurring,16.0
+StreamKMeans,posture,1.0
+StreamKMeans,smartmeter,1.0
+StreamKMeans,uwave,14.0
+StreamKMeans,asfault,16.0
+StreamKMeans,powersupply,15.0
+StreamKMeans,outdoor,17.0
+StreamKMeans,gassensor,17.0
+StreamKMeans,htru2,4.0
+StreamKMeans,cancer,16.0
+StreamKMeans,sepsissurvival,10.5
+StreamKMeans,electricity,17.0
+StreamKMeans,mirs,15.0
+StreamKMeans,yoga,17.0
+StreamKMeans,noaa,17.0
+StreamKM++,kddcup99,4.0
+StreamKM++,covertype,15.0
+StreamKM++,sensorstream,13.0
+StreamKM++,pokerhand,4.0
+StreamKM++,heartbeats,8.0
+StreamKM++,rialto,11.0
+StreamKM++,phiusiil,3.0
+StreamKM++,starlightcurves,6.0
+StreamKM++,har,6.0
+StreamKM++,pendigits,6.0
+StreamKM++,adult,1.0
+StreamKM++,iabrupt,5.0
+StreamKM++,iincremental,4.0
+StreamKM++,ireocurring,1.0
+StreamKM++,igradual,6.0
+StreamKM++,iabruptreocurring,3.0
+StreamKM++,posture,11.0
+StreamKM++,smartmeter,10.0
+StreamKM++,uwave,7.0
+StreamKM++,asfault,9.0
+StreamKM++,powersupply,3.0
+StreamKM++,outdoor,7.0
+StreamKM++,gassensor,4.0
+StreamKM++,htru2,3.0
+StreamKM++,cancer,8.0
+StreamKM++,sepsissurvival,1.0
+StreamKM++,electricity,6.0
+StreamKM++,mirs,12.0
+StreamKM++,yoga,11.0
+StreamKM++,noaa,3.0
+BIRCH,kddcup99,3.0
+BIRCH,covertype,14.0
+BIRCH,sensorstream,14.0
+BIRCH,pokerhand,6.0
+BIRCH,heartbeats,1.0
+BIRCH,rialto,14.0
+BIRCH,phiusiil,1.0
+BIRCH,starlightcurves,6.0
+BIRCH,har,14.0
+BIRCH,pendigits,1.0
+BIRCH,adult,15.0
+BIRCH,iabrupt,6.0
+BIRCH,iincremental,13.0
+BIRCH,ireocurring,14.0
+BIRCH,igradual,12.0
+BIRCH,iabruptreocurring,15.0
+BIRCH,posture,10.0
+BIRCH,smartmeter,16.5
+BIRCH,uwave,9.0
+BIRCH,asfault,1.0
+BIRCH,powersupply,1.0
+BIRCH,outdoor,15.0
+BIRCH,gassensor,16.0
+BIRCH,htru2,2.0
+BIRCH,cancer,12.0
+BIRCH,sepsissurvival,3.0
+BIRCH,electricity,16.0
+BIRCH,mirs,2.0
+BIRCH,yoga,12.0
+BIRCH,noaa,4.0
+CluStream,kddcup99,10.0
+CluStream,covertype,2.0
+CluStream,sensorstream,4.0
+CluStream,pokerhand,15.0
+CluStream,heartbeats,14.0
+CluStream,rialto,7.0
+CluStream,phiusiil,13.0
+CluStream,starlightcurves,17.0
+CluStream,har,10.0
+CluStream,pendigits,8.0
+CluStream,adult,13.0
+CluStream,iabrupt,13.0
+CluStream,iincremental,6.0
+CluStream,ireocurring,15.0
+CluStream,igradual,7.0
+CluStream,iabruptreocurring,14.0
+CluStream,posture,2.0
+CluStream,smartmeter,8.0
+CluStream,uwave,15.0
+CluStream,asfault,7.0
+CluStream,powersupply,5.0
+CluStream,outdoor,12.0
+CluStream,gassensor,9.0
+CluStream,htru2,10.0
+CluStream,cancer,16.0
+CluStream,sepsissurvival,6.0
+CluStream,electricity,4.0
+CluStream,mirs,16.5
+CluStream,yoga,8.0
+CluStream,noaa,13.0
+DenStream,kddcup99,11.0
+DenStream,covertype,16.0
+DenStream,sensorstream,15.0
+DenStream,pokerhand,3.0
+DenStream,heartbeats,10.0
+DenStream,rialto,15.0
+DenStream,phiusiil,2.0
+DenStream,starlightcurves,10.0
+DenStream,har,11.0
+DenStream,pendigits,5.0
+DenStream,adult,16.0
+DenStream,iabrupt,1.0
+DenStream,iincremental,9.0
+DenStream,ireocurring,5.0
+DenStream,igradual,13.0
+DenStream,iabruptreocurring,1.0
+DenStream,posture,3.0
+DenStream,smartmeter,3.0
+DenStream,uwave,8.0
+DenStream,asfault,5.0
+DenStream,powersupply,2.0
+DenStream,outdoor,10.0
+DenStream,gassensor,6.0
+DenStream,htru2,1.0
+DenStream,cancer,14.0
+DenStream,sepsissurvival,2.0
+DenStream,electricity,13.0
+DenStream,mirs,1.0
+DenStream,yoga,14.0
+DenStream,noaa,2.0
+SWClustering,kddcup99,7.0
+SWClustering,covertype,3.0
+SWClustering,sensorstream,7.0
+SWClustering,pokerhand,5.0
+SWClustering,heartbeats,7.0
+SWClustering,rialto,6.0
+SWClustering,phiusiil,12.0
+SWClustering,starlightcurves,1.0
+SWClustering,har,9.0
+SWClustering,pendigits,10.0
+SWClustering,adult,17.0
+SWClustering,iabrupt,10.0
+SWClustering,iincremental,12.0
+SWClustering,ireocurring,9.0
+SWClustering,igradual,11.0
+SWClustering,iabruptreocurring,12.0
+SWClustering,posture,5.0
+SWClustering,smartmeter,14.0
+SWClustering,uwave,5.0
+SWClustering,asfault,13.0
+SWClustering,powersupply,4.0
+SWClustering,outdoor,8.0
+SWClustering,gassensor,8.0
+SWClustering,htru2,7.0
+SWClustering,cancer,11.0
+SWClustering,sepsissurvival,4.0
+SWClustering,electricity,3.0
+SWClustering,mirs,14.0
+SWClustering,yoga,13.0
+SWClustering,noaa,1.0
+D-Stream,kddcup99,8.0
+D-Stream,covertype,13.0
+D-Stream,sensorstream,12.0
+D-Stream,pokerhand,1.0
+D-Stream,heartbeats,17.0
+D-Stream,rialto,13.0
+D-Stream,phiusiil,16.5
+D-Stream,starlightcurves,8.0
+D-Stream,har,15.0
+D-Stream,pendigits,15.0
+D-Stream,adult,12.0
+D-Stream,iabrupt,17.0
+D-Stream,iincremental,16.0
+D-Stream,ireocurring,3.0
+D-Stream,igradual,16.0
+D-Stream,iabruptreocurring,2.0
+D-Stream,posture,17.0
+D-Stream,smartmeter,15.0
+D-Stream,uwave,16.0
+D-Stream,asfault,17.0
+D-Stream,powersupply,16.0
+D-Stream,outdoor,16.0
+D-Stream,gassensor,10.0
+D-Stream,htru2,16.0
+D-Stream,cancer,16.0
+D-Stream,sepsissurvival,5.0
+D-Stream,electricity,1.0
+D-Stream,mirs,13.0
+D-Stream,yoga,15.0
+D-Stream,noaa,16.0
+GB-FuzzyStream,kddcup99,17.0
+GB-FuzzyStream,covertype,1.0
+GB-FuzzyStream,sensorstream,17.0
+GB-FuzzyStream,pokerhand,2.0
+GB-FuzzyStream,heartbeats,4.0
+GB-FuzzyStream,rialto,17.0
+GB-FuzzyStream,phiusiil,16.5
+GB-FuzzyStream,starlightcurves,3.0
+GB-FuzzyStream,har,8.0
+GB-FuzzyStream,pendigits,2.0
+GB-FuzzyStream,adult,14.0
+GB-FuzzyStream,iabrupt,14.0
+GB-FuzzyStream,iincremental,15.0
+GB-FuzzyStream,ireocurring,13.0
+GB-FuzzyStream,igradual,15.0
+GB-FuzzyStream,iabruptreocurring,13.0
+GB-FuzzyStream,posture,7.0
+GB-FuzzyStream,smartmeter,16.5
+GB-FuzzyStream,uwave,1.0
+GB-FuzzyStream,asfault,11.0
+GB-FuzzyStream,powersupply,17.0
+GB-FuzzyStream,outdoor,1.0
+GB-FuzzyStream,gassensor,5.0
+GB-FuzzyStream,htru2,17.0
+GB-FuzzyStream,cancer,1.0
+GB-FuzzyStream,sepsissurvival,15.0
+GB-FuzzyStream,electricity,2.0
+GB-FuzzyStream,mirs,16.5
+GB-FuzzyStream,yoga,10.0
+GB-FuzzyStream,noaa,15.0
+STM-Stream,kddcup99,15.0
+STM-Stream,covertype,10.0
+STM-Stream,sensorstream,6.0
+STM-Stream,pokerhand,17.0
+STM-Stream,heartbeats,16.0
+STM-Stream,rialto,8.0
+STM-Stream,phiusiil,15.0
+STM-Stream,starlightcurves,16.0
+STM-Stream,har,16.0
+STM-Stream,pendigits,17.0
+STM-Stream,adult,9.0
+STM-Stream,iabrupt,15.0
+STM-Stream,iincremental,17.0
+STM-Stream,ireocurring,17.0
+STM-Stream,igradual,17.0
+STM-Stream,iabruptreocurring,17.0
+STM-Stream,posture,13.0
+STM-Stream,smartmeter,13.0
+STM-Stream,uwave,17.0
+STM-Stream,asfault,15.0
+STM-Stream,powersupply,14.0
+STM-Stream,outdoor,11.0
+STM-Stream,gassensor,13.0
+STM-Stream,htru2,14.0
+STM-Stream,cancer,13.0
+STM-Stream,sepsissurvival,7.0
+STM-Stream,electricity,7.0
+STM-Stream,mirs,3.0
+STM-Stream,yoga,16.0
+STM-Stream,noaa,12.0

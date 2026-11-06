@@ -1,0 +1,324 @@
+online_method,dataset_name,TS
+Random (Batch),covertype,-0.025944253601138403
+Random (Batch),pokerhand,0.20158707342938864
+Random (Batch),har,-0.05968289572186825
+Random (Batch),pendigits,0.13241907100119205
+Random (Batch),adult,0.19876016658959111
+Random (Batch),iabrupt,0.18072163338788289
+Random (Batch),iincremental,0.17317293119946273
+Random (Batch),ireocurring,0.18359564060355954
+Random (Batch),igradual,0.16998113463702286
+Random (Batch),iabruptreocurring,0.18460469900277604
+Random (Batch),posture,0.12220658853612242
+Random (Batch),uwave,0.10395748290465524
+Random (Batch),asfault,0.17811900459424457
+Random (Batch),outdoor,0.10185484314374456
+Random (Batch),gassensor,0.23138568877698734
+Random (Batch),htru2,0.03821361378157345
+Random (Batch),yoga,0.13707860159009502
+Random (Batch),noaa,0.15586783968710427
+Random (Batch),electricity,0.11111878826286466
+LWC (Batch),covertype,-0.02791616300486694
+LWC (Batch),pokerhand,0.20308103304929526
+LWC (Batch),har,-0.017883779867012665
+LWC (Batch),pendigits,0.1471211477046498
+LWC (Batch),adult,0.20121008754131312
+LWC (Batch),iabrupt,0.17737131203854067
+LWC (Batch),iincremental,0.17692734130300852
+LWC (Batch),ireocurring,0.18343992521756738
+LWC (Batch),igradual,0.18396401135736612
+LWC (Batch),iabruptreocurring,0.18332451086200346
+LWC (Batch),posture,0.11946808617858663
+LWC (Batch),uwave,0.13046517921739445
+LWC (Batch),asfault,0.17097504614182846
+LWC (Batch),outdoor,0.1189046825426529
+LWC (Batch),gassensor,0.23497151483068626
+LWC (Batch),htru2,0.11416183612598885
+LWC (Batch),yoga,0.11642542004157347
+LWC (Batch),noaa,0.13480409074349953
+LWC (Batch),electricity,0.10308953886191387
+k-Centroid (Batch),covertype,-0.09197136354353014
+k-Centroid (Batch),pokerhand,0.20797190967640963
+k-Centroid (Batch),har,-0.08712209837469442
+k-Centroid (Batch),pendigits,0.1379433467750713
+k-Centroid (Batch),adult,0.2184869912630439
+k-Centroid (Batch),iabrupt,0.18991415994298472
+k-Centroid (Batch),iincremental,0.18310597083388064
+k-Centroid (Batch),ireocurring,0.19682125482978324
+k-Centroid (Batch),igradual,0.1957945182431636
+k-Centroid (Batch),iabruptreocurring,0.19869981211555232
+k-Centroid (Batch),posture,0.14208961593266026
+k-Centroid (Batch),uwave,0.14548666032811539
+k-Centroid (Batch),asfault,0.20205989907914776
+k-Centroid (Batch),outdoor,0.06611026974022877
+k-Centroid (Batch),gassensor,0.19897619350792672
+k-Centroid (Batch),htru2,0.1530764661337026
+k-Centroid (Batch),yoga,0.14126611181733226
+k-Centroid (Batch),noaa,0.19609871301168763
+k-Centroid (Batch),electricity,0.0724245495477706
+ProTraS (Batch),covertype,-0.10984765837135559
+ProTraS (Batch),pokerhand,0.21110150904486344
+ProTraS (Batch),har,-0.0927886623967802
+ProTraS (Batch),pendigits,0.13521389626036873
+ProTraS (Batch),adult,0.1983006170537483
+ProTraS (Batch),iabrupt,0.1771692966479908
+ProTraS (Batch),iincremental,0.17228189940066024
+ProTraS (Batch),ireocurring,0.1841659294727816
+ProTraS (Batch),igradual,0.1802961301187176
+ProTraS (Batch),iabruptreocurring,0.1861722040560698
+ProTraS (Batch),posture,0.12266285672980119
+ProTraS (Batch),uwave,0.16015115754904996
+ProTraS (Batch),asfault,0.18437793238285702
+ProTraS (Batch),outdoor,0.007470286248852517
+ProTraS (Batch),gassensor,0.090453618387251
+ProTraS (Batch),htru2,0.10797867325565977
+ProTraS (Batch),yoga,0.09396231775128404
+ProTraS (Batch),noaa,0.2375333222806045
+ProTraS (Batch),electricity,0.10492286117842374
+Random (Window),covertype,-0.07186099721132734
+Random (Window),pokerhand,0.20282856818801337
+Random (Window),har,-0.05593436381572949
+Random (Window),pendigits,0.13525185805611273
+Random (Window),adult,0.19870215441512928
+Random (Window),iabrupt,0.17662947356365521
+Random (Window),iincremental,0.1744304087926199
+Random (Window),ireocurring,0.1829085804385455
+Random (Window),igradual,0.17535934388001867
+Random (Window),iabruptreocurring,0.18216387073795712
+Random (Window),posture,0.11726561522034692
+Random (Window),uwave,0.1425663078949885
+Random (Window),asfault,0.19664046512033218
+Random (Window),outdoor,0.08008486284241613
+Random (Window),gassensor,0.18433218899282894
+Random (Window),htru2,0.02162400509692765
+Random (Window),yoga,0.10782680252969394
+Random (Window),noaa,0.13917197047286742
+Random (Window),electricity,0.09029453393613678
+LWC (Window),covertype,-0.07100534300662692
+LWC (Window),pokerhand,0.20330374117892522
+LWC (Window),har,-0.06709190779275594
+LWC (Window),pendigits,0.14436529545404425
+LWC (Window),adult,0.20283901757933692
+LWC (Window),iabrupt,0.17995409578546012
+LWC (Window),iincremental,0.17249501375349752
+LWC (Window),ireocurring,0.18255795322868235
+LWC (Window),igradual,0.1720802832381064
+LWC (Window),iabruptreocurring,0.18780272767077902
+LWC (Window),posture,0.12650515816664765
+LWC (Window),uwave,0.10375596982517755
+LWC (Window),asfault,0.17931124651669267
+LWC (Window),outdoor,0.09691630508916936
+LWC (Window),gassensor,0.18783680433643415
+LWC (Window),htru2,0.09633325824786948
+LWC (Window),yoga,0.125371814648757
+LWC (Window),noaa,0.1646076086146391
+LWC (Window),electricity,0.10239615918914868
+k-Centroid (Window),covertype,-0.09098445762527761
+k-Centroid (Window),pokerhand,0.20865952569341006
+k-Centroid (Window),har,-0.048189049992099116
+k-Centroid (Window),pendigits,0.1266348242081619
+k-Centroid (Window),adult,0.21009767301061313
+k-Centroid (Window),iabrupt,0.1956814614076498
+k-Centroid (Window),iincremental,0.18205992910617286
+k-Centroid (Window),ireocurring,0.19647072409052024
+k-Centroid (Window),igradual,0.19775525363520602
+k-Centroid (Window),iabruptreocurring,0.20056356247803764
+k-Centroid (Window),posture,0.14321654724270783
+k-Centroid (Window),uwave,0.12997093998674966
+k-Centroid (Window),asfault,0.18929304456609605
+k-Centroid (Window),outdoor,0.11815272227109548
+k-Centroid (Window),gassensor,0.19865346803697653
+k-Centroid (Window),htru2,0.10745985644270145
+k-Centroid (Window),yoga,0.13495632000396737
+k-Centroid (Window),noaa,0.21709969508781804
+k-Centroid (Window),electricity,0.06281049667906483
+ProTraS (Window),covertype,-0.10783145918563838
+ProTraS (Window),pokerhand,0.21139437355800553
+ProTraS (Window),har,-0.07485064597122527
+ProTraS (Window),pendigits,0.14530343606918764
+ProTraS (Window),adult,0.2003983105303446
+ProTraS (Window),iabrupt,0.17653861446332278
+ProTraS (Window),iincremental,0.17695734975425859
+ProTraS (Window),ireocurring,0.1828597816695565
+ProTraS (Window),igradual,0.1776649165379823
+ProTraS (Window),iabruptreocurring,0.1863828680028193
+ProTraS (Window),posture,0.1178581420116063
+ProTraS (Window),uwave,0.13007010705219843
+ProTraS (Window),asfault,0.18223601249934426
+ProTraS (Window),outdoor,0.04734131540246434
+ProTraS (Window),gassensor,0.08507980473296678
+ProTraS (Window),htru2,0.12682255669150358
+ProTraS (Window),yoga,0.13180728246351903
+ProTraS (Window),noaa,0.2713624694382209
+ProTraS (Window),electricity,0.10356701893056176
+StreamKMeans,covertype,-0.06458424111184766
+StreamKMeans,pokerhand,0.14622592857921327
+StreamKMeans,har,0.14203220510118464
+StreamKMeans,pendigits,0.18032446635945412
+StreamKMeans,adult,0.27451732743216345
+StreamKMeans,iabrupt,0.24750899579189514
+StreamKMeans,iincremental,0.2569512834430565
+StreamKMeans,ireocurring,0.22760958687279878
+StreamKMeans,igradual,0.2023951585538069
+StreamKMeans,iabruptreocurring,0.2338472920529069
+StreamKMeans,posture,0.28035157380566084
+StreamKMeans,uwave,0.21214236673954187
+StreamKMeans,asfault,0.2178548385357912
+StreamKMeans,outdoor,0.3472713283410207
+StreamKMeans,gassensor,0.05931792713394141
+StreamKMeans,htru2,0.329540182583482
+StreamKMeans,yoga,0.15100262970558767
+StreamKMeans,noaa,0.24668073006383986
+StreamKMeans,electricity,0.13584610755586585
+StreamKM++,covertype,-0.01802268683474251
+StreamKM++,pokerhand,0.1407435331732266
+StreamKM++,har,-0.16316079838428907
+StreamKM++,pendigits,0.07307753229384603
+StreamKM++,adult,0.16804646481759264
+StreamKM++,iabrupt,0.15155398799296887
+StreamKM++,iincremental,0.15151607006268095
+StreamKM++,ireocurring,0.15414250860596676
+StreamKM++,igradual,0.16571724321406145
+StreamKM++,iabruptreocurring,0.15549862549422463
+StreamKM++,posture,-0.12807300313175846
+StreamKM++,uwave,0.11952019063131333
+StreamKM++,asfault,0.11442023947705574
+StreamKM++,outdoor,-0.0021098363035506914
+StreamKM++,gassensor,0.12231601652890822
+StreamKM++,htru2,-0.1178950185097795
+StreamKM++,yoga,0.06193584237178538
+StreamKM++,noaa,-0.12823764842127727
+StreamKM++,electricity,-0.11905227263325463
+BIRCH,covertype,0.2886572105971901
+BIRCH,pokerhand,0.1400404342091925
+BIRCH,har,0.054636507853121956
+BIRCH,pendigits,0.16465848468513244
+BIRCH,adult,0.2292873667678336
+BIRCH,iabrupt,0.1975669367320951
+BIRCH,iincremental,0.15357150059829727
+BIRCH,ireocurring,0.20231259948387836
+BIRCH,igradual,0.19142741477081368
+BIRCH,iabruptreocurring,0.19066276572038254
+BIRCH,posture,0.17286830373460518
+BIRCH,uwave,0.08910203397331402
+BIRCH,asfault,0.17628105594558258
+BIRCH,outdoor,0.15087871843356987
+BIRCH,gassensor,0.32618089006407325
+BIRCH,htru2,0.22797582114389126
+BIRCH,yoga,0.18597051102877035
+BIRCH,noaa,0.05592054894678464
+BIRCH,electricity,0.12928358778997143
+CluStream,covertype,-0.1752973693479484
+CluStream,pokerhand,0.22750277670831165
+CluStream,har,0.1234583205025748
+CluStream,pendigits,0.1399668414015574
+CluStream,adult,0.2262920096920043
+CluStream,iabrupt,0.211155367428456
+CluStream,iincremental,0.21753624537254498
+CluStream,ireocurring,0.21065593258077125
+CluStream,igradual,0.1982362946514091
+CluStream,iabruptreocurring,0.20827443083618427
+CluStream,posture,-0.06961042723340127
+CluStream,uwave,0.18377903086074096
+CluStream,asfault,0.24237418475759046
+CluStream,outdoor,0.11331243619673478
+CluStream,gassensor,0.11439497455639538
+CluStream,htru2,0.19099742564703345
+CluStream,yoga,0.17220350326601166
+CluStream,noaa,0.1663819630832887
+CluStream,electricity,-0.0982163420908318
+DenStream,covertype,0.10603182000479756
+DenStream,pokerhand,0.12839609100178528
+DenStream,har,-0.030835599160029068
+DenStream,pendigits,0.12737343725912773
+DenStream,adult,0.18701025961449427
+DenStream,iabrupt,0.16689577168616185
+DenStream,iincremental,0.17131756353996658
+DenStream,ireocurring,0.1750503308400716
+DenStream,igradual,0.1830067274612193
+DenStream,iabruptreocurring,0.17378347530146518
+DenStream,posture,-0.1335480950075772
+DenStream,uwave,0.16354054078200295
+DenStream,asfault,0.1909863096742666
+DenStream,outdoor,0.08482544034926641
+DenStream,gassensor,0.2226796354862116
+DenStream,htru2,0.23919798508813972
+DenStream,yoga,0.15167806622485613
+DenStream,noaa,-0.0641347180751438
+DenStream,electricity,0.16830570924278837
+SWClustering,covertype,-0.03720613135793296
+SWClustering,pokerhand,0.1430245586916491
+SWClustering,har,0.1829978594491381
+SWClustering,pendigits,0.1388211960667723
+SWClustering,adult,-0.006846203093698985
+SWClustering,iabrupt,0.19086013561839352
+SWClustering,iincremental,0.19879675970352628
+SWClustering,ireocurring,0.21286199519618268
+SWClustering,igradual,0.1979094228009662
+SWClustering,iabruptreocurring,0.24667952222749984
+SWClustering,posture,0.12197992277510651
+SWClustering,uwave,0.1688861937003539
+SWClustering,asfault,0.26056598159682987
+SWClustering,outdoor,0.018882978473576926
+SWClustering,gassensor,0.07299427204627254
+SWClustering,htru2,0.19326015635921037
+SWClustering,yoga,0.17977907063693568
+SWClustering,noaa,0.018347827078043995
+SWClustering,electricity,-0.22003432986694338
+D-Stream,covertype,0.10446068659306353
+D-Stream,pokerhand,0.11187726871534552
+D-Stream,har,-0.004433715946598355
+D-Stream,pendigits,-0.0108136432926829
+D-Stream,adult,-0.006846203093698985
+D-Stream,iabrupt,-0.010443689913016913
+D-Stream,iincremental,-0.01249802662737462
+D-Stream,ireocurring,-0.015598857761060713
+D-Stream,igradual,-0.020311526479750763
+D-Stream,iabruptreocurring,-0.018404136213251474
+D-Stream,posture,-0.011591558717995491
+D-Stream,uwave,-0.00023590469450342083
+D-Stream,asfault,-0.0226367258239768
+D-Stream,outdoor,-0.000857142857142842
+D-Stream,gassensor,-0.03418803418803418
+D-Stream,htru2,-0.09714023726288037
+D-Stream,yoga,-0.00015873015873015358
+D-Stream,noaa,-0.0031250864238502062
+D-Stream,electricity,-0.13895163433430774
+GB-FuzzyStream,covertype,-0.46337308614490924
+GB-FuzzyStream,pokerhand,0.1643997628532326
+GB-FuzzyStream,har,-0.28007248477712693
+GB-FuzzyStream,pendigits,-0.0108136432926829
+GB-FuzzyStream,adult,-0.006846203093698985
+GB-FuzzyStream,iabrupt,-0.010443689913016913
+GB-FuzzyStream,iincremental,-0.01249802662737462
+GB-FuzzyStream,ireocurring,-0.015598857761060713
+GB-FuzzyStream,igradual,-0.020311526479750763
+GB-FuzzyStream,iabruptreocurring,-0.018404136213251474
+GB-FuzzyStream,posture,-0.011591558717995491
+GB-FuzzyStream,uwave,-0.08003470106007739
+GB-FuzzyStream,asfault,-0.0226367258239768
+GB-FuzzyStream,outdoor,-0.23455330918981132
+GB-FuzzyStream,gassensor,-0.3817045562509925
+GB-FuzzyStream,htru2,-0.09714023726288037
+GB-FuzzyStream,yoga,-0.17499478288299777
+GB-FuzzyStream,noaa,-0.0031250864238502062
+GB-FuzzyStream,electricity,-0.13895163433430774
+STM-Stream,covertype,-0.29790202606728783
+STM-Stream,pokerhand,-0.0019858439714928147
+STM-Stream,har,0.07535915857358573
+STM-Stream,pendigits,0.15352072642488565
+STM-Stream,adult,0.19674690804865044
+STM-Stream,iabrupt,0.1806787627733465
+STM-Stream,iincremental,0.19514938542217522
+STM-Stream,ireocurring,0.18159333633781766
+STM-Stream,igradual,0.1891349304598196
+STM-Stream,iabruptreocurring,0.17006218373218737
+STM-Stream,posture,-0.048026311781359896
+STM-Stream,uwave,0.17236836586482107
+STM-Stream,asfault,0.04848928531093585
+STM-Stream,outdoor,-0.13267850388884478
+STM-Stream,gassensor,0.1080891243789025
+STM-Stream,htru2,0.09617674090567033
+STM-Stream,yoga,0.04627982875432506
+STM-Stream,noaa,0.035489221506204156
+STM-Stream,electricity,-0.22235979631922215
