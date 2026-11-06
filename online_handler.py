@@ -8,11 +8,12 @@ from dstream import DStream
 #from emcstream import EMCStream
 #from gbfuzzystream import GBFuzzyStream
 #from hddstream import HDDStream
-from original_implementations.EmCStream import OriginalEmcStream
+#from original_implementations.EmCStream import OriginalEmcStream
 from original_implementations.birch_sklearn import SklearnBirch
 from original_implementations.gbfuzzystream.MBStream import OriginalGBFuzzyStream
 from river_local.cluster.river_clustream import RiverCluStream
 from river_local.cluster.river_denstream import RiverDenStream
+#from river_local.cluster.river_denstream_postnorm import RiverDenStreamPostNorm
 from river_local.cluster.river_streamkmeans import RiverSTREAMKMeans
 from stmstream import STMStream
 #from streamkmeans import STREAMKmeans
@@ -68,20 +69,20 @@ def get_online_method(method, config_dict, seed):
         method = DStream(dim_grid_num=param_dict["dim_grid_num"], dim=param_dict["dim"],
                          value_ranges=param_dict["value_ranges"], cm=param_dict["cm"], cl=param_dict["cl"],
                          window=param_dict["window"], l=1 - param_dict["l"], beta=param_dict["beta"])
-    elif method == "emcstream":
-        param_dict = {"k": 10, "horizon": 1000, "init_num_factor": 2, "drift_num_factor": 5,
-                      "drift_num_factor_change": 1, "drift_inc_delay": 2, "consistency_threshold": 1.0,
-                      "consistency_drift": 0.001,
-                      "consistency_delay": 4} | config_dict
-        method = EMCStream(k=param_dict["k"], horizon=param_dict["horizon"],
-                           init_num_factor=param_dict["init_num_factor"],
-                           drift_num_factor=param_dict["drift_num_factor"],
-                           drift_num_factor_change=param_dict["drift_num_factor_change"],
-                           drift_inc_delay=param_dict["drift_inc_delay"],
-                           consistency_threshold=param_dict["consistency_threshold"],
-                           consistency_drift=param_dict["consistency_drift"],
-                           consistency_delay=param_dict["consistency_delay"],
-                           random_state=seed, verbose=False)
+    # elif method == "emcstream":
+    #     param_dict = {"k": 10, "horizon": 1000, "init_num_factor": 2, "drift_num_factor": 5,
+    #                   "drift_num_factor_change": 1, "drift_inc_delay": 2, "consistency_threshold": 1.0,
+    #                   "consistency_drift": 0.001,
+    #                   "consistency_delay": 4} | config_dict
+    #     method = EMCStream(k=param_dict["k"], horizon=param_dict["horizon"],
+    #                        init_num_factor=param_dict["init_num_factor"],
+    #                        drift_num_factor=param_dict["drift_num_factor"],
+    #                        drift_num_factor_change=param_dict["drift_num_factor_change"],
+    #                        drift_inc_delay=param_dict["drift_inc_delay"],
+    #                        consistency_threshold=param_dict["consistency_threshold"],
+    #                        consistency_drift=param_dict["consistency_drift"],
+    #                        consistency_delay=param_dict["consistency_delay"],
+    #                        random_state=seed, verbose=False)
     # elif method == "gbfuzzystream":
 
     #     param_dict = {"l": 0.2, "threshold": 0.3, "m": 2, "eps": 10, "dist": "euclidean", "window": 1000,
@@ -128,36 +129,41 @@ def get_online_method(method, config_dict, seed):
         method = RiverDenStream(decaying_factor=param_dict["l"], beta=param_dict["beta"], epsilon=param_dict["epsilon"],
                                 mu=param_dict["mu"], stream_speed=param_dict["stream_speed"],
                                 n_samples_init=param_dict["init_num"])
-
+    # elif method == "denstream_river_postnorm":
+    #     param_dict = {"init_num": 1000, "mu": 10, "beta": 0.2, "epsilon": 16.0, "l": 0.25,
+    #                   "stream_speed": 1000} | config_dict
+    #     method = RiverDenStreamPostNorm(decaying_factor=param_dict["l"], beta=param_dict["beta"], epsilon=param_dict["epsilon"],
+    #                             mu=param_dict["mu"], stream_speed=param_dict["stream_speed"],
+    #                             n_samples_init=param_dict["init_num"])
     elif method == "streamkmeans_river":
         param_dict = {"chunk_size": 1000, "prototype_num": 500, "mu": 0.5, "sigma": 0.5} | config_dict
         method = RiverSTREAMKMeans(n_clusters=param_dict["prototype_num"], chunk_size=param_dict["chunk_size"],
                                    mu=param_dict["mu"], sigma=param_dict["sigma"], seed=seed)
-    elif method == "emcstream_original":
-        param_dict = {"k": 10, "horizon": 1000, "consistency_threshold": 1.0, "consistency_drift": 0.001,
-                      "init_num_factor": 2, "drift_num_factor": 5, "drift_inc_delay": 4,
-                      "consistency_delay": 4} | config_dict
+    # elif method == "emcstream_original":
+    #     param_dict = {"k": 10, "horizon": 1000, "consistency_threshold": 1.0, "consistency_drift": 0.001,
+    #                   "init_num_factor": 2, "drift_num_factor": 5, "drift_inc_delay": 4,
+    #                   "consistency_delay": 4} | config_dict
+    #
+    #     method = OriginalEmcStream(k=param_dict["k"], horizon=param_dict["horizon"],
+    #                                ari_threshold=param_dict["consistency_threshold"],
+    #                                ari_threshold_step=param_dict["consistency_drift"],
+    #                                init_num_factor=param_dict["init_num_factor"],
+    #                                drift_num_factor=param_dict["drift_num_factor"],
+    #                                drift_inc_delay=param_dict["drift_inc_delay"],
+    #                                consistency_delay=param_dict["consistency_delay"], seed=seed)
 
-        method = OriginalEmcStream(k=param_dict["k"], horizon=param_dict["horizon"],
-                                   ari_threshold=param_dict["consistency_threshold"],
-                                   ari_threshold_step=param_dict["consistency_drift"],
-                                   init_num_factor=param_dict["init_num_factor"],
-                                   drift_num_factor=param_dict["drift_num_factor"],
-                                   drift_inc_delay=param_dict["drift_inc_delay"],
-                                   consistency_delay=param_dict["consistency_delay"], seed=seed)
-
-    elif method == "emcstream_mod":
-        param_dict = {"k": 10, "horizon": 1000, "consistency_threshold": 1.0, "consistency_drift": 0.001,
-                      "init_num_factor": 2, "drift_num_factor": 5, "drift_inc_delay": 4,
-                      "consistency_delay": 4} | config_dict
-
-        method = ModEmcStream(k=param_dict["k"], horizon=param_dict["horizon"],
-                                   ari_threshold=param_dict["consistency_threshold"],
-                                   ari_threshold_step=param_dict["consistency_drift"],
-                                   init_num_factor=param_dict["init_num_factor"],
-                                   drift_num_factor=param_dict["drift_num_factor"],
-                                   drift_inc_delay=param_dict["drift_inc_delay"],
-                                   consistency_delay=param_dict["consistency_delay"], seed=seed)
+    # elif method == "emcstream_mod":
+    #     param_dict = {"k": 10, "horizon": 1000, "consistency_threshold": 1.0, "consistency_drift": 0.001,
+    #                   "init_num_factor": 2, "drift_num_factor": 5, "drift_inc_delay": 4,
+    #                   "consistency_delay": 4} | config_dict
+    #
+    #     method = ModEmcStream(k=param_dict["k"], horizon=param_dict["horizon"],
+    #                                ari_threshold=param_dict["consistency_threshold"],
+    #                                ari_threshold_step=param_dict["consistency_drift"],
+    #                                init_num_factor=param_dict["init_num_factor"],
+    #                                drift_num_factor=param_dict["drift_num_factor"],
+    #                                drift_inc_delay=param_dict["drift_inc_delay"],
+    #                                consistency_delay=param_dict["consistency_delay"], seed=seed)
     elif method == "gbfuzzystream_original":
 
         param_dict = {"l": 0.2, "threshold": 0.3, "m": 2, "eps": 10, "dist": "euclidean", "window": 1000,

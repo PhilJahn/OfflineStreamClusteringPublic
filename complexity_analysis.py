@@ -7,7 +7,7 @@ from defines import online_method_names, online_colors, online_linestyles, main_
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--scaling', default="d", type=str, help='Scaling component')
+    parser.add_argument('--scaling', default="k", type=str, help='Scaling component')
     parser.add_argument('--resource', default="time", type=str, help='Resource to plot')
     args = parser.parse_args()
 

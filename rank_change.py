@@ -124,10 +124,10 @@ def make_rank_change_figure(first, first_score, second, second_score):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--first', default="online", type=str, help='First ranked aspect')
-    parser.add_argument('--first_score', default="batch_ts", type=str, help='Score for ranking of first aspect')
-    parser.add_argument('--second', default="seed_online", type=str, help='Second ranked aspect')
-    parser.add_argument('--second_score', default="batch_ts", type=str, help='Score for ranking of second aspect')
+    parser.add_argument('--first', default="seed_online", type=str, help='First ranked aspect')
+    parser.add_argument('--first_score', default="real_completed_purity", type=str, help='Score for ranking of first aspect')
+    parser.add_argument('--second', default="shade", type=str, help='Second ranked aspect')
+    parser.add_argument('--second_score', default="real_completed_offline_score", type=str, help='Score for ranking of second aspect')
     args = parser.parse_args()
 
 

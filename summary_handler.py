@@ -10,7 +10,8 @@ from online_handler import get_online_method
 def process_summary(online_alg, summary, batch_datapoints, eval_datapoints, batch_start_id, do_pseudoclustering):
     if online_alg in ["clustream", "denstream", "hddstream", "streamkmeans", "streamkmeans+", "streamkmplus",
                       "streamkmplus+", "birch", "swclustering", "swclustering+",
-                      "clustream_river", "denstream_river", "streamkmeans_river", "birch_sklearn"]:
+                      "clustream_river", "denstream_river", "denstream_river_postnorm",
+                      "streamkmeans_river", "birch_sklearn"]:
         if online_alg == "clustream":
             positions = np.array([mc.mean for mc in summary.values()])
             radii = np.array([mc.boundary for mc in summary.values()])
@@ -88,7 +89,7 @@ def process_summary(online_alg, summary, batch_datapoints, eval_datapoints, batc
             weights = np.array([mc.weight for mc in summary.values()])
             id_map = np.array(list(summary.keys()))
             status = np.array(["dense"] * len(weights))
-        elif online_alg == "denstream_river":
+        elif online_alg == "denstream_river" or online_alg == "denstream_river_postnorm":
 
             pmcs = summary["pmcs"]  # DenStream discards omcs for clustering
 
@@ -279,8 +280,8 @@ def process_summary(online_alg, summary, batch_datapoints, eval_datapoints, batc
         raise NotImplementedError(f"{online_alg} is not implemented.")
     min_store = {"id_map": id_map, "center": positions, "radii": radii, "weights": weights, "status": status}
     if do_pseudoclustering:
-        if online_alg in ["clustream", "denstream", "hddstream", "dstream", "gbfuzzystream",
-                          "stmstream", "stmstream+", "birch", "swclustering", "swclustering+",
+        if online_alg in ["clustream", "denstream", "denstream_river_postnorm", "hddstream", "dstream",
+                          "gbfuzzystream", "stmstream", "stmstream+", "birch", "swclustering", "swclustering+",
                           "clustream_river", "denstream_river", "gbfuzzystream_original", "birch_sklearn"]:  # connected components
 
             mc_dists = utils.distance_calc(positions, positions, dist="euclidean")

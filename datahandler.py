@@ -11,6 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from ucimlrepo import fetch_ucirepo
 
+from defines import complete_real_datasets
 from temporalsilhouette.TSindex import tempsil
 
 def read_file(dsname):
@@ -265,6 +266,8 @@ if __name__ == "__main__":
         "powersupply", "outdoor", "noaa", "gassensor", "rialto",
            "phiusiil", "sepsissurvival", "htru2"]
 
+    #dss = complete_real_datasets
+
     dss.sort()
 
     dss.append("stream_densired")
@@ -337,7 +340,7 @@ if __name__ == "__main__":
         #    timesum2 += budget
         #    print(f"Alt. Time: {timesum2}s, {timesum2 / 60:.2f}m, {timesum2 / 3600:.2f}h, {timesum2 / (3600 * 24):.2f}d")
 
-        category = "Synth." if ds in ["stream_densired"] else "Real"
+        category = "Synth." if ds in ["stream_densired", "rbf3"] else "Real"
 
         table_line = f"{ds} & & {category} & {len(label)} & {data.shape[1]} & {len(np.unique(label))} & {nochange_acc:.3f} & {budget / 3600:.2f}h\\\\"
         print(table_line, flush=True)
@@ -345,7 +348,7 @@ if __name__ == "__main__":
         ds_table_str += f'["{ds}"]={len(batch_ids)-2} '
 
     print(ds_table_str)
-
+    print(f"{timesum / 3600:.2f}h")
 ""
 
     # for ds in ["stream_densired", "rbf3", "har", "electricity", "insects_abrupt"]:

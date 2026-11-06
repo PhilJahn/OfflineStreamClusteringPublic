@@ -4,11 +4,12 @@ import os
 import numpy as np
 
 from defines import real_datasets, main_online_algorithms, full_online_algorithms, smaller_better_metrics, \
-    online_method_names, metric_names
+    online_method_names, metric_names, complete_real_datasets, all_online_algorithms
 from critdd import Diagram
 import pandas as pd
 
-def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
+def extract_results_to_file(offline, online_key, online_list, ds_key, ds_list, metric):
+    print(f"{offline}_{online_key}_{ds_key}_{metric}")
     result_store = {}
 
     substitution_ds = []
@@ -35,6 +36,8 @@ def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
                 results = np.load(store_name, allow_pickle=True).item()
                 if metric == "offline_score":
                     result_store[ds][online] = 2 - results["all"][metric]
+                elif metric in ["bop_score", "bop_score_summary", "bop_score_real"]:
+                    result_store[ds][online] = -1 * results["all"][metric]
                 else:
                     result_store[ds][online] = results["all"][metric]
             else:
@@ -80,7 +83,7 @@ def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
         for ds in ds_list:
             score_text += f"{online_name},{ds},{result_store[ds][online]}\n"
 
-    output_file_name = f"result_extracts/scores_{offline}_{online_key}_{metric}.txt"
+    output_file_name = f"result_extracts/scores_{offline}_{online_key}_{ds_key}_{metric}.txt"
     with open(output_file_name, "w") as f:
         f.write(score_text)
 
@@ -124,7 +127,7 @@ def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
         for ds in ds_list:
             ranks_text += f"{online_name},{ds},{ranks[online][ds]}\n"
 
-    output_file_name = f"result_extracts/ranks_{offline}_{online_key}_{metric}.txt"
+    output_file_name = f"result_extracts/ranks_{offline}_{online_key}_{ds_key}_{metric}.txt"
     with open(output_file_name, "w") as f:
         f.write(ranks_text)
 
@@ -134,7 +137,7 @@ def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
         os.makedirs("cd_figures/", exist_ok=True)
 
     diagram.to_file(
-        f"cd_figures/{offline}_{online_key}_{metric}_cd.pdf",
+        f"cd_figures/{offline}_{online_key}_{ds_key}_{metric}_cd.pdf",
         alpha=.05,
         adjustment="holm",
         reverse_x=True,
@@ -144,28 +147,39 @@ def extract_results_to_file(offline, online_key, online_list, ds_list, metric):
         tikzpicture_options = {"treatment label/.style": "font=\\large"}
     )
 
-    os.remove(f"cd_figures/{offline}_{online_key}_{metric}_cd.aux")
-    os.remove(f"cd_figures/{offline}_{online_key}_{metric}_cd.tex")
-    os.remove(f"cd_figures/{offline}_{online_key}_{metric}_cd.log")
+    os.remove(f"cd_figures/{offline}_{online_key}_{ds_key}_{metric}_cd.aux")
+    os.remove(f"cd_figures/{offline}_{online_key}_{ds_key}_{metric}_cd.tex")
+    os.remove(f"cd_figures/{offline}_{online_key}_{ds_key}_{metric}_cd.log")
 
 
 if __name__ == '__main__':
-    offline_algs = ["online", "seed_online", "kmeans", "dbscan", "dpc", "adjacency"]
+    offline_algs = ["seed_online", "online", "kmeans", "dbscan", "dpc", "adjacency", "shade"]
     online_algss = ["main", "full"]
-
-    extract_results_to_file("structure", "main", main_online_algorithms, real_datasets, "summary_ssil")
+    dsss = ["real_completed","real"]
+    structure_metrics = ["summary_ssil", "bop_score_real", "bop_score_summary", "bop_score", "summary_chi"]
+    for structure_metric in structure_metrics:
+        extract_results_to_file("structure", "main", main_online_algorithms, "real_completed", complete_real_datasets, structure_metric)
 
     for online_algs in online_algss:
         if online_algs == "main":
             online_alg_list = main_online_algorithms
+        elif online_algs == "all":
+            online_alg_list = all_online_algorithms
         else:
             online_alg_list = full_online_algorithms
-        for offline_alg in offline_algs:
-            if offline_alg == "online" or offline_alg == "seed_online":
-                metrics = ["purity", "batch_ts"]
+        for dss in dsss:
+            if dss == "real_completed":
+                dataset_list = complete_real_datasets
             else:
-                metrics = ["offline_score", "batch_ts"]
+                dataset_list = real_datasets
 
-            if (offline_alg != "online" and offline_alg != "seed_online") or online_algs != "full":
-                for metric in metrics:
-                    extract_results_to_file(offline_alg, online_algs, online_alg_list, real_datasets, metric)
+            for offline_alg in offline_algs:
+                if offline_alg == "online" or offline_alg == "seed_online":
+                    metrics = ["purity", "batch_ts", "offline_score"]
+                else:
+                    metrics = ["offline_score", "batch_ts", "purity"]
+
+                if (offline_alg != "online" and offline_alg != "seed_online") or online_algs != "full":
+                    if offline_alg != "shade" or dss != "real":
+                        for metric in metrics:
+                            extract_results_to_file(offline_alg, online_algs, online_alg_list, dss, dataset_list, metric)

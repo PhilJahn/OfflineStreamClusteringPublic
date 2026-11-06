@@ -214,7 +214,7 @@ def get_online_configspace(method, data_points, labels, args):
             river_clustream_2 = Integer("mmc", (1, 100), default=gt_cls_num)
         river_clustream_3 = Integer("window", (100, 2*args.batch), default=512)
         config_space.add([river_clustream_1, river_clustream_2, river_clustream_3])
-    elif method == "denstream_river":
+    elif method == "denstream_river" or method == "denstream_river_postnorm":
         denstream_1 = Constant("init_num", min(args.batch, 1000))
         denstream_2 = Integer("mu", (1, 100), default=10)
         denstream_3 = Float("beta", (0, 1), default=0.2)

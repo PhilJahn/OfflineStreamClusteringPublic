@@ -17,7 +17,6 @@ import online_handler
 import utils
 from clustpy.metrics import purity
 from datahandler import load_data
-#from denstream import FailedHeuristicError
 from online_config_handler import get_online_configspace
 from online_handler import get_online_method
 from original_implementations.birch_sklearn import TooManySummariesError
@@ -113,7 +112,7 @@ def online_runner(config: Configuration, result_tracker: Tracker, seed: int = 0)
                     #summaries[seed][batch] = summary
                     if online_method == "emcstream" or online_method == "emcstream_original" or online_method == "emcstream_mod":
                         summary_count = len(summary["labels"])
-                    elif online_method == "denstream" or online_method == "denstream_river":
+                    elif online_method == "denstream" or online_method == "denstream_river" or online_method == "denstream_river_postnorm":
                         summary_count = len(summary["pmcs"])
                     else:
                         summary_count = len(summary)
@@ -179,7 +178,7 @@ def online_runner(config: Configuration, result_tracker: Tracker, seed: int = 0)
         # check against expected exceptions due to hyperparam choice
         processed = False
         #print(traceback.format_exc(), flush=True)
-        if online_method == "denstream" or online_method == "denstream_river":
+        if online_method == "denstream" or online_method == "denstream_river" or online_method == "denstream_river_postnorm":
             if config["mu"] * config["beta"] <= 1: #or type(ex) is FailedHeuristicError:
                 final_score = np.inf
                 #print(traceback.format_exc(), flush=True)
@@ -261,14 +260,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ds', default="stream_densired", type=str,
                         help='Dataset')
-    parser.add_argument('--online', default="full_batch", type=str, help='Online Summarization Method')
-    parser.add_argument('--batch_budget', default="300_logdim"
+    parser.add_argument('--online', default="denstream_river_postnorm", type=str, help='Online Summarization Method')
+    parser.add_argument('--batch_budget', default="10_logdim"
                         , type=str, help='SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--batch', default=1000, type=int, help='Batch Size for Stream Evaluation')
     parser.add_argument('--eval_size', default=1, type=int, help='Number of preceding batches to include in evaluation')
     parser.add_argument('--smac_seed', default=0, type=int, help='Seed for SMAC Optimization')
     parser.add_argument('--summary_limit', default=15000, type=int, help='Limit on Summary structures')
-    parser.add_argument('--memory_limit', default=8000, type=int, help='Memory Limit in MB')
+    parser.add_argument('--memory_limit', default=None, type=int, help='Memory Limit in MB')
     parser.add_argument('--trial_limit', default=1000, type=int, help='Maximum number of trials')
 
     args = parser.parse_args()

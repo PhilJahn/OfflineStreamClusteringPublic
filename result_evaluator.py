@@ -111,6 +111,8 @@ def get_clustering(args):
             print(batch_id, best_s, best_score, best_optimized.replace("\n", ""), flush=True)
             if offline_alg == "kmeans":
                 seeds = list(range(10))
+            elif offline_alg == "shade":
+                seeds = list(range(3))
             else:
                 seeds = [0]
 
@@ -187,6 +189,8 @@ def get_clustering(args):
 
         if offline_alg == "kmeans":
             seeds = list(range(10))
+        elif offline_alg == "shade":
+            seeds = list(range(3))
         else:
             seeds = [0]
 
