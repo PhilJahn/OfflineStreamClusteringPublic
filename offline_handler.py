@@ -8,11 +8,15 @@ from sklearn.cluster import AgglomerativeClustering, KMeans, DBSCAN
 from sklearn.neighbors import kneighbors_graph
 
 import utils
+#from clustpy_muted.deep.dec import IDEC
+from clustpy_muted.deep.neural_networks.feedforward_autoencoder import FeedforwardAutoencoder
 from datahandler import load_data
 from density_peak_clustering import DensityPeakClustering
 #from offline.predecon import PreDeCon
 import numpy as np
 import pandas as pd
+
+from offline.SHADE.shade import SHADE
 
 
 def get_adjacency_clustering(positions, radii, status):
@@ -92,6 +96,48 @@ def get_summary_clustering(data_points, radii, weights, status, offline_method, 
     elif offline_method == "adjacency":
         start = time.time()
         clustering = get_adjacency_clustering(data_points, radii, status)
+        stop = time.time()
+    # elif offline_method == "idec":
+    #     if np.sum(np.ceil(weights)) <= 2000:
+    #         sample_indices = []
+    #         for i in range(len(weights)):
+    #             weight = weights[i]
+    #             sample_indices.extend([i] * int(np.ceil(weight)))
+    #         sample_indices = np.array(sample_indices)
+    #     else:
+    #         generator = np.random.default_rng(seed)
+    #         sample_indices = generator.choice(len(data_points), size=2000, p=np.array(weights)/sum(weights), replace=True)
+    #     sample_data = data_points[sample_indices]
+    #     #print(len(sample_data))
+    #     start = time.time()
+    #     device = "cpu"
+    #     config = {"n_clusters": 8, "embedding_size": min(10, len(data_points[0])), "clustering_loss_weight": 0.1, "alpha": 1, "plr": 1e-3, "clr": 1e-3, "device": device} | config_dict
+    #     network = (FeedforwardAutoencoder, {"layers": [len(data_points[0]), 512, 256, 128, config["embedding_size"]]})
+    #     idec = IDEC(n_clusters=config["n_clusters"], embedding_size=config["embedding_size"],
+    #                 clustering_loss_weight=config["clustering_loss_weight"], alpha=config["alpha"],
+    #                 pretrain_optimizer_params={"lr": config["plr"]}, clustering_optimizer_params={"lr": config["clr"]},
+    #                 device=config["device"], random_state=seed, neural_network=network)
+    #     clustering = idec.fit_predict(sample_data, None)
+    #     stop = time.time()
+    elif offline_method == "shade":
+        if np.sum(np.ceil(weights)) <= 2000:
+            sample_indices = []
+            for i in range(len(weights)):
+                weight = weights[i]
+                sample_indices.extend([i] * int(np.ceil(weight)))
+            sample_indices = np.array(sample_indices)
+        else:
+            generator = np.random.default_rng(seed)
+            sample_indices = generator.choice(len(data_points), size=2000, p=np.array(weights)/sum(weights), replace=True)
+        sample_data = data_points[sample_indices]
+        #print(len(sample_data))
+        start = time.time()
+        device = "cpu"
+        config = {"min_points": 5, "embedding_size": min(10, len(data_points[0])), "plr": 1e-3, "clr": 1e-3, "device": device} | config_dict
+        shade = SHADE(min_points=config["min_points"], embedding_size=config["embedding_size"],
+                      pretrain_optimizer_params={"lr": config["plr"]}, clustering_optimizer_params={"lr": config["clr"]},
+                      device=config["device"], random_state=seed)
+        clustering = shade.fit_predict(sample_data, None)
         stop = time.time()
     else:
         raise NotImplementedError

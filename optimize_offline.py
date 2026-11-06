@@ -33,6 +33,7 @@ global off_prefix
 
 
 non_deterministic_offline = ["kmeans"]
+non_deterministic_offline_slow = ["shade", "idec"]
 
 
 def offline_runner(config: Configuration, result_tracker: Tracker, seed: int = 0) -> float:
@@ -52,6 +53,8 @@ def offline_runner(config: Configuration, result_tracker: Tracker, seed: int = 0
         with time_limit(remaining_time):
             if offline_method in non_deterministic_offline:
                 offline_seeds = list(range(10))
+            elif offline_method in non_deterministic_offline_slow:
+                offline_seeds = list(range(3))
             else:
                 offline_seeds = [0]
             for seed in offline_seeds:
@@ -80,13 +83,14 @@ def offline_runner(config: Configuration, result_tracker: Tracker, seed: int = 0
         assertion_error_file.write("\n")
         assertion_error_file.write(traceback.format_exc())
         assertion_error_file.close()
-        # print(traceback.format_exc(), flush=True)
+        #print(traceback.format_exc(), flush=True)
         final_score = np.inf
         raise AssertionError
     # https://stackoverflow.com/questions/9823936/how-do-i-determine-what-type-of-exception-occurred
     except Exception as ex:
         # check against expected exceptions due to hyperparam choice
         processed = False
+        #print(traceback.format_exc(), flush=True)
         final_score = np.inf
         raise ex
     finally:
@@ -234,7 +238,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ds', default="stream_densired", type=str, help='Dataset')
     parser.add_argument('--online', default="dstream", type=str, help='Online Summarization Method')
-    parser.add_argument('--offline', default="adjacency", type=str, help='Offline Clustering Method')
+    parser.add_argument('--offline', default="shade", type=str, help='Offline Clustering Method')
     parser.add_argument('--online_batch_budget', default="300_logdim"
                         , type=str, help='Online SMAC AutoML Budget (in seconds per batch)')
     parser.add_argument('--offline_batch_budget', default="600_logdim"
@@ -250,7 +254,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.offline == "dbscan" and args.online in ["dstream", "denstream_river"]: # different DBSCAN handling for non-integer weights
+    if args.offline == "dbscan" and args.online in ["dstream", "denstream_river", "denstream_river_postnorm"]: # different DBSCAN handling for non-integer weights
         args.offline = "fdbscan"
 
     data_points, labels = load_data(args.ds, 0)

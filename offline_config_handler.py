@@ -73,7 +73,7 @@ def get_offline_configspace(method, summary_centers, weights, labels, args):
         else:
             dpc_2 = Float("distance_threshold", (0, max_distance), default=min(distance_threshold, max_distance))
         dpc_3 = Categorical("gaussian", [True, False], default=True)
-        if args.online not in ["denstream", "denstream_river", "dstream"]:
+        if args.online not in ["denstream", "denstream_river", "denstream_river_postnorm", "dstream"]:
             dpc_4 = Float("min_rho", (1, max_min_rho), default=max(1, min(min_rho, max_min_rho)))
         else:
             dpc_4 = Float("min_rho", (0, max_min_rho), default=max(0, min(min_rho, max_min_rho)))
@@ -108,6 +108,24 @@ def get_offline_configspace(method, summary_centers, weights, labels, args):
     #     if args.online in ["clustream", "denstream"]:
     #         adjacency_2 = Float("range", (1, 10), default=1)
     #         config_space.add([adjacency_2])
+    elif method == "idec":
+        max_num_clusters = min(100, len(summary_centers))
+        if max_num_clusters == 1:
+            idec_1 = Constant("n_clusters", 1)
+        else:
+            idec_1 = Integer("n_clusters", (1, max_num_clusters), default=min(max_num_clusters,gt_cls_num))
+        idec_2 = Float("alpha", (0.1, 2), default=1)
+        idec_3 = Float("clustering_loss_weight ", (0.1, 2), default=1)
+        idec_4 = Float("plr", (1e-5, 1e-1), default=1e-3, log=True)
+        idec_5 = Float("clr", (1e-5, 1e-1), default=1e-3, log=True)
+        idec_6 = Constant("device", "cpu")
+        config_space.add([idec_1, idec_2, idec_3, idec_4, idec_5, idec_6])
+    elif method == "shade":
+        shade_1 = Integer("min_points", (2, 100), default=5)
+        shade_2 = Float("plr", (1e-5, 1e-1), default=1e-3, log=True)
+        shade_3 = Float("clr", (1e-5, 1e-1), default=1e-3, log=True)
+        shade_4 = Constant("device", "cpu")
+        config_space.add([shade_1, shade_2, shade_3, shade_4])
     elif method != "adjacency":
         raise NotImplementedError(method)
     return config_space

@@ -32,7 +32,6 @@ Supported Online Methods:
 | streamkmeans_river      | StreamKMeans        |
 | birch_sklearn           | BIRCH               |
 | gbfuzzystream_original  | GB-FuzzyStream      |
-| emcstream_original      | EmCStream           |
 | dstream                 | D-Stream            |
 | stmstream               | STM-Stream          |
 | swclustering            | SWClustering        |
@@ -72,22 +71,6 @@ The optimization for the online phase is done with ```optimize_offline.py```. Th
 | --trial_limit          | Maximum number of trials (Default: 1000)                                                                             |
 | --eval_size            | Number of preceding batches to include in evaluation (Default: 1 [2 batches for evaluation])                         |
 
-The pure offline optimization is done with ```optimize_pure_offline```
-
-| **Parameter**    | **Function**                                                                                                         |
-|------------------|----------------------------------------------------------------------------------------------------------------------|
-| --ds             | Dataset                                                                                                              |
-| --offline        | Offline Method                                                                                                       |
-| --batch          | Evaluation batch size                                                                                                |
-| --batch_budget   | Duration in seconds per batch for (completed) online phase (Default: 900_logdim [900 seconds $\cdot log_{10}$ of d]) |
-| --batch_id       | Batch to optimize                                                                                                    |
-| --smac_seed      | Seed for SMAC                                                                                                        |
-| --memory_limit   | Memory Limit per configuration in MB (Default: 8000)                                                                 |
-| --trial_limit    | Maximum number of trials (Default: 1000)                                                                             |
-| --eval_size      | Number of preceding batches to include in evaluation (Default: 1 [2 batches for evaluation])                         |
-
-
-
 Supported Offline Methods:
 
 | **Key(s)** | **Method**                                                                            | 
@@ -97,6 +80,7 @@ Supported Offline Methods:
 | dpc        | Density Peak Clustering                                                               |
 | dbscan     | DBSCAN                                                                                |
 | fdbscan    | (Float) DBSCAN (weights and min-points multiplied by 100), for D-Stream and DenStream |
+| shade      |  SHADE                                                                                |
 
 
 ## Resource Evaluation
@@ -206,7 +190,7 @@ The rankings are then extracted with ```result_extractor.py```. These are provid
 We provide our results in the following Zenodo repositories:
 
 - https://zenodo.org/records/22235275 (DOI:https://doi.org/10.5281/zenodo.22235275)
-- https://zenodo.org/records/22238050 (DOI:https://doi.org/10.5281/zenodo.22238050)
+- https://zenodo.org/records/24000537 (DOI:https://doi.org/10.5281/zenodo.24000537)
 
 The content is stored in .zip files and needs to be extracted into folders of the same name. The offline results had to be split into separate .zip-files. The file names need to be split along the ```-``` into subfolders.
 
@@ -236,10 +220,12 @@ Code for specific methods were originally from:
 
 CluStream, DenStream, StreamKMeans: [River Stream learning repository](https://github.com/online-ml/river)
 
-EmCStream: [EmCStream repository](https://gitlab.com/alaettinzubaroglu/emcstream)
-
 GB-FuzzyStream: [GBFuzzyStream repository](https://github.com/xjnine/GBFuzzyStream/tree/master)
 
 BIRCH: [scikit-learn](https://github.com/scikit-learn/scikit-learn)
 
 SMAC3: [SMAC3 repository](https://github.com/automl/smac3) (our modifications only restrict the to-file logging of SMAC3 to minimize FileIO during optimization)
+
+SHADE: [SHADE repository](https://github.com/pasiweber/SHADE)
+
+ClustPy Autoencoder: [ClustPy](https://github.com/collinleiber/ClustPy) (our modifications disable the print-outs from tqdm)

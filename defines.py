@@ -108,14 +108,19 @@ dataset_names = {"stream_densired": "SDENS",
 main_online_algorithms = ["batch_random", "batch_lwc_square", "batch_kcentroid", "batch_protras",
                            "window_random", "window_lwc_square", "window_kcentroid", "window_protras",
                            "streamkmeans_river", "streamkmplus", "birch_sklearn", "clustream_river", "denstream_river", "swclustering",
-                           "dstream", "emcstream_original", "gbfuzzystream_original", "stmstream"]
+                           "dstream", "gbfuzzystream_original", "stmstream"]
 
 select_online_algorithms = ["batch_random", "batch_kcentroid",
                            "window_random", "window_kcentroid",
                            "streamkmeans_river", "birch_sklearn", "clustream_river", "denstream_river",
-                           "dstream", "emcstream_original", "gbfuzzystream_original", "stmstream"]
+                           "dstream", "gbfuzzystream_original", "stmstream"]
 
-full_online_algorithms = ["pure_offline", "full_batch", "batch_random", "batch_lwc_square", "batch_kcentroid", "batch_protras",
+full_online_algorithms = ["full_batch", "batch_random", "batch_lwc_square", "batch_kcentroid", "batch_protras",
+                           "window_random", "window_lwc_square", "window_kcentroid", "window_protras",
+                           "streamkmeans_river", "streamkmplus", "birch_sklearn", "clustream_river", "denstream_river", "swclustering",
+                           "dstream", "gbfuzzystream_original", "stmstream"]
+
+all_online_algorithms = ["full_batch", "batch_random", "batch_lwc_square", "batch_kcentroid", "batch_protras",
                            "window_random", "window_lwc_square", "window_kcentroid", "window_protras",
                            "streamkmeans_river", "streamkmplus", "birch_sklearn", "clustream_river", "denstream_river", "swclustering",
                            "dstream", "emcstream_original", "gbfuzzystream_original", "stmstream"]
@@ -126,18 +131,29 @@ synth_datasets = ["stream_densired", "rbf3"]
 all_datasets = copy(synth_datasets)
 all_datasets.extend(real_datasets)
 
+complete_real_datasets = ["covertype", "pokerhand", "har", "pendigits", "adult", "iabrupt", "iincremental", "ireocurring", "igradual", "iabruptreocurring", "posture", "uwave", "asfault", "outdoor", "gassensor", "htru2", "yoga", "noaa", "electricity"]
+
 smaller_better_metrics = ["davies_bouldin_score", "offline_score", "online_score"]
 
 metric_names = {"ari": "ARI", "accuracy": "Accuracy", "ami": "AMI", "purity": "Purity", "batch_ts": "TS",
                       "offline_score": "ARI+AMI", "clu_num": "q",
                       "cmm": "CMM", "cmm_alt": "CMM+", "fowlkes_mallows": "FMI", "nmi": "NMI",
                       "homogeneity": "HOM", "completeness": "COM", "fair_nmi": "FNMI", "variation_of_information": "VI",
-                      "davies_bouldin_score": "DBI", "calinski_harabasz_score": "CH", "disco": "DISCO",
-                        "simplified_silhouette": "SSIL", "summary_ssil": "SSIL"
+                      "davies_bouldin_score": "DBI", "calinski_harabasz_score": "CHI", "disco": "DISCO",
+                        "simplified_silhouette": "SSIL", "summary_ssil": "SSIL",
+                        "bop_score_real": "BoP$_{R}$", "bop_score_summary": "BoP$_{S}$", "bop_score": "BOP",
+                        "summary_chi": "CHI", "adjacency": "Adjacency"
                       }
 
-offline_colors = {"dbscan": "cyan", "dpc": "lavender", "kmeans": "silver", "adjacency": "gold"}
+corr_metric_names = {"purity": "Purity", "batch_ts": "TS",
+                      "offline_score": "Online\n(ARI+AMI)", "clu_num": "Count", "summary_ssil": "SSIL",
+                        "bop_score_real": "BoP$_{R}$", "bop_score_summary": "BoP$_{S}$", "bop_score": "BOP",
+                        "summary_chi": "CHI", "adjacency": "Adjacency\n(ARI+AMI)"
+                      }
+
+offline_colors = {"dbscan": "cyan", "dpc": "lavender", "kmeans": "silver", "adjacency": "gold", "shade": "orange", "online": "slategray"}
 
 if __name__ == "__main__":
     print(len(all_datasets))
     print(len(synth_datasets))
+    print(len(complete_real_datasets))
