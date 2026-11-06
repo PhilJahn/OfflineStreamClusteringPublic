@@ -1,6 +1,6 @@
-# Repository for Moving Off the Online Phase: Analyzing Summaries for Offline Phase Stream Clustering
+# Repository for Purely Misleading: Examining Purity Evaluation for Online-Offline Stream Clustering [Experiment, Analysis, and Benchmark]
 
-This repository contains the code for the VLDB 2027 submission "Moving Off the Online Phase: Analyzing Summaries for Offline Phase Stream Clustering [Experiment, Analysis & Benchmark]" by Philipp Jahn, Walid Durani, Collin Leiber and Thomas Seidl
+This repository contains the code for the ICDE 2027 submission "Purely Misleading: Examining Purity Evaluation for Online-Offline Stream Clustering [Experiment, Analysis, and Benchmark]" by Philipp Jahn, Walid Durani, Collin Leiber and Thomas Seidl
 
 ## Online Phase
 
