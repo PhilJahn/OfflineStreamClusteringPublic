@@ -146,7 +146,7 @@ metric_names = {"ari": "ARI", "accuracy": "Accuracy", "ami": "AMI", "purity": "P
                       }
 
 corr_metric_names = {"purity": "Purity", "batch_ts": "TS",
-                      "offline_score": "Online\n(ARI+AMI)", "clu_num": "Count", "summary_ssil": "SSIL",
+                      "offline_score": "Online\n(ARI+AMI)", "clu_num": "SS Count", "summary_ssil": "SSIL",
                         "bop_score_real": "BoP$_{R}$", "bop_score_summary": "BoP$_{S}$", "bop_score": "BOP",
                         "summary_chi": "CHI", "adjacency": "Adjacency\n(ARI+AMI)"
                       }
