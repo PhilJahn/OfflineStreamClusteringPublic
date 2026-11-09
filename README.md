@@ -193,6 +193,7 @@ We provide our results in the following Zenodo repositories:
 - https://zenodo.org/records/24000537 (DOI:https://doi.org/10.5281/zenodo.24000537)
 
 The content is stored in .zip files and needs to be extracted into folders of the same name. The offline results had to be split into separate .zip-files. The file names need to be split along the ```-``` into subfolders.
+The files for SHADE offline clustering are in their own separate .zip files.
 
 The scripts we used to execute our experiments can be found in ``Scripts/``.
 
@@ -200,19 +201,20 @@ Both worker-b and worker-c share the same hardware (AMD EPYC 9454 48-Core Proces
 
 ## Figures / Tables
 
-- Figure 1: Created with draw.io, content created with ``fig1_content.ipynb`` (see ``figure1_content/``)
+- Figure 1: Created with ``purity_motivation.py``
+- Figure 2: Created with draw.io, content created with ``fig1_content.ipynb`` (see ``figure1_content/``)
 - Table 1: Manual
-- Figure 2: Created with draw.io, content created with ``sampling_figure.py`` (see ``sampling_figure/``)
-- Figure 3: Created with ``sampling_figure.py`` (see ``sampling_figure/``)
+- Figure 3: Created with draw.io, content created with ``sampling_figure.py`` (see ``sampling_figure/``)
+- Figure 4: Created with ``sampling_figure.py`` (see ``sampling_figure/``)
 - Table 2: Created using the output of ``datahandler.py`` (prints to command line)
 - Table 3: Manual
 - Table 4: Manual
-- Table 5: Created with ``hpo_config_table.py`` (result is ``table_hpo_configs.txt``)
-- Performance Boxplots (Figures 5, 6, 7 (left side)): Created with ``rank_change.py`` (``--first/--first_score``: origin of arrow, ``--second/--second_score``: actual boxplot, without arrow (i.e., Figure 5): set both groups to the same) (see ``result_figures/``)
-- Critical Difference Diagrams (Figure 7 (right side)): Automatically created with ``result_extractor.py`` (see ``cd_figures/``)
-- Figure 8: Created with ``offline_analysis.py`` (see ``result_figures/``)
-- Table 6: Created with ``correlation_extractor.py`` (result is ``table_spearman.txt``)
-- Figure 9: Created with
+- Performance Boxplots (Figures 5, 6, 8 (left side), 10): Created with ``rank_change.py`` (``--first/--first_score``: origin of arrow, ``--second/--second_score``: actual boxplot, without arrow (i.e., Figure 5): set both groups to the same) (see ``result_figures/``)
+- Critical Difference Diagrams (Figure 8 (right side)): Automatically created with ``result_extractor.py`` (see ``cd_figures/``)
+- Figure 8: Created with ``purity_figure_maker.py``
+- Figure 9: Created with ``offline_analysis.py`` (see ``result_figures/``)
+- Figure 11: Created with ``correlation_figure_maker.py``
+- Figure 12: Created with ``complexity_analysis``
 
 ## External Code
 
