@@ -7,8 +7,8 @@ from defines import online_method_names, online_colors, online_linestyles, main_
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--scaling', default="k", type=str, help='Scaling component')
-    parser.add_argument('--resource', default="time", type=str, help='Resource to plot')
+    parser.add_argument('--scaling', default="n", type=str, help='Scaling component')
+    parser.add_argument('--resource', default="full_memory", type=str, help='Resource to plot')
     args = parser.parse_args()
 
     # https://phyletica.org/matplotlib-fonts/
@@ -85,7 +85,7 @@ if __name__ == "__main__":
             iterated_resources = np.array(ds)
 
         plt.fill_between(iterated_resources, results_mean[online] - results_std[online], results_mean[online] + results_std[online], alpha=0.2, color=online_colors[online])
-        plt.plot(iterated_resources, results_mean[online], label=online_method_names[online], color=online_colors[online], linestyle=online_linestyles[online], lw=3.5)
+        plt.plot(iterated_resources, results_mean[online], label=online_method_names[online], color=online_colors[online], linestyle=online_linestyles[online], lw=5)
         i += 1
     plt.xscale("log")
     plt.yscale("log")
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     plt.show()
     plt.figure(figsize=(10, 2))
     for key in main_online_algorithms:
-        plt.plot(0, 1000, label=online_method_names[key], color=online_colors[key], ls=online_linestyles[key], lw=2)
+        plt.plot(0, 1000, label=online_method_names[key], color=online_colors[key], ls=online_linestyles[key], lw=3)
     plt.legend(framealpha=1.0, edgecolor="black", ncols=4)
     plt.axis("off")
     plt.savefig("result_figures/scaling_legend.pdf", bbox_inches='tight')
